@@ -86,7 +86,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $match = substr($match,6,-7); // remove form wrap
         $lines = explode("\n",$match);
         $action = '';
-        $thanks = 'Data sent.';
+        $thanks = $this->getLang('thanks');
 
         // parse the lines into an command/argument array
         $cmds = array();
@@ -96,11 +96,11 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             $args = $this->_parse_line($line);
             $args[0] = strtolower($args[0]);
             if(!isset($this->argcheck[$args[0]])){
-                msg('Unknown type "'.hsc($args[0]).'"',-1);
+                msg(sprintf($this->getLang('e_unknowntype'),hsc($args[0])),-1);
                 continue;
             }
             if(count($args) < $this->argcheck[$args[0]]){
-                msg('Not enough arguments for '.hsc($args[0]).' '.hsc($args[1]),-1);
+                msg(sprintf($this->getLang('e_missingargs'),hsc($args[0]),hsc($args[1])),-1);
                 continue;
             }
 
@@ -150,7 +150,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
         if(!$action){
-            msg('No action defined - there is no target to send the data to',-1);
+            msg($this->getLang('e_noaction'),-1);
         }
 
         return array('data'=>$cmds,'action'=>$action,'thanks'=>$thanks);
@@ -171,7 +171,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                     $R->doc .= '<p>'.hsc($data['thanks']).'</p>';
                     return true;
                 }else{
-                    msg('Something went wrong with sending that data',-1);
+                    msg($this->getLang('e_mail'),-1);
                 }
             }
         }
@@ -193,7 +193,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 if($opt['optional']) continue;
                 if(in_array($opt['cmd'],$this->nofield)) continue;
                 $errors[$opt['idx']] = 1;
-                msg(hsc($opt['label']).' has to be filled',-1);
+                msg(sprintf($this->getLang('e_required'),hsc($opt['label'])),-1);
                 continue;
             }
             $value = $_POST['bureaucracy'][$opt['idx']];
@@ -201,35 +201,35 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             // regexp
             if($opt['re'] && !@preg_match('/'.$opt['re'].'/i',$value)){
                 $errors[$opt['idx']] = 1;
-                msg(hsc($opt['label']).' isn\'t valid (matched against /'.hsc($opt['re']).'/i)',-1);
+                msg(sprintf($this->getLang('e_match'),hsc($opt['label']),hsc($opt['re'])),-1);
                 continue;
             }
 
             // email
             if($opt['cmd'] == 'email' && !mail_isvalid($value)){
                 $errors[$opt['idx']] = 1;
-                msg(hsc($opt['label']).' needs to be a valid email address',-1);
+                msg(sprintf($this->getLang('e_email'),hsc($opt['label'])),-1);
                 continue;
             }
 
             // numbers
             if($opt['cmd'] == 'number' && !is_numeric($value)){
                 $errors[$opt['idx']] = 1;
-                msg(hsc($opt['label']).' has to be numeric',-1);
+                msg(sprintf($this->getLang('e_numeric'),hsc($opt['label'])),-1);
                 continue;
             }
 
             // min
             if(isset($opt['min']) && $value < $opt['min']){
                 $errors[$opt['idx']] = 1;
-                msg(hsc($opt['label']).' has to be at least '.hsc($opt['min']),-1);
+                msg(sprintf($this->getLang('e_min'),hsc($opt['label']),hsc($opt['min'])),-1);
                 continue;
             }
 
             // max
             if(isset($opt['max']) && $value > $opt['max']){
                 $errors[$opt['idx']] = 1;
-                msg(hsc($opt['label']).' has to be lower than '.hsc($opt['max']),-1);
+                msg(sprintf($this->getLang('e_max'),hsc($opt['label']),hsc($opt['max'])),-1);
                 continue;
             }
         }
@@ -244,8 +244,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         global $ID;
         global $conf;
 
-        $sub = 'Form submitted at '.$ID;
-        $txt = "The following data was submitted at page $ID\n\n\n";
+        $sub = sprintf($this->getLang('mailsubject'),$ID);
+        $txt = sprintf($this->getLang('mailintro')."\n\n\n",strftime($conf['dformat']));
         foreach($data as $opt){
             $value = $_POST['bureaucracy'][$opt['idx']];
 
