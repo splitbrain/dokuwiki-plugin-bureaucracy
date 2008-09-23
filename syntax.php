@@ -163,6 +163,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     function render($format, &$R, $data) {
         global $ID;
         if($format != 'xhtml') return false;
+        $R->info['cache'] = false; // don't cache
 
         $errors = array();
         if(isset($_POST['bureaucracy'])){
