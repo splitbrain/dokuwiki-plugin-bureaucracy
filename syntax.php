@@ -1,10 +1,9 @@
 <?php
 /**
- * Info Plugin: Displays information about various DokuWiki internals
+ * Bureaucracy Plugin: Creates forms and submits them via email
  *
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author     Andreas Gohr <andi@splitbrain.org>
- * @author     Esther Brunner <wikidesign@gmail.com>
  */
 // must be run within Dokuwiki
 if(!defined('DOKU_INC')) die();
@@ -43,8 +42,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         return array(
             'author' => 'Andreas Gohr',
             'email'  => 'andi@splitbrain.org',
-            'date'   => '2008-09-12',
-            'name'   => 'Info Plugin',
+            'date'   => '2008-09-23',
+            'name'   => 'Bureaucracy Plugin',
             'desc'   => 'A simple form generator/emailer',
             'url'    => 'http://dokuwiki.org/plugin:bureaucracy',
         );
@@ -139,8 +138,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 }elseif($arg[0] == '<'){
                     $opt['max'] = substr($arg,1);
                     if(!is_numeric($opt['max'])) unset($opt['max']);
-                }elseif($arg[0] == '~'){
-                    $opt['re'] = substr($arg,1);
+                }elseif($arg[0] == '/' && substr($arg,-1) == '/'){
+                    $opt['re'] = substr($arg,1,-1);
                 }elseif($arg == '!'){
                     $opt['optional'] = true;
                 }
@@ -198,6 +197,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 continue;
             }
             $value = $_POST['bureaucracy'][$opt['idx']];
+
+            // regexp
+            if($opt['re'] && !@preg_match('/'.$opt['re'].'/i',$value)){
+                $errors[$opt['idx']] = 1;
+                msg(hsc($opt['label']).' isn\'t valid (matched against /'.hsc($opt['re']).'/i)',-1);
+                continue;
+            }
 
             // email
             if($opt['cmd'] == 'email' && !mail_isvalid($value)){
