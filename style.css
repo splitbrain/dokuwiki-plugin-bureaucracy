@@ -1,0 +1,50 @@
+div.dokuwiki form#bureaucracy__plugin {
+    width: 100%;
+    text-align: center;
+}
+
+div.dokuwiki form#bureaucracy__plugin p {
+    font-size: 90%;
+    text-align: left;
+}
+
+div.dokuwiki form#bureaucracy__plugin fieldset {
+    width: 80%;
+}
+
+div.dokuwiki form#bureaucracy__plugin label {
+    display: block;
+    overflow: auto;
+    margin: 5px;
+}
+
+div.dokuwiki form#bureaucracy__plugin label span {
+    width: 48%;
+    text-align: right;
+    display: block;
+    float: left;
+}
+
+div.dokuwiki form#bureaucracy__plugin label input {
+    float: left;
+    margin-left: 5px;
+}
+
+div.dokuwiki form#bureaucracy__plugin label textarea.edit,
+div.dokuwiki form#bureaucracy__plugin label input.edit {
+    width: 48%;
+    display: block;
+    float: left;
+    margin-left: 5px;
+}
+
+div.dokuwiki form#bureaucracy__plugin label select {
+    display: block;
+    float: left;
+    margin-left: 5px;
+}
+
+
+div.dokuwiki form#bureaucracy__plugin label.bureaucracy_error span {
+    color: #f00;
+}
