@@ -88,6 +88,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $action = '';
         $thanks = $this->getLang('thanks');
 
+        $idx = 0;
         // parse the lines into an command/argument array
         $cmds = array();
         foreach($lines as $line){
@@ -120,7 +121,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             $opt = array();
             $opt['cmd']   = array_shift($args);
             $opt['label'] = array_shift($args);
-            $opt['idx']   = base64_encode($opt['label']);
+            $opt['idx']   = $idx++;
 
             // save addtional minimum args here
             $keep = $this->argcheck[$opt['cmd']]-2;
