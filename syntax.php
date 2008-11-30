@@ -42,7 +42,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         return array(
             'author' => 'Andreas Gohr',
             'email'  => 'andi@splitbrain.org',
-            'date'   => '2008-09-23',
+            'date'   => '2008-11-30',
             'name'   => 'Bureaucracy Plugin',
             'desc'   => 'A simple form generator/emailer',
             'url'    => 'http://dokuwiki.org/plugin:bureaucracy',
@@ -327,7 +327,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                     break;
                 case 'textarea':
                     $form->addElement('<label class="'.$class.'"><span>'.hsc($opt['label']).'</span>'.
-                                      '<textarea name="'.$name.'" class="edit">'.formText($value).'</textarea>');
+                                      '<textarea name="'.$name.'" class="edit">'.formText($value).'</textarea></label>');
                     break;
             }
         }
