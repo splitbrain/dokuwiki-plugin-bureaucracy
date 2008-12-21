@@ -31,6 +31,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                         'textarea'   => 2,
                         'action'     => 2,
                         'thanks'     => 2,
+                        'pagename'   => 2,
                         );
     // types that are no fields
     var $nofield = array('action','static','fieldset','submit','thanks');
@@ -86,7 +87,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $match = substr($match,6,-7); // remove form wrap
         $lines = explode("\n",$match);
         $action = '';
-        $thanks = $this->getLang('thanks');
+        $thanks = $this->getLang($action['type'].'_thanks');
+
 
         $idx = 0;
         // parse the lines into an command/argument array
@@ -107,7 +109,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
             // is action element?
             if($args[0] == 'action'){
-                $action = $args[1];
+                $action['type'] = $args[1];
+                $action['argv'] = $args[2];
                 continue;
             }
 
@@ -143,15 +146,19 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                     $opt['re'] = substr($arg,1,-1);
                 }elseif($arg == '!'){
                     $opt['optional'] = true;
+                }elseif($arg == '@'){
+                    $opt['pagename'] = true;
+                }elseif(preg_match('/x\d/', $arg)) {
+                    $opt['rows'] = substr($arg,1);
                 }
             }
-
 
             $cmds[] = $opt;
         }
 
-        if(!$action){
-            msg($this->getLang('e_noaction'),-1);
+        // check if action is available
+        if(!$action or !@file_exists(DOKU_PLUGIN.'bureaucracy/actions/' . $action['type'] . '.php')) {
+            msg(sprintf($this->getLang('e_noaction'), $action),-1);
         }
 
         return array('data'=>$cmds,'action'=>$action,'thanks'=>$thanks);
@@ -169,12 +176,17 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         if(isset($_POST['bureaucracy'])){
             $errors = $this->_checkpost($data['data']);
             if(!count($errors) && $data['action']){
-                if($this->_sendemail($data['data'],$data['action'])){
-                    $R->doc .= '<p>'.hsc($data['thanks']).'</p>';
+
+                require_once(DOKU_PLUGIN . 'bureaucracy/actions/actions.php');
+                require_once(DOKU_PLUGIN . 'bureaucracy/actions/' . $data['action']['type'] . '.php');
+                $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
+                $action = new $class();
+
+                if($action->run($data['data'], $data['thanks'], $data['action']['argv'], &$errors)) {
+                    $R->doc .= $action->success;
                     return true;
-                }else{
-                    msg($this->getLang('e_mail'),-1);
                 }
+
             }
         }
         $R->doc .= $this->_htmlform($data['data'],$errors);
@@ -198,6 +210,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 msg(sprintf($this->getLang('e_required'),hsc($opt['label'])),-1);
                 continue;
             }
+
             $value = $_POST['bureaucracy'][$opt['idx']];
 
             // regexp
@@ -237,32 +250,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
         return $errors;
-    }
-
-    /**
-     * Build a nice email from the submitted data and send it
-     */
-    function _sendemail($data,$to){
-        global $ID;
-        global $conf;
-
-        $sub = sprintf($this->getLang('mailsubject'),$ID);
-        $txt = sprintf($this->getLang('mailintro')."\n\n\n",strftime($conf['dformat']));
-        foreach($data as $opt){
-            $value = $_POST['bureaucracy'][$opt['idx']];
-
-            switch($opt['cmd']){
-                case 'fieldset':
-                    $txt .= "\n====== ".hsc($opt['label'])." ======\n\n";
-                    break;
-                default:
-                    if(in_array($opt['cmd'],$this->nofield)) break;
-                    $txt .= $opt['label']."\n";
-                    $txt .= "\t\t$value\n";
-            }
-        }
-
-        return mail_send($to, $sub, $txt, $conf['mailfrom']);
     }
 
     /**
@@ -326,8 +313,9 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                     $form->addElement('<p>'.hsc($opt['label']).'</p>');
                     break;
                 case 'textarea':
+                    $rows = ($opt['rows']) ? $opt['rows'] : 10;
                     $form->addElement('<label class="'.$class.'"><span>'.hsc($opt['label']).'</span>'.
-                                      '<textarea name="'.$name.'" class="edit">'.formText($value).'</textarea></label>');
+                                      '<textarea name="'.$name.'" rows="' . $rows . '" cols="10" class="edit">'.$value.'</textarea></label>');
                     break;
             }
         }

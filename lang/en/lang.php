@@ -12,7 +12,13 @@ $lang['e_numeric']     = '"%s" needs to be a number.';
 $lang['e_min']         = '"%s" needs to be greater than %s.';
 $lang['e_max']         = '"%s" needs to be less than %s.';
 
+$lang['e_pagename']    = 'Missing pagename';
+$lang['e_pageexists']  = 'The page "%s" exists already. Please choose a different pagename.';
+$lang['e_template']    = 'Could not read template "%s"';
+$lang['e_denied']	   = 'Your are not allowed to create this page, maybe you forgot to log in?';
 
-$lang['thanks']        = 'Your data was sent successfully. Thank you.';
 $lang['mailsubject']   = 'Form data submitted at %s';
 $lang['mailintro']     = 'The following data was submitted on %s.';
+
+$lang['sendemail_thanks'] = 'Your data was sent successfully. Thank you.';
+$lang['template_thanks']  = 'The page has been created, you can visit it here "%s"';
