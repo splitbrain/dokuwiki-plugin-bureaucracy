@@ -182,7 +182,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
                 $action = new $class();
 
-                if($action->run($data['data'], $data['thanks'], $data['action']['argv'], &$errors)) {
+                if($action->run($data['data'], $data['thanks'], $data['action']['argv'], $errors)) {
                     $R->doc .= $action->success;
                     return true;
                 }
