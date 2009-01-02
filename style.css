@@ -1,3 +1,10 @@
+div.dokuwiki div.bureaucracy__plugin {
+    width: 50%;
+    text-align: center;
+    font-size: 120%;
+    padding: 2em;
+}
+
 div.dokuwiki form#bureaucracy__plugin {
     width: 100%;
     text-align: center;

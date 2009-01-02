@@ -69,7 +69,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         }
 
         saveWikiText($this->pagename, $template, sprintf($this->getLang('summary'),$ID));
-        $this->success = sprintf($thanks, html_wikilink($this->pagename));
+        $this->success = $thanks.' '.html_wikilink($this->pagename);
         return true;
     }
 

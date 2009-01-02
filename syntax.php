@@ -87,8 +87,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $match = substr($match,6,-7); // remove form wrap
         $lines = explode("\n",$match);
         $action = array('type'=>'','argv'=>array());
-        $thanks = $this->getLang($action['type'].'_thanks');
-
+        $thanks = '';
 
         $idx = 0;
         // parse the lines into an command/argument array
@@ -162,6 +161,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         if(!$action['type'] or !@file_exists(DOKU_PLUGIN.'bureaucracy/actions/' . $action['type'] . '.php')) {
             msg(sprintf($this->getLang('e_noaction'), $action),-1);
         }
+        // set thank you message
+        if(!$thanks){
+            $thanks = $this->getLang($action['type'].'_thanks');
+        }else{
+            $thanks = hsc($thanks);
+        }
 
         return array('data'=>$cmds,'action'=>$action,'thanks'=>$thanks);
     }
@@ -185,7 +190,9 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $action = new $class();
 
                 if($action->run($data['data'], $data['thanks'], $data['action']['argv'], $errors)) {
+                    $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">';
                     $R->doc .= $action->success;
+                    $R->doc .= '</div>';
                     return true;
                 }
 

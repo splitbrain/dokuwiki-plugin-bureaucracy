@@ -1,18 +1,27 @@
 <?php
 
-$lang['e_unknowntype'] = 'Unbekannter Typ "%s"';
-$lang['e_missingargs'] = 'Nicht genug Argumente f&uuml;r %s %s';
-$lang['e_noaction']    = 'Keine Aktion definiert - wohin sollen die Daten gesendet werden?';
-$lang['e_mail']        = 'Beim Versenden der Daten ist ein Fehler augetreten';
+$lang['e_unknowntype']   = 'Unbekannter Typ "%s"';
+$lang['e_missingargs']   = 'Nicht genug Argumente für %s %s';
+$lang['e_noaction']      = 'Keine Aktion definiert - wohin sollen die Daten gesendet werden?';
+$lang['e_mail']          = 'Beim Versenden der Daten ist ein Fehler augetreten';
 
-$lang['e_required']    = '"%s" muss ausgef&uuml;llt werden.';
-$lang['e_match']       = '"%s" wurde nicht korrekt ausgef&uuml;llt. (&uuml;berpr&uuml;ft gegen /%s/)';
-$lang['e_email']       = '"%s" muss eine g&uuml;ltige E-Mail Adresse sein.';
-$lang['e_numeric']     = '"%s" muss eine Nummer sein.';
-$lang['e_min']         = '"%s" muss gr&ouml;&szlig;er sein als %s.';
-$lang['e_max']         = '"%s" muss weniger sein als %s.';
+$lang['e_required']      = '"%s" muss ausgefüllt werden.';
+$lang['e_match']         = '"%s" wurde nicht korrekt ausgefüllt. (überprüft gegen /%s/)';
+$lang['e_email']         = '"%s" muss eine gültige E-Mail Adresse sein.';
+$lang['e_numeric']       = '"%s" muss eine Nummer sein.';
+$lang['e_min']           = '"%s" muss größer sein als %s.';
+$lang['e_max']           = '"%s" muss kleiner sein als %s.';
 
+$lang['e_pagename']      = 'Seitenname nicht angegeben.';
+$lang['e_pageexists']    = 'Die Seite "%s" exisistiert bereits. Bitte wählen Sie einen anderen Namen.';
+$lang['e_template']      = 'Das Template konnte nicht geladen werden. Möglicherweise existiert es nicht oder Sie verfügen nicht über die benötigten Rechte.';
+$lang['e_denied']        = 'Sie sind nicht berechtigt diese Seite anzulegen. Haben Sie vielleicht vergessen sich anzumelden?';
 
-$lang['thanks']        = 'Ihre Daten wurden erfolgreich versandt. Vielen Dank.';
-$lang['mailsubject']   = 'Formulardaten &uuml;bermittelt auf %s';
-$lang['mailintro']     = 'Die folgenden Daten wurden &uuml;bermittelt am %s.';
+$lang['mailsubject']     = 'Formulardaten übermittelt auf %s';
+$lang['mailintro']       = 'Die folgenden Daten wurden übermittelt am %s.';
+
+$lang['mail_thanks']     = 'Ihre Daten wurden erfolgreich versandt. Vielen Dank.';
+$lang['template_thanks'] = 'Die Seite wurde angelegt, folgen Sie dem Link um die neue Seite aufzurufen.';
+
+$lang['summary']         = 'Created from the formular at %s';
+
