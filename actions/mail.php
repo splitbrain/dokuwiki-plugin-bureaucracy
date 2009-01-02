@@ -3,7 +3,7 @@
  * Action sendemail for DokuWiki plugin bureaucracy
  */
 
-class syntax_plugin_bureaucracy_action_sendemail extends syntax_plugin_bureaucracy_actions {
+class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_actions {
 
     /**
      * Build a nice email from the submitted data and send it
@@ -13,7 +13,7 @@ class syntax_plugin_bureaucracy_action_sendemail extends syntax_plugin_bureaucra
         global $conf;
 
         // get receipient address
-        $to = $argv;
+        $to = array_shift($argv);
 
         $sub = sprintf($this->getLang('mailsubject'),$ID);
         $txt = sprintf($this->getLang('mailintro')."\n\n\n",strftime($conf['dformat']));

@@ -13,11 +13,18 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
     function run($data, $thanks, $argv, $errors) {
 
+        $tpl = cleanID(array_shift($argv));
+
+        if(auth_quickaclcheck($tpl) < AUTH_READ){
+            msg(sprintf($this->getLang('e_template'), $tpl), -1);
+            return false;
+        }
+
         // fetch template
-        $template = rawWiki($argv);
+        $template = rawWiki($tpl);
 
         if(empty($template)) {
-            msg(sprintf($this->getLang('e_template'), $argv), -1);
+            msg(sprintf($this->getLang('e_template'), $tpl), -1);
             return false;
         }
 

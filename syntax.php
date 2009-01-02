@@ -86,7 +86,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     function handle($match, $state, $pos, &$handler){
         $match = substr($match,6,-7); // remove form wrap
         $lines = explode("\n",$match);
-        $action = '';
+        $action = array('type'=>'','argv'=>array());
         $thanks = $this->getLang($action['type'].'_thanks');
 
 
@@ -109,8 +109,9 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
             // is action element?
             if($args[0] == 'action'){
-                $action['type'] = $args[1];
-                $action['argv'] = $args[2];
+                array_shift($args);
+                $action['type'] = array_shift($args);
+                $action['argv'] = $args;
                 continue;
             }
 
@@ -157,7 +158,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
         // check if action is available
-        if(!$action or !@file_exists(DOKU_PLUGIN.'bureaucracy/actions/' . $action['type'] . '.php')) {
+        $action['type'] = preg_replace('/[^a-z]+/','',$action['type']);
+        if(!$action['type'] or !@file_exists(DOKU_PLUGIN.'bureaucracy/actions/' . $action['type'] . '.php')) {
             msg(sprintf($this->getLang('e_noaction'), $action),-1);
         }
 

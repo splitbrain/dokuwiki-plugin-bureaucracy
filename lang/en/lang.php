@@ -14,8 +14,8 @@ $lang['e_max']         = '"%s" needs to be less than %s.';
 
 $lang['e_pagename']    = 'Missing pagename';
 $lang['e_pageexists']  = 'The page "%s" exists already. Please choose a different pagename.';
-$lang['e_template']    = 'Could not read template "%s"';
-$lang['e_denied']	   = 'Your are not allowed to create this page, maybe you forgot to log in?';
+$lang['e_template']    = 'Could not read template "%s". Maybe it doesn\'t exist or you have no read permissions?';
+$lang['e_denied']      = 'Your are not allowed to create this page, maybe you forgot to log in?';
 
 $lang['mailsubject']   = 'Form data submitted at %s';
 $lang['mailintro']     = 'The following data was submitted on %s.';
