@@ -12,6 +12,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     var $pagename = null;
 
     function run($data, $thanks, $argv, $errors) {
+        global $ID;
 
         $tpl = cleanID(array_shift($argv));
 
@@ -49,7 +50,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                             msg(sprintf($this->getLang('e_pageexists'), html_wikilink($this->pagename)), -1);
                             $errors[$opt['idx']] = 1;
                             return false;
-                        } 
+                        }
                         if(auth_quickaclcheck($this->pagename) < AUTH_CREATE) {
                             msg($this->getLang('e_denied'), -1);
                             return false;
@@ -67,7 +68,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             return false;
         }
 
-        saveWikiText($this->pagename, $template, 'test');
+        saveWikiText($this->pagename, $template, sprintf($this->getLang('summary'),$ID));
         $this->success = sprintf($thanks, html_wikilink($this->pagename));
         return true;
     }
