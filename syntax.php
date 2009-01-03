@@ -31,7 +31,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                         'textarea'   => 2,
                         'action'     => 2,
                         'thanks'     => 2,
-                        'pagename'   => 2,
                         );
     // types that are no fields
     var $nofield = array('action','static','fieldset','submit','thanks');
@@ -43,7 +42,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         return array(
             'author' => 'Andreas Gohr',
             'email'  => 'andi@splitbrain.org',
-            'date'   => '2009-01-02',
+            'date'   => '2009-01-03',
             'name'   => 'Bureaucracy Plugin',
             'desc'   => 'A simple form generator/emailer',
             'url'    => 'http://dokuwiki.org/plugin:bureaucracy',
@@ -182,8 +181,14 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $errors = array();
         if(isset($_POST['bureaucracy'])){
             $errors = $this->_checkpost($data['data']);
-            if(!count($errors) && $data['action']){
+            // check CAPTCHA
+            $ok = true;
+            $helper = plugin_load('helper','captcha');
+            if(!is_null($helper) && $helper->isEnabled()){
+                $ok = $helper->check();
+            }
 
+            if($ok && !count($errors) && $data['action']){
                 require_once(DOKU_PLUGIN . 'bureaucracy/actions/actions.php');
                 require_once(DOKU_PLUGIN . 'bureaucracy/actions/' . $data['action']['type'] . '.php');
                 $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
@@ -270,6 +275,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $form = new Doku_Form('bureaucracy__plugin');
         $form->addHidden('id',$ID);
 
+        $captcha = false; // to make sure we add it only once
+
         foreach($data as $opt){
             if(isset($_POST['bureaucracy'][$opt['idx']])){
                 $value = $_POST['bureaucracy'][$opt['idx']];
@@ -295,7 +302,16 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                     $form->startFieldset($opt['label']);
                     break;
                 case 'submit':
-                     $form->addElement(form_makeButton('submit','', $opt['label']));
+                    //add captcha if available
+                    if(!$captcha){
+                        $captcha = true;
+                        $helper = plugin_load('helper','captcha');
+                        if(!is_null($helper) && $helper->isEnabled()){
+                            $form->addElement($helper->getHTML());
+                        }
+                    }
+
+                    $form->addElement(form_makeButton('submit','', $opt['label']));
                     break;
                 case 'password':
                     $form->addElement(form_makePasswordField($name,$opt['label'],'',$class));
