@@ -6,10 +6,6 @@
  */
 class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucracy_actions {
 
-    // tmp value used for textareas
-    var $value = '';
-
-    var $pagename = null;
 
     function run($data, $thanks, $argv, $errors) {
         global $ID;
@@ -29,47 +25,39 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             return false;
         }
 
-        // replace normal stuff first
+        $sep = '_'; //FIXME
+        $pagename = '';
+
+
+        // run through fields and do replacements
         foreach($data as $opt) {
-
             $value = $_POST['bureaucracy'][$opt['idx']];
-            $parts = (explode(' ', $opt['label']));
-            $label = strtoupper(trim($parts[0]));
-
-            switch($opt['cmd']) {
-                case 'textarea':
-                    $pattern = '/@@' . $label . '!@@(.*?@@LINE@@.*?)@@!' . $label . '@@/s';
-                    $this->value = $value;
-                    $template = preg_replace_callback($pattern, array($this, 'replace_callback'), $template);
-                    break;
-                default:
-                    if(in_array($opt['cmd'],$this->nofield)) break;
-                    if($opt['pagename']) {
-                        $this->pagename = cleanID($_POST['bureaucracy'][$opt['idx']]);
-                        if(page_exists($this->pagename)) {
-                            msg(sprintf($this->getLang('e_pageexists'), html_wikilink($this->pagename)), -1);
-                            $errors[$opt['idx']] = 1;
-                            return false;
-                        }
-                        if(auth_quickaclcheck($this->pagename) < AUTH_CREATE) {
-                            msg($this->getLang('e_denied'), -1);
-                            return false;
-                        }
-                    }
-                    $pattern = '/@@' . $label . '@@/';
-                    $template = preg_replace($pattern, $value, $template);
-                    break;
-            }
+            $label = preg_quote($opt['label']);
+            if(in_array($opt['cmd'],$this->nofield)) continue;
+            if($opt['pagename']) $pagename .= $sep . $value; // rmember values for pagename
+            $pattern = '/@@' . $label . '@@/i';
+            $template = preg_replace($pattern, $value, $template);
         }
 
-        // still no pagename die!
-        if(!$this->pagename) {
+        // check pagename
+        $pagename = cleanID($pagename);
+        if(!$pagename) {
             msg($this->getLang('e_pagename'), -1);
             return false;
         }
+        if(page_exists($pagename)) {
+            msg(sprintf($this->getLang('e_pageexists'), html_wikilink($pagename)), -1);
+            return false;
+        }
+        if(auth_quickaclcheck($pagename) < AUTH_CREATE) {
+            msg($this->getLang('e_denied'), -1);
+            return false;
+        }
 
-        saveWikiText($this->pagename, $template, sprintf($this->getLang('summary'),$ID));
-        $this->success = $thanks.' '.html_wikilink($this->pagename);
+        // still no pagename die!
+
+        saveWikiText($pagename, $template, sprintf($this->getLang('summary'),$ID));
+        $this->success = $thanks.' '.html_wikilink($pagename);
         return true;
     }
 

@@ -43,7 +43,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         return array(
             'author' => 'Andreas Gohr',
             'email'  => 'andi@splitbrain.org',
-            'date'   => '2008-11-30',
+            'date'   => '2009-01-02',
             'name'   => 'Bureaucracy Plugin',
             'desc'   => 'A simple form generator/emailer',
             'url'    => 'http://dokuwiki.org/plugin:bureaucracy',
