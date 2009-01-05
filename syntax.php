@@ -42,7 +42,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         return array(
             'author' => 'Andreas Gohr',
             'email'  => 'andi@splitbrain.org',
-            'date'   => '2009-01-03',
+            'date'   => '2009-01-05',
             'name'   => 'Bureaucracy Plugin',
             'desc'   => 'A simple form generator/emailer',
             'url'    => 'http://dokuwiki.org/plugin:bureaucracy',
@@ -194,9 +194,10 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
                 $action = new $class();
 
-                if($action->run($data['data'], $data['thanks'], $data['action']['argv'], $errors)) {
+                $success = $action->run($data['data'], $data['thanks'], $data['action']['argv'], $errors);
+                if($success) {
                     $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">';
-                    $R->doc .= $action->success;
+                    $R->doc .= $success;
                     $R->doc .= '</div>';
                     return true;
                 }
