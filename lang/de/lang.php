@@ -17,8 +17,8 @@ $lang['e_pageexists']    = 'Die Seite "%s" exisistiert bereits. Bitte wählen Si
 $lang['e_template']      = 'Das Template konnte nicht geladen werden. Möglicherweise existiert es nicht oder Sie verfügen nicht über die benötigten Rechte.';
 $lang['e_denied']        = 'Sie sind nicht berechtigt diese Seite anzulegen. Haben Sie vielleicht vergessen sich anzumelden?';
 
-$lang['mailsubject']     = 'Formulardaten übermittelt auf %s';
-$lang['mailintro']       = 'Die folgenden Daten wurden übermittelt am %s.';
+$lang['mailsubject']     = 'Formulardaten übermittelt von %s';
+$lang['mailintro']       = 'Die folgenden Daten wurden am %s abgeschickt.';
 
 $lang['mail_thanks']     = 'Ihre Daten wurden erfolgreich versandt. Vielen Dank.';
 $lang['template_thanks'] = 'Die Seite wurde angelegt, folgen Sie dem Link um die neue Seite aufzurufen.';
