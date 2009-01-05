@@ -16,22 +16,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $sep = array_shift($argv); // used for combining pagename parts
         if(is_null($sep)) $sep = $conf['sepchar'];
 
-        if(auth_quickaclcheck($tpl) < AUTH_READ){
-            msg(sprintf($this->getLang('e_template'), $tpl), -1);
-            return false;
-        }
-
-        // fetch template
-        $template = rawWiki($tpl);
-
-        if(empty($template)) {
-            msg(sprintf($this->getLang('e_template'), $tpl), -1);
-            return false;
-        }
 
         $pagename = '';
+        $patterns = array();
+        $values   = array();
 
-        // run through fields and do replacements
+        // run through fields and prepare replacements
         foreach($data as $opt) {
             $value = $_POST['bureaucracy'][$opt['idx']];
             $label = preg_quote($opt['label']);
@@ -44,8 +34,8 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $name = str_replace(':',' ',$name);
                 $pagename .= $sep . $name;
             }
-            $pattern = '/@@' . $label . '@@/i';
-            $template = preg_replace($pattern, $value, $template);
+            $patterns[] = '/(@@|##)'.$label.'(@@|##)/i';
+            $values[]   = $value;
         }
 
         // check pagename
@@ -64,20 +54,31 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             return false;
         }
 
+        // get template
+        if($tpl == ''){
+            // use namespace template
+            $template = pageTemplate(array($pagename));
+        }else{
+            $tpl = cleanID($tpl);
+            if(auth_quickaclcheck($tpl) < AUTH_READ){
+                msg(sprintf($this->getLang('e_template'), $tpl), -1);
+                return false;
+            }
+            // fetch template
+            $template = rawWiki($tpl);
+        }
+        if(empty($template)) {
+            msg(sprintf($this->getLang('e_template'), $tpl), -1);
+            return false;
+        }
+
+        // do the replacements
+        $template = preg_replace($patterns,$values,$template);
+
+        // save page and return
         saveWikiText($pagename, $template, sprintf($this->getLang('summary'),$ID));
         return $thanks.' '.html_wikilink($pagename);
     }
 
-    /**
-     * Replace callback to iterate over multiline textarea patterns
-     */
-    function replace_callback($matches) {
-        $lines = explode("\n", trim($this->value));
-        $ret = '';
-        foreach($lines as $line) {
-            $ret .= trim(preg_replace("/@@LINE@@/", trim($line), trim($matches[1]))) . "\n";
-        }
-        return ($ret);
-    }
 }
 // vim:ts=4:sw=4:et:enc=utf-8:
