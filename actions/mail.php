@@ -12,8 +12,8 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
         global $ID;
         global $conf;
 
-        // get receipient address
-        $to = array_shift($argv);
+        // get receipient address(es)
+        $to = join(',',$argv);
 
         $sub = sprintf($this->getLang('mailsubject'),$ID);
         $txt = sprintf($this->getLang('mailintro')."\n\n\n",strftime($conf['dformat']));
