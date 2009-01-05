@@ -23,4 +23,4 @@ $lang['mailintro']       = 'The following data was submitted on %s.';
 $lang['mail_thanks']     = 'Your data was sent successfully. Thank you.';
 $lang['template_thanks'] = 'The page has been created, follow the link to open it.';
 
-$lang['summary']         = 'Created from the formular at %s';
+$lang['summary']         = 'Created from the form at %s';
