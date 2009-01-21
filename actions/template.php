@@ -49,7 +49,15 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             msg(sprintf($this->getLang('e_pageexists'), html_wikilink($pagename)), -1);
             return false;
         }
-        if(auth_quickaclcheck($pagename) < AUTH_CREATE) {
+
+        // check auth
+        $runas = $this->getConf('runas');
+        if($runas){
+            $auth = auth_aclcheck($pagename,$runas,array());
+        }else{
+            $auth = auth_quickaclcheck($pagename);
+        }
+        if($auth < AUTH_CREATE) {
             msg($this->getLang('e_denied'), -1);
             return false;
         }
@@ -60,7 +68,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $template = pageTemplate(array($pagename));
         }else{
             $tpl = cleanID($tpl);
-            if(auth_quickaclcheck($tpl) < AUTH_READ){
+            if($runas){
+                $auth = auth_aclcheck($tpl,$runas,array());
+            }else{
+                $auth = auth_quickaclcheck($tpl);
+            }
+            if($auth < AUTH_READ){
                 msg(sprintf($this->getLang('e_template'), $tpl), -1);
                 return false;
             }
