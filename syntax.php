@@ -183,7 +183,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             $errors = $this->_checkpost($data['data']);
             // check CAPTCHA
             $ok = true;
-            $helper = plugin_load('helper','captcha');
+            $helper = null;
+            if(@is_dir(DOKU_PLUGIN.'captcha')) $helper = plugin_load('helper','captcha');
             if(!is_null($helper) && $helper->isEnabled()){
                 $ok = $helper->check();
             }
@@ -306,7 +307,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                     //add captcha if available
                     if(!$captcha){
                         $captcha = true;
-                        $helper = plugin_load('helper','captcha');
+                        $helper = null;
+                        if(@is_dir(DOKU_PLUGIN.'captcha')) $helper = plugin_load('helper','captcha');
                         if(!is_null($helper) && $helper->isEnabled()){
                             $form->addElement($helper->getHTML());
                         }
