@@ -17,7 +17,7 @@ $lang['e_pageexists']    = 'De pagina "%s" bestaat al. Kies een andere pagina na
 $lang['e_template']      = 'Kon de template "%s" niet lezen. wellicht bestaat de pagina niet of zijn de rechten onvoldoende?';
 $lang['e_denied']        = 'Onvoldoende rechten om deze pagina te maken, niet ingelogd?';
 
-$lang['mailsubject']     = 'Forumulier gegevens verstuurd op %s';
+$lang['mailsubject']     = 'Formulier gegevens verstuurd op %s';
 $lang['mailintro']       = 'De volgende gegevens zijn verstuurd op %s.';
 
 $lang['mail_thanks']     = 'De gegevens zijn verstuurt. Bedankt.';
