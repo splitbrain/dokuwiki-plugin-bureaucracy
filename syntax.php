@@ -17,6 +17,7 @@ require_once(DOKU_PLUGIN.'syntax.php');
  */
 class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     // allowed types and the number of arguments
+    var $form_id = 0;
     var $argcheck = array(
                         'textbox'    => 2,
                         'email'      => 2,
@@ -178,8 +179,9 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         if($format != 'xhtml') return false;
         $R->info['cache'] = false; // don't cache
 
+        $this->form_id++;
         $errors = array();
-        if(isset($_POST['bureaucracy'])){
+        if(isset($_POST['bureaucracy']) && $_POST['bureaucracy_id'] == $this->form_id){
             $errors = $this->_checkpost($data['data']);
             // check CAPTCHA
             $ok = true;
@@ -276,11 +278,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         $form = new Doku_Form('bureaucracy__plugin');
         $form->addHidden('id',$ID);
+        $form->addHidden('bureaucracy_id',$this->form_id);
 
         $captcha = false; // to make sure we add it only once
 
         foreach($data as $opt){
-            if(isset($_POST['bureaucracy'][$opt['idx']])){
+            if(isset($_POST['bureaucracy'][$opt['idx']]) && ($_POST['bureaucracy_id'] == $this->form_id)){
                 $value = $_POST['bureaucracy'][$opt['idx']];
             }else{
                 $value = $opt['default'];
