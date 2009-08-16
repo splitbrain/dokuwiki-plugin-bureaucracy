@@ -24,7 +24,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         // run through fields and prepare replacements
         foreach($data as $opt) {
             $value = $_POST['bureaucracy'][$opt['idx']];
-            $label = preg_quote($opt['label']);
+            $label = preg_quote($opt['label'],'/');
             if(in_array($opt['cmd'],$this->nofield)) continue;
             // handle pagenames:
             if($opt['pagename']){
