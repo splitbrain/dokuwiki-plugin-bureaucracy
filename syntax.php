@@ -43,7 +43,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         return array(
             'author' => 'Andreas Gohr',
             'email'  => 'andi@splitbrain.org',
-            'date'   => '2009-07-31',
+            'date'   => '2009-08-16',
             'name'   => 'Bureaucracy Plugin',
             'desc'   => 'A simple form generator/emailer',
             'url'    => 'http://dokuwiki.org/plugin:bureaucracy',
@@ -337,7 +337,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                     $vals = explode('|',$opt['args'][0]);
                     $vals = array_map('trim',$vals);
                     $vals = array_filter($vals);
-                    array_unshift($vals,' ');
+                    if (!$value && $opt['optional']) array_unshift($vals,' ');
                     $form->addElement(form_makeListboxField($name,$vals,$value,$opt['label'],'',$class));
                     break;
                 case 'static':
