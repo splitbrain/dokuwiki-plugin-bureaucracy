@@ -1,9 +1,10 @@
 <?php
 /**
- * Simple template replacement action for the burreaucracy plugin
+ * Simple template replacement action for the bureaucracy plugin
  *
  * @author Michael Klier <chi@chimeric.de>
  */
+
 class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucracy_actions {
 
 
@@ -11,11 +12,8 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         global $ID;
         global $conf;
 
-        $tpl = cleanID(array_shift($argv));
-        $ns  = cleanID(array_shift($argv));
-        $sep = array_shift($argv); // used for combining pagename parts
+        list($tpl, $ns, $sep) = $argv;
         if(is_null($sep)) $sep = $conf['sepchar'];
-
 
         $pagename = '';
         $patterns = array();
@@ -28,7 +26,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             if(in_array($opt['cmd'],$this->nofield)) continue;
             // handle pagenames:
             if($opt['pagename']){
-                // no namespace seperators in input allowed:
+                // no namespace separators in input allowed:
                 $name = $value;
                 if($conf['useslash']) $name = str_replace('/',' ',$name);
                 $name = str_replace(':',' ',$name);
@@ -44,7 +42,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             msg($this->getLang('e_pagename'), -1);
             return false;
         }
-        $pagename = $ns.':'.$pagename;
+        $pagename = cleanID($ns).':'.$pagename;
         if(page_exists($pagename)) {
             msg(sprintf($this->getLang('e_pageexists'), html_wikilink($pagename)), -1);
             return false;
@@ -62,35 +60,56 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             return false;
         }
 
-        // get template
+        $templates = array();
+        // get templates
         if($tpl == ''){
             // use namespace template
-            $template = pageTemplate(array($pagename));
-        }else{
-            $tpl = cleanID($tpl);
-            if($runas){
-                $auth = auth_aclcheck($tpl,$runas,array());
-            }else{
-                $auth = auth_quickaclcheck($tpl);
+            $templates[$pagename] = pageTemplate(array($pagename));
+        } else {
+            // Namespace link
+            require_once DOKU_INC.'inc/search.php';
+            if ($runas) {
+                /* Hack user credentials. */
+                global $USERINFO;
+                $backup = array($_SERVER['REMOTE_USER'],$USERINFO['grps']);
+                $_SERVER['REMOTE_USER'] = $runas;
+                $USERINFO['grps'] = array();
             }
-            if($auth < AUTH_READ){
-                msg(sprintf($this->getLang('e_template'), $tpl), -1);
-                return false;
+            $t_pages = array();
+            search($t_pages, $conf['datadir'], 'search_index', array(),
+                   str_replace(':', '/', getNS($tpl)));
+            foreach($t_pages as $t_page) {
+                $t_name = cleanID($t_page['id']);
+                $p_name = str_replace(cleanID($tpl), $pagename, $t_name);
+                if ($p_name === $t_name) {
+                    /* When using a single-page template, ignore other pages
+                       in the same namespace. */
+                    continue;
+                }
+                $templates[$p_name] = rawWiki($t_name);
             }
-            // fetch template
-            $template = rawWiki($tpl);
+
+            if ($runas) {
+                /* Restore user credentials. */
+                global $USERINFO;
+                list($_SERVER['REMOTE_USER'],$USERINFO['grps']) = $backup;
+            }
         }
-        if(empty($template)) {
+        if(empty($templates)) {
             msg(sprintf($this->getLang('e_template'), $tpl), -1);
             return false;
         }
 
-        // do the replacements
-        $template = preg_replace($patterns,$values,$template);
+        foreach($templates as $pname => $template) {
 
-        // save page and return
-        saveWikiText($pagename, $template, sprintf($this->getLang('summary'),$ID));
-        return $thanks.' '.html_wikilink($pagename);
+            // do the replacements
+            $template = preg_replace($patterns,$values,$template);
+
+            // save page and return
+            //saveWikiText($pname, $template, sprintf($this->getLang('summary'),$ID));
+
+        }
+        return $thanks.' '.implode(', ', array_map('html_wikilink', array_keys($templates)));
     }
 
 }
