@@ -18,23 +18,33 @@ require_once(DOKU_PLUGIN.'syntax.php');
 class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     // allowed types and the number of arguments
     var $form_id = 0;
-    var $argcheck = array(
-                        'textbox'    => 2,
-                        'email'      => 2,
-                        'password'   => 2,
-                        'number'     => 2,
-                        'submit'     => 1,
-                        'fieldset'   => 1,
-                        'select'     => 3,
-                        'onoff'      => 2,
-                        'yesno'      => 2,
-                        'static'     => 2,
-                        'textarea'   => 2,
-                        'action'     => 2,
-                        'thanks'     => 2,
+
+    var $fields;
+
+    function syntax_plugin_bureaucracy() {
+        $textbox = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@LABEL@@', '', '@@CLASS@@');
+        $checkbox = '<label class="@@CLASS@@"><span>@@LABEL@@</span>'.
+                                      '<input type="checkbox" name="@@NAME@@" value="Yes" @@CHECK@@ /></label>';
+        $this->fields = array(
+                        'action'   => array('args' => 2, 'noparam' => true),
+                        'email'    => array('args' => 2, 'render' => $textbox),
+                        'fieldset' => array('args' => 1, 'noparam' => true),
+                        'number'   => array('args' => 2, 'render' => $textbox),
+                        'onoff'    => array('args' => 2, 'render' => $checkbox),
+                        'password' => array('args' => 2,
+                                            'render' => form_makePasswordField('@@NAME@@', '@@LABEL@@', '', '@@CLASS@@')),
+                        'select'   => array('args' => 3),
+                        'static'   => array('args' => 2, 'noparam' => true,
+                                            'render' => '<p>@@LABEL@@</p>'),
+                        'submit'   => array('args' => 1, 'noparam' => true,
+                                            'render' => form_makeButton('submit','', '@@LABEL@@')),
+                        'textarea' => array('args' => 2,
+                                            'render' => '<label class="@@CLASS@@"><span>@@LABEL@@</span><textarea name="@@NAME@@" rows="@@ROWS|10@@" cols="10" class="edit">@@VALUE@@</textarea></label>'),
+                        'textbox'  => array('args' => 2, 'render' => $textbox),
+                        'thanks'   => array('args' => 2, 'noparam' => true),
+                        'yesno'    => array('args' => 2, 'render' => $checkbox),
                         );
-    // types that are no fields
-    var $nofield = array('action','static','fieldset','submit','thanks');
+    }
 
     /**
      * What kind of syntax are we?
@@ -72,7 +82,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     function handle($match, $state, $pos, &$handler){
         $match = substr($match,6,-7); // remove form wrap
         $lines = explode("\n",$match);
-        $action = array('type'=>'','argv'=>array());
+        $action = array('type' => '',
+                        'argv' => array());
         $thanks = '';
 
         $idx = 0;
@@ -81,13 +92,17 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         foreach($lines as $line){
             $line = trim($line);
             if(!$line) continue;
+
             $args = $this->_parse_line($line);
             $args[0] = strtolower($args[0]);
-            if(!isset($this->argcheck[$args[0]])){
+
+            /* Check if type is known and the correct number of arguments has
+               been passed. */
+            if(!isset($this->fields[$args[0]])){
                 msg(sprintf($this->getLang('e_unknowntype'),hsc($args[0])),-1);
                 continue;
             }
-            if(count($args) < $this->argcheck[$args[0]]){
+            if(count($args) < $this->fields[$args[0]]['args']){
                 msg(sprintf($this->getLang('e_missingargs'),hsc($args[0]),hsc($args[1])),-1);
                 continue;
             }
@@ -107,13 +122,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             }
 
             // get standard arguments
-            $opt = array();
-            $opt['cmd']   = array_shift($args);
-            $opt['label'] = array_shift($args);
-            $opt['idx']   = $idx++;
+            $opt = array('cmd'   => array_shift($args),
+                         'label' => array_shift($args),
+                         'idx'   => $idx++);
 
             // save addtional minimum args here
-            $keep = $this->argcheck[$opt['cmd']]-2;
+            $keep = $this->fields[$opt['cmd']]['args'] - 2;
             if($keep > 0){
                 $opt['args'] = array_slice($args,0,$keep);
             }
@@ -209,7 +223,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             // required
             if(trim($_POST['bureaucracy'][$opt['idx']]) === ''){
                 if($opt['optional']) continue;
-                if(in_array($opt['cmd'],$this->nofield)) continue;
+                if(isset($this->fields[$opt['cmd']]['noparam']) &&
+                   $this->fields[$opt['cmd']]['noparam'] === true) continue;
                 $errors[$opt['idx']] = 1;
                 msg(sprintf($this->getLang('e_required'),hsc($opt['label'])),-1);
                 continue;
@@ -269,29 +284,24 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $captcha = false; // to make sure we add it only once
 
         foreach($data as $opt){
-            if(isset($_POST['bureaucracy'][$opt['idx']]) && ($_POST['bureaucracy_id'] == $this->form_id)){
-                $value = $_POST['bureaucracy'][$opt['idx']];
-            }else{
-                $value = $opt['default'];
-            }
-            $name  = 'bureaucracy['.$opt['idx'].']';
-
-            if($errors[$opt['idx']]){
-                $class = 'bureaucracy_error';
-            }else{
-                $class = '';
-            }
+            $params = array('value' => (isset($_POST['bureaucracy'][$opt['idx']]) &&
+                                        ($_POST['bureaucracy_id'] == $this->form_id))
+                                       ? $_POST['bureaucracy'][$opt['idx']]
+                                       : $opt['default'],
+                            'name'  => 'bureaucracy['.$opt['idx'].']',
+                            'class' => isset($errors[$opt['idx']]) ? 'bureaucracy_error' : '',
+                            );
 
             // we always start with a fieldset!
             if(!$form->_infieldset && $opt['cmd'] != 'fieldset'){
                 $form->startFieldset('');
             }
 
-            // handle different field types
+            // special cases
             switch($opt['cmd']){
                 case 'fieldset':
                     $form->startFieldset($opt['label']);
-                    break;
+                    continue 2;
                 case 'submit':
                     //add captcha if available
                     if(!$captcha){
@@ -302,49 +312,47 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                             $form->addElement($helper->getHTML());
                         }
                     }
-
-                    $form->addElement(form_makeButton('submit','', $opt['label']));
-                    break;
-                case 'password':
-                    $form->addElement(form_makePasswordField($name,$opt['label'],'',$class));
-                    break;
-                case 'textbox':
-                case 'number':
-                case 'email':
-                    $form->addElement(form_makeTextField($name,$value,$opt['label'],'',$class));
                     break;
                 case 'onoff':
                 case 'yesno':
-                    $chk = ($value) ? 'checked="checked"' : '';
-                    $form->addElement('<label class="'.$class.'"><span>'.hsc($opt['label']).'</span>'.
-                                      '<input type="checkbox" name="'.$name.'" value="Yes" '.$chk.' /></label>');
+                    $params['check'] = $params['value'] ? 'checked="checked"' : '';
                     break;
                 case 'select':
                     $vals = explode('|',$opt['args'][0]);
                     $vals = array_map('trim',$vals);
                     $vals = array_filter($vals);
-                    if (!$value && $opt['optional']) array_unshift($vals,' ');
-                    $form->addElement(form_makeListboxField($name,$vals,$value,$opt['label'],'',$class));
-                    break;
-                case 'static':
-                    $form->addElement('<p>'.hsc($opt['label']).'</p>');
-                    break;
-                case 'textarea':
-                    $rows = ($opt['rows']) ? $opt['rows'] : 10;
-                    $form->addElement('<label class="'.$class.'"><span>'.hsc($opt['label']).'</span>'.
-                                      '<textarea name="'.$name.'" rows="' . $rows . '" cols="10" class="edit">'.$value.'</textarea></label>');
-                    break;
+                    if (!$params['value'] && isset($opt['optional'])) array_unshift($vals,' ');
+                    $form->addElement(form_makeListboxField($params['name'],$vals,$params['value'],$opt['label'],'',$params['class']));
+                    continue 2;
             }
+            $form->addElement($this->_parse_tpl($this->fields[$opt['cmd']]['render'],
+                                                array_merge($opt, $params)));
         }
 
         ob_start();
         $form->printForm();
-        $out .= ob_get_contents();
+        $out = ob_get_contents();
         ob_end_clean();
         return $out;
     }
 
-
+    function _parse_tpl($tpl, $params) {
+        if (is_array($tpl)) {
+            /* addElement supports a special array format as well. */
+            foreach ($tpl as $key => &$val) {
+                $val = $this->_parse_tpl($val, $params);
+            }
+            return $tpl;
+        }
+        preg_match_all('/@@([A-Z]+)(?:\|((?:[^@]|@$|@[^@])+))?@@/', $tpl, &$pregs);
+        for ($i = 0 ; $i < count($pregs[2]) ; ++$i) {
+            if (isset($params[strtolower($pregs[1][$i])])) {
+                $pregs[2][$i] = $params[strtolower($pregs[1][$i])];
+            }
+            $pregs[2][$i] = hsc($pregs[2][$i]);
+        }
+        return str_replace($pregs[0], $pregs[2], $tpl);
+    }
 
     /**
      * Parse a line into (quoted) arguments
@@ -382,8 +390,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         if ( strlen($arg) > 0 ) array_push($args, $arg);
         return $args;
     }
-
-
 }
 
 //Setup VIM: ex: et ts=4 enc=utf-8 :
