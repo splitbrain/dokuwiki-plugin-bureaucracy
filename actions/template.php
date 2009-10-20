@@ -21,11 +21,11 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
         // run through fields and prepare replacements
         foreach($data as $opt) {
-            $value = $_POST['bureaucracy'][$opt['idx']];
-            $label = preg_quote($opt['label'],'/');
-            if(in_array($opt['cmd'],$this->nofield)) continue;
+            $value = $opt->getValue();
+            $label = preg_quote($opt->getLabel(),'/');
+            if($value === null || $label === null) continue;
             // handle pagenames:
-            if($opt['pagename']){
+            if(isset($opt->opt['pagename'])){
                 // no namespace separators in input allowed:
                 $name = $value;
                 if($conf['useslash']) $name = str_replace('/',' ',$name);

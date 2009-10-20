@@ -19,15 +19,16 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
         $txt = sprintf($this->getLang('mailintro')."\n\n\n",strftime($conf['dformat']));
 
         foreach($data as $opt){
-            $value = $_POST['bureaucracy'][$opt['idx']];
+            $value = $opt->getValue();
+            $label = $opt->getLabel();
 
-            switch($opt['cmd']){
+            switch($opt->cmd){
                 case 'fieldset':
-                    $txt .= "\n====== ".hsc($opt['label'])." ======\n\n";
+                    $txt .= "\n====== ".hsc($label)." ======\n\n";
                     break;
                 default:
-                    if(in_array($opt['cmd'],$this->nofield)) break;
-                    $txt .= $opt['label']."\n";
+                    if($value === null || $label === null) break;
+                    $txt .= $label."\n";
                     $txt .= "\t\t$value\n";
             }
         }
