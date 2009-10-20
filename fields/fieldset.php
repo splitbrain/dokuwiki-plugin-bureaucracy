@@ -3,14 +3,14 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
     var $extraargs = 1;
 
     function render($params, $form) {
-        $form->startFieldset($this->opt['label']);
+        $form->startFieldset($this->getParam('label'));
     }
 
     function handle_post($param) {
         return true;
     }
 
-    function getValue() {
-        return null;
+    function getParam($name) {
+        return ($name === 'value') ? null : parent::getParam($name);
     }
 }

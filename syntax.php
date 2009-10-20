@@ -183,13 +183,10 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $form->addHidden('id',$ID);
         $form->addHidden('bureaucracy_id',$this->form_id);
 
-        $captcha = false; // to make sure we add it only once
         foreach($data as $id => $opt){
-            $params = array('name'  => 'bureaucracy['.$id.']',
-                            'class' => isset($errors[$id]) ? 'bureaucracy_error' : '',
-                            );
-            if (isset($_POST['bureaucracy'][$id]) && $_POST['bureaucracy_id'] == $this->form_id) {
-                $params['value'] = $_POST['bureaucracy'][$id];
+            $params = array('name' => 'bureaucracy['.$id.']');
+            if (isset($errors[$id])) {
+                $params['class'] = 'bureaucracy_error';
             }
             $opt->render($params, $form);
         }

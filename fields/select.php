@@ -10,10 +10,10 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
         if (!isset($params['value']) && isset($params['optional'])) {
             array_unshift($vals,' ');
         }
-        $form->addElement(form_makeListboxField($params['name'], $vals,
-                                                isset($params['value']) ?
-                                                $params['value'] : $vals[0],
-                                                $params['label'], '',
-                                                $params['class']));
+        $form->addElement(call_user_func_array('form_makeListboxField',
+                                               $this->_parse_tpl(array('@@NAME@@',
+                                                $vals, '@@VALUE|' . $vals[0] . '@@',
+                                                '@@LABEL@@', '', '@@CLASS@@'),
+                                                $params)));
     }
 }

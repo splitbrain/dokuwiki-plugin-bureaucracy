@@ -1,7 +1,7 @@
 <?php
 class syntax_plugin_bureaucracy_field {
     var $extraargs = 0;
-    var $opts = array();
+    var $opt = array();
 
     function syntax_plugin_bureaucracy_field($syntax_plugin, $args) {
         $this->syntax_plugin = $syntax_plugin;
@@ -102,11 +102,14 @@ class syntax_plugin_bureaucracy_field {
         return $this->syntax_plugin->getLang($param);
     }
 
-    function getLabel() {
-        return $this->opt['label'];
+    function getFieldType() {
+        return $this->cmd;
     }
 
-    function getValue() {
-        return $this->opt['value'];
+    function getParam($name) {
+        if (!isset($this->opt[$name])) {
+            return null;
+        }
+        return $this->opt[$name];
     }
 }

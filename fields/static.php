@@ -7,7 +7,7 @@ class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_f
         return true;
     }
 
-    function getValue() {
-        return null;
+    function getParam($name) {
+        return ($name === 'value') ? null : parent::getParam($name);
     }
 }
