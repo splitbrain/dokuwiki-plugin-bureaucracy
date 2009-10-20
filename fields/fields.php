@@ -57,6 +57,8 @@ class syntax_plugin_bureaucracy_field {
             return false;
         }
 
+        $this->opt['value'] = $value;
+
         // regexp
         if(isset($this->opt['re']) && !@preg_match('/'.$this->opt['re'].'/i',$value)){
             msg(sprintf($this->getLang('e_match'),hsc($this->opt['label']),hsc($this->opt['re'])),-1);
@@ -64,18 +66,17 @@ class syntax_plugin_bureaucracy_field {
         }
 
         // min
-        if(isset($this->opt['min']) && $value < $this->opt['min']){
+        if(isset($this->opt['min']) && !($value > $this->opt['min'])){
             msg(sprintf($this->getLang('e_min'),hsc($this->opt['label']),hsc($this->opt['min'])),-1);
             return false;
         }
 
         // max
-        if(isset($this->opt['max']) && $value > $this->opt['max']){
+        if(isset($this->opt['max']) && !($value < $this->opt['max'])){
             msg(sprintf($this->getLang('e_max'),hsc($this->opt['label']),hsc($this->opt['max'])),-1);
             return false;
         }
 
-        $this->opt['value'] = $value;
         return true;
     }
 
