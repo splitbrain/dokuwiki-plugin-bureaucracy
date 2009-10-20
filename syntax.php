@@ -136,7 +136,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->form_id++;
         $errors = array();
         if(isset($_POST['bureaucracy']) && $_POST['bureaucracy_id'] == $this->form_id){
-            $errors = $this->_checkpost($data['data']);
+            list($errors, $hiddens) = $this->_checkpost($data['data']);
 
             if(count($errors) === 0 && $data['action']){
                 require_once DOKU_PLUGIN . 'bureaucracy/actions/actions.php';
@@ -144,7 +144,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
                 $action = new $class();
 
-                $success = $action->run($data['data'], $data['thanks'], $data['action']['argv'], $errors);
+                $out_data = array();
+                foreach ($data['data'] as $id => $dat) {
+                    if (!isset($hiddens[$id])) $out_data[$id] = $dat;
+                }
+
+                $success = $action->run($out_data, $data['thanks'], $data['action']['argv'], $errors);
                 if($success) {
                     $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">';
                     $R->doc .= $success;
@@ -165,12 +170,30 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      */
     function _checkpost($data){
         $errors = array();
+        $hiddens = array();
         foreach($data as $id => $opt){
-            if (!$opt->handle_post($_POST['bureaucracy'][$id])) {
+            if ($id > 0 && isset($hiddens[$id - 1]) && $opt->getFieldType() !== 'fieldset') {
+                $hiddens[$id] = 1;
+                continue;
+            }
+            $_res = $opt->handle_post($_POST['bureaucracy'][$id]);
+            if ($_res === false) {
                 $errors[$id] = 1;
+                continue;
+            } elseif ($_res !== true) {
+                for ($n = 0 ; $n < $id; ++$n) {
+                    if ($data[$n]->getParam('label') != $_res[0]) {
+                        continue;
+                    }
+                    $hidden = $data[$n]->getParam('value') != $_res[1];
+                    if ($hidden) {
+                        $hiddens[$id] = 1;
+                    }
+                    break;
+                }
             }
         }
-        return $errors;
+        return array($errors, $hiddens);
     }
 
     /**
