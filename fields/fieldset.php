@@ -27,7 +27,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
                 $msg = 'Only edit this fieldset if ' .
                        '“<span class="bureaucracy_depends_fname">%s</span>” is set.';
             }
-           $form->addElement('<p class="bureaucracy_depends">' . vsprintf($msg, $this->depends_on) . '</p>');
+            $form->addElement('<p class="bureaucracy_depends">' . vsprintf($msg, $this->depends_on) . '</p>');
         }
     }
 

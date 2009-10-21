@@ -51,7 +51,6 @@ div.dokuwiki form#bureaucracy__plugin label select {
     margin-left: 5px;
 }
 
-
 div.dokuwiki form#bureaucracy__plugin label.bureaucracy_error span {
-    color: #f00;
+    color: #F00;
 }
