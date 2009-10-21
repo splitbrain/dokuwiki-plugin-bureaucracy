@@ -5,10 +5,10 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
     function syntax_plugin_bureaucracy_field_fieldset($syntax_plugin, $args) {
         $this->syntax_plugin = $syntax_plugin;
         // get standard arguments
-        $this->cmd = array_shift($args);
+        $this->opt = array('cmd' => array_shift($args));
 
         if (count($args) > 0) {
-            $this->opt = array('label' => array_shift($args));
+            $this->opt['label'] = array_shift($args);
         }
 
         if (count($args) > 0) {

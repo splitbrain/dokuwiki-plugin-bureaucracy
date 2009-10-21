@@ -1,7 +1,22 @@
 <?php
+
+function validate_match($d, $value) {
+    return @preg_match('/' . $d . '/i', $value);
+}
+
+function validate_min($d, $value) {
+    return $value > $d;
+}
+
+function validate_max($d, $value) {
+    return $value < $d;
+}
+
 class syntax_plugin_bureaucracy_field {
     var $extraargs = 0;
     var $opt = array();
+    var $checks = array();
+    var $checktypes = array('/' => 'match', '<' => 'max', '>' => 'min');
 
     function syntax_plugin_bureaucracy_field($syntax_plugin, $args) {
         $this->syntax_plugin = $syntax_plugin;
@@ -9,35 +24,40 @@ class syntax_plugin_bureaucracy_field {
             msg(sprintf($this->getLang('e_missingargs'),hsc($args[0]),hsc($args[1])),-1);
             return;
         }
-        // get standard arguments
-        $this->cmd = array_shift($args);
 
-        $this->opt = array('label' => array_shift($args));
+        // get standard arguments
+        $this->opt = array('cmd'   => array_shift($args),
+                           'label' => array_shift($args));
 
         // save additional minimum args here
         $keep = $this->extraargs - 1;
         if($keep > 0){
             $this->opt['args'] = array_slice($args,0,$keep);
         }
-
+        $add_args = array_slice($args, $keep);
         // parse additional arguments
-        foreach($args as $arg){
-            if($arg[0] == '='){
+        foreach($add_args as $arg){
+            if ($arg[0] == '=') {
                 $this->opt['value'] = substr($arg,1);
-            }elseif($arg[0] == '>'){
-                $this->opt['min'] = substr($arg,1);
-                if(!is_numeric($this->opt['min'])) unset($this->opt['min']);
-            }elseif($arg[0] == '<'){
-                $this->opt['max'] = substr($arg,1);
-                if(!is_numeric($this->opt['max'])) unset($this->opt['max']);
-            }elseif($arg[0] == '/' && substr($arg,-1) == '/'){
-                $this->opt['re'] = substr($arg,1,-1);
-            }elseif($arg == '!'){
+            } elseif ($arg == '!') {
                 $this->opt['optional'] = true;
-            }elseif($arg == '@'){
+            } elseif($arg == '@') {
                 $this->opt['pagename'] = true;
-            }elseif(preg_match('/x\d/', $arg)) {
+            } elseif(preg_match('/x\d/', $arg)) {
                 $this->opt['rows'] = substr($arg,1);
+            } else {
+                $t = $arg[0];
+                $d = substr($arg,1);
+                if (in_array($t, array('>', '<')) && !is_numeric($d)) {
+                    break;
+                }
+                if ($t == '/') {
+                    if (substr($d, -1) !== '/') {
+                        break;
+                    }
+                    $d = substr($d, 0, -1);
+                }
+                $this->checks[] = array('t' => $t, 'd' => $d);
             }
         }
     }
@@ -59,22 +79,13 @@ class syntax_plugin_bureaucracy_field {
 
         $this->opt['value'] = $value;
 
-        // regexp
-        if(isset($this->opt['re']) && !@preg_match('/'.$this->opt['re'].'/i',$value)){
-            msg(sprintf($this->getLang('e_match'),hsc($this->opt['label']),hsc($this->opt['re'])),-1);
-            return false;
-        }
-
-        // min
-        if(isset($this->opt['min']) && !($value > $this->opt['min'])){
-            msg(sprintf($this->getLang('e_min'),hsc($this->opt['label']),hsc($this->opt['min'])),-1);
-            return false;
-        }
-
-        // max
-        if(isset($this->opt['max']) && !($value < $this->opt['max'])){
-            msg(sprintf($this->getLang('e_max'),hsc($this->opt['label']),hsc($this->opt['max'])),-1);
-            return false;
+        foreach ($this->checks as $check) {
+            $checktype = $this->checktypes[$check['t']];
+            if (!call_user_func('validate_' . $checktype, $check['d'], $value)) {
+                msg(sprintf($this->getLang('e_' . $checktype),
+                            hsc($this->opt['label']), hsc($check['d'])), -1);
+                return false;
+            }
         }
 
         return true;
@@ -103,7 +114,7 @@ class syntax_plugin_bureaucracy_field {
     }
 
     function getFieldType() {
-        return $this->cmd;
+        return $this->opt['cmd'];
     }
 
     function getParam($name) {
