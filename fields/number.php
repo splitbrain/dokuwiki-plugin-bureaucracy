@@ -7,7 +7,7 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
         }
 
         if(!is_numeric($value)){
-            msg(sprintf($this->getLang('e_numeric'),hsc($opt['label'])),-1);
+            msg(sprintf($this->getLang('e_numeric'),hsc($this->getParam('label'))),-1);
             return false;
         }
         return true;
