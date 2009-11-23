@@ -38,9 +38,20 @@ addInitEvent(function () {
                                         (this.checked || this.type !== 'checkbox' &&
                                          (this.dpar.tval === true && this.value !== '') ||
                                          this.value === this.dpar.tval)) ? 'block' : 'none';
-    }
+        var inputs = this.dpar.fset.getElementsByTagName('input');
+        for (var i = 0; i < inputs.length ; ++i) {
+            if (inputs[i].dpar) handle_update.call(inputs[i]);
+        }
+        var inputs = this.dpar.fset.getElementsByTagName('select');
+        for (var i = 0; i < inputs.length ; ++i) {
+            if (inputs[i].dpar) handle_update.call(inputs[i]);
+        }
+   }
+
     /* All labels in the form. */
     var labels = form.getElementsByTagName('label');
+
+    var todos = [];
 
     for (var i = 0; i < depends.length ; ++i) {
         var fname = getElementsByClass('bureaucracy_depends_fname',
@@ -65,7 +76,11 @@ addInitEvent(function () {
         var dvalue = tvalues[tvalues.length - 1];
         dvalue.dpar = {fset: depends[i].parentNode, tval: fvalue};
         dvalue.addEventListener('change', handle_update, false);
-        handle_update.apply(dvalue);
+        todos.push(dvalue);
         depends[i].style.display = 'none';
+    }
+
+    for (var i = 0 ; i < todos.length ; ++i) {
+        handle_update.call(todos[i]);
     }
 });
