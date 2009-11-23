@@ -20,7 +20,8 @@ function syntax_plugin_bureaucracy_autoload($name) {
 
     $subclass = substr($name, 32);
     if (!@file_exists(DOKU_PLUGIN . 'bureaucracy/fields/' . $subclass . '.php')) {
-        msg(sprintf($this->getLang('e_unknowntype'),hsc($subclass)),-1);
+        $plg = new syntax_plugin_bureaucracy;
+        msg(sprintf($plg->getLang('e_unknowntype'),hsc($subclass)),-1);
         return false;
     }
     require_once DOKU_PLUGIN . 'bureaucracy/fields/' . $subclass . '.php';
