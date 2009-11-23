@@ -105,7 +105,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $template = preg_replace($patterns,$values,$template);
 
             // save page and return
-            //saveWikiText($pname, $template, sprintf($this->getLang('summary'),$ID));
+            saveWikiText($pname, $template, sprintf($this->getLang('summary'),$ID));
 
         }
         return $thanks.' '.implode(', ', array_map('html_wikilink', array_keys($templates)));
