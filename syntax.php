@@ -142,7 +142,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             list($errors, $hiddens) = $this->_checkpost($data['data']);
 
             if (count($errors) === 0 && $data['action']) {
-                require_once DOKU_PLUGIN . 'bureaucracy/actions/actions.php';
+                require_once DOKU_PLUGIN . 'bureaucracy/actions/action.php';
                 require_once DOKU_PLUGIN . 'bureaucracy/actions/' . $data['action']['type'] . '.php';
                 $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
                 $action = new $class();

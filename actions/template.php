@@ -5,8 +5,7 @@
  * @author Michael Klier <chi@chimeric.de>
  */
 
-class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucracy_actions {
-
+class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucracy_action {
 
     function run($data, $thanks, $argv, &$errors) {
         global $ID;

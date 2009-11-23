@@ -3,7 +3,7 @@
  * Action sendemail for DokuWiki plugin bureaucracy
  */
 
-class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_actions {
+class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_action {
 
     /**
      * Build a nice email from the submitted data and send it
