@@ -11,7 +11,7 @@ if (!defined('DOKU_INC')) die();
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 
-require_once DOKU_PLUGIN . 'bureaucracy/fields/fields.php';
+require_once DOKU_PLUGIN . 'bureaucracy/fields/field.php';
 
 function syntax_plugin_bureaucracy_autoload($name) {
     if (strpos($name, 'syntax_plugin_bureaucracy_field_') !== 0) {
