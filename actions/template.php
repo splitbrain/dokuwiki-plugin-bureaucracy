@@ -61,7 +61,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
         $templates = array();
         // get templates
-        if($tpl == ''){
+        if($tpl == '_'){
             // use namespace template
             $templates[$pagename] = pageTemplate(array($pagename));
         } else {
