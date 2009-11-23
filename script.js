@@ -34,9 +34,10 @@ addInitEvent(function () {
      * value and the depending fieldset.
      **/
     function handle_update() {
-        this.dpar.fset.style.display = (this.checked || this.type !== 'checkbox' &&
-                                        (this.dpar.tval === true && this.value !== '') ||
-                                        this.value === this.dpar.tval) ? 'block' : 'none';
+        this.dpar.fset.style.display = (this.parentNode.parentNode.style.display !== 'none' &&
+                                        (this.checked || this.type !== 'checkbox' &&
+                                         (this.dpar.tval === true && this.value !== '') ||
+                                         this.value === this.dpar.tval)) ? 'block' : 'none';
     }
     /* All labels in the form. */
     var labels = form.getElementsByTagName('label');
