@@ -54,3 +54,40 @@ div.dokuwiki form#bureaucracy__plugin label select {
 div.dokuwiki form#bureaucracy__plugin label.bureaucracy_error span {
     color: #F00;
 }
+
+.calendar-box {
+    display:none;
+    background-color:#fff;
+    border:1px solid #444;
+    position:absolute;
+    width:250px;
+    padding: 0 5px;
+}
+.calendar-box select.calendar-month {
+    width:7em;
+}
+.calendar-box select.calendar-year {
+    width:5em;
+}
+.calendar-box .calendar-cancel {
+    width:100%;
+}
+.calendar-box table td {
+    width:14%;
+}
+.calendar-box .calendar-title {
+    text-align:center;
+}
+.calendar-box a {
+    text-decoration:none;
+}
+.calendar-box .today a {
+    padding:0 5px;
+    margin-left:-5px;
+    background-color:#ffe9c6;
+}
+.calendar-box .selected a {
+    padding:0 5px;
+    margin-left:-5px;
+    background-color:#c9ff8b;
+}
