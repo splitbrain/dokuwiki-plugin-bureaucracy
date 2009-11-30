@@ -207,7 +207,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     function _htmlform($data,$errors){
         global $ID;
 
-        $form = new Doku_Form('bureaucracy__plugin');
+        $form = new Doku_Form(array('class' => 'bureaucracy__plugin',
+                                    'id'    => 'bureaucracy__plugin' . $this->form_id));
         $form->addHidden('id', $ID);
         $form->addHidden('bureaucracy_id', $this->form_id);
 

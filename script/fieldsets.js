@@ -15,72 +15,74 @@
  **/
 
 addInitEvent(function () {
-    var form = $('bureaucracy__plugin');
-    if (!form) {
-        /* No form – gtfo. */
-        return;
-    }
-    var depends = getElementsByClass('bureaucracy_depends', form, 'p');
-    if (depends.length === 0) {
-        /* No fieldset with dependencies – gtfo. */
-        return;
-    }
-
-    /**
-     * onchange event handler
-     *
-     * This function changes the visibility of a fieldset depending on the
-     * value of the input specified by “this”. this.dpar contains the target
-     * value and the depending fieldset.
-     **/
-    function handle_update() {
-        this.dpar.fset.style.display = (this.parentNode.parentNode.style.display !== 'none' &&
-                                        (this.checked || this.type !== 'checkbox' &&
-                                         (this.dpar.tval === true && this.value !== '') ||
-                                         this.value === this.dpar.tval)) ? 'block' : 'none';
-        var inputs = this.dpar.fset.getElementsByTagName('input');
-        for (var i = 0; i < inputs.length ; ++i) {
-            if (inputs[i].dpar) handle_update.call(inputs[i]);
+    function handle(form) {
+        var depends = getElementsByClass('bureaucracy_depends', form, 'p');
+        if (depends.length === 0) {
+            /* No fieldset with dependencies – gtfo. */
+            return;
         }
-        var inputs = this.dpar.fset.getElementsByTagName('select');
-        for (var i = 0; i < inputs.length ; ++i) {
-            if (inputs[i].dpar) handle_update.call(inputs[i]);
-        }
-   }
 
-    /* All labels in the form. */
-    var labels = form.getElementsByTagName('label');
-
-    var todos = [];
-
-    for (var i = 0; i < depends.length ; ++i) {
-        var fname = getElementsByClass('bureaucracy_depends_fname',
-                                       depends[i], 'span')[0].innerHTML;
-        var spans = getElementsByClass('bureaucracy_depends_fvalue',
-                                       depends[i], 'span');
-        var fvalue = (spans.length > 0) ? spans[0].innerHTML : true;
-
-        for (var n = 0 ; n < labels.length ; ++n) {
-            if (labels[n].firstChild.innerHTML === fname) {
-                break;
+        /**
+         * onchange event handler
+         *
+         * This function changes the visibility of a fieldset depending on the
+         * value of the input specified by “this”. this.dpar contains the target
+         * value and the depending fieldset.
+         **/
+        function handle_update() {
+            this.dpar.fset.style.display = (this.parentNode.parentNode.style.display !== 'none' &&
+                                            (this.checked || this.type !== 'checkbox' &&
+                                             (this.dpar.tval === true && this.value !== '') ||
+                                             this.value === this.dpar.tval)) ? 'block' : 'none';
+            var inputs = this.dpar.fset.getElementsByTagName('input');
+            for (var i = 0; i < inputs.length ; ++i) {
+                if (inputs[i].dpar) handle_update.call(inputs[i]);
             }
+            var inputs = this.dpar.fset.getElementsByTagName('select');
+            for (var i = 0; i < inputs.length ; ++i) {
+                if (inputs[i].dpar) handle_update.call(inputs[i]);
+            }
+       }
+
+        /* All labels in the form. */
+        var labels = form.getElementsByTagName('label');
+
+        var todos = [];
+
+        for (var i = 0; i < depends.length ; ++i) {
+            var fname = getElementsByClass('bureaucracy_depends_fname',
+                                           depends[i], 'span')[0].innerHTML;
+            var spans = getElementsByClass('bureaucracy_depends_fvalue',
+                                           depends[i], 'span');
+            var fvalue = (spans.length > 0) ? spans[0].innerHTML : true;
+
+            for (var n = 0 ; n < labels.length ; ++n) {
+                if (labels[n].firstChild.innerHTML === fname) {
+                    break;
+                }
+            }
+            if (n === labels.length) return;
+
+            var tvalues = labels[n].getElementsByTagName('input');
+            if (tvalues.length === 0) tvalues = labels[n].getElementsByTagName('select');
+            if (tvalues.length === 0) return;
+
+            /* Get the input or select determining the visibility of this
+               fieldset. Take the last one to ignore the hidden checkbox input. */
+            var dvalue = tvalues[tvalues.length - 1];
+            dvalue.dpar = {fset: depends[i].parentNode, tval: fvalue};
+            dvalue.addEventListener('change', handle_update, false);
+            todos.push(dvalue);
+            depends[i].style.display = 'none';
         }
-        if (n === labels.length) return;
 
-        var tvalues = labels[n].getElementsByTagName('input');
-        if (tvalues.length === 0) tvalues = labels[n].getElementsByTagName('select');
-        if (tvalues.length === 0) return;
-
-        /* Get the input or select determining the visibility of this
-           fieldset. Take the last one to ignore the hidden checkbox input. */
-        var dvalue = tvalues[tvalues.length - 1];
-        dvalue.dpar = {fset: depends[i].parentNode, tval: fvalue};
-        dvalue.addEventListener('change', handle_update, false);
-        todos.push(dvalue);
-        depends[i].style.display = 'none';
+        for (var i = 0 ; i < todos.length ; ++i) {
+            handle_update.call(todos[i]);
+        }
     }
 
-    for (var i = 0 ; i < todos.length ; ++i) {
-        handle_update.call(todos[i]);
+    var forms = getElementsByClass('bureaucracy__plugin', document, 'form');
+    for (var i = 0 ; i < forms.length ; ++i) {
+        handle(forms[i]);
     }
 });
