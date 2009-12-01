@@ -22,7 +22,9 @@ function syntax_plugin_bureaucracy_autoload($name) {
     if (!@file_exists(DOKU_PLUGIN . 'bureaucracy/fields/' . $subclass . '.php')) {
         $plg = new syntax_plugin_bureaucracy;
         msg(sprintf($plg->getLang('e_unknowntype'),hsc($subclass)),-1);
-        return false;
+        eval("class syntax_plugin_bureaucracy_field_$subclass extends " .
+             'syntax_plugin_bureaucracy_field { };');
+        return true;
     }
     require_once DOKU_PLUGIN . 'bureaucracy/fields/' . $subclass . '.php';
     return true;
