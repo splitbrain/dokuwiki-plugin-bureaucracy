@@ -91,3 +91,29 @@ div.dokuwiki form.bureaucracy__plugin label.bureaucracy_error span {
     margin-left:-5px;
     background-color:#c9ff8b;
 }
+
+div.dokuwiki ul.bureaucracy_user_auto {
+    background:__background__ none repeat scroll 0 0;
+    border:1px solid;
+    list-style-image:none;
+    list-style-position:outside;
+    list-style-type:none;
+    opacity:0.9;
+    padding:0.3em;
+    margin:0;
+    position:absolute;
+}
+
+div.dokuwiki ul.bureaucracy_user_auto li {
+    width: 100%;
+    text-align: left;
+}
+
+div.dokuwiki ul.bureaucracy_user_auto li a {
+    width: 100%;
+    display: block;
+}
+
+div.dokuwiki ul.bureaucracy_user_auto li a:hover {
+    background: __background_alt__;
+}

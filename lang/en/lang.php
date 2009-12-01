@@ -10,6 +10,7 @@ $lang['e_match']         = '"%s" wasn\'t filled in correctly. (Checked against /
 $lang['e_email']         = '"%s" needs to be a valid email address.';
 $lang['e_numeric']       = '"%s" needs to be a number.';
 $lang['e_date']          = '"%s" needs to be a valid date in the format yyyy-mm-dd.';
+$lang['e_user']          = '"%s" needs to be the name of an existing user.';
 $lang['e_min']           = '"%s" needs to be greater than %s.';
 $lang['e_max']           = '"%s" needs to be less than %s.';
 
