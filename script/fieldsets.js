@@ -71,7 +71,7 @@ addInitEvent(function () {
                fieldset. Take the last one to ignore the hidden checkbox input. */
             var dvalue = tvalues[tvalues.length - 1];
             dvalue.dpar = {fset: depends[i].parentNode, tval: fvalue};
-            dvalue.addEventListener('change', handle_update, false);
+            addEvent(dvalue, 'change', handle_update);
             todos.push(dvalue);
             depends[i].style.display = 'none';
         }
