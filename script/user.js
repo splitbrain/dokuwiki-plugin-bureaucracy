@@ -5,7 +5,7 @@
  */
 addInitEvent(function () {
     var regexes = {
-        'userpicker': /^()(.+)$/,
+        'userpicker': /^()(.*)$/,
         'userspicker': /^((?:.*,)?)\s*([^,]*)$/
     };
     var ajax = new sack(DOKU_BASE + 'lib/exe/ajax.php');
@@ -20,17 +20,17 @@ addInitEvent(function () {
         if (!users) return;
 
         // Strip out already selected user names
-        n_users = {};
+        n_users = [];
         for (var name in users) {
             var str = input.value.match(regex)[1];
             do {
                 var index = str.indexOf(name);
                 if (index === -1) {
-                    n_users[name] = users[name];
+                    n_users.push([name, users[name]]);
                     break;
                 }
-                if ((index === 0 || str[index - 1].match(/[\s,]/)) &&
-                    (index + name.length === str.length || str[index + name.length].match(/[\s,]/))) {
+                if ((index === 0 || str.charAt(index - 1).match(/[\s,]/)) &&
+                    (index + name.length === str.length || str.charAt(index + name.length).match(/[\s,]/))) {
                     break;
                 }
                 str = str.slice(index + name.length);
@@ -45,9 +45,11 @@ addInitEvent(function () {
         ul.style.top = (findPosY(input) + input.offsetHeight - 1) + 'px';
         ul.style.left = findPosX(input) + 'px';
         ul.style.width = (input.offsetWidth - 10) + 'px';
-        for (var name in users) {
+        for (var index in users) {
+            var name = users[index][0];
+            var fullname = users[index][1];
             var li = document.createElement('li');
-            li.innerHTML = '<a href="#">' + users[name] + ' (' + name + ')' + '</a>';
+            li.innerHTML = '<a href="#">' + fullname + ' (' + name + ')' + '</a>';
             li.id = 'bureaucracy__user__' + name.replace(/\W/g, '_');
             li._user = name;
             ul.appendChild(li);
@@ -58,7 +60,7 @@ addInitEvent(function () {
                 return false;
             });
         }
-        input.parentNode.insertBefore(ul, input.nextChild);
+        input.parentNode.insertBefore(ul, input.nextSibling);
     };
 
     function handler () {
