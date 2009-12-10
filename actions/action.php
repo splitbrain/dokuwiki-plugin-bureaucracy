@@ -23,11 +23,9 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      *                            or default one. Might be modified by the action
      *                            before returned
      * @param array  $argv      - additional arguments passed to the action
-     * @param array ref $errors - reference to the error array, for more
-     *                            messages on failure
      * @return mixed            - false on error, $thanks on success
      */
-    function run($data, $thanks, $argv, &$errors){
+    function run($data, $thanks, $argv){
         msg('ERROR: called action %s did not implement a run() function');
         return false;
     }

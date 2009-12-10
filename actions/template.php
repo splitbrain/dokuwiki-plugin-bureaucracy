@@ -7,7 +7,7 @@
 
 class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucracy_action {
 
-    function run($data, $thanks, $argv, &$errors) {
+    function run($data, $thanks, $argv) {
         global $ID;
         global $conf;
 
@@ -38,13 +38,11 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         // check pagename
         $pagename = cleanID($pagename);
         if(!$pagename) {
-            msg($this->getLang('e_pagename'), -1);
-            return false;
+            throw new Exception($this->getLang('e_pagename'));
         }
         $pagename = cleanID($ns).':'.$pagename;
         if(page_exists($pagename)) {
-            msg(sprintf($this->getLang('e_pageexists'), html_wikilink($pagename)), -1);
-            return false;
+            throw new Exception(sprintf($this->getLang('e_pageexists'), html_wikilink($pagename)));
         }
 
         // check auth
@@ -55,8 +53,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $auth = auth_quickaclcheck($pagename);
         }
         if($auth < AUTH_CREATE) {
-            msg($this->getLang('e_denied'), -1);
-            return false;
+            throw new Exception($this->getLang('e_denied'));
         }
 
         $templates = array();
@@ -95,8 +92,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             }
         }
         if(empty($templates)) {
-            msg(sprintf($this->getLang('e_template'), $tpl), -1);
-            return false;
+            throw new Exception(sprintf($this->getLang('e_template'), $tpl));
         }
 
         foreach($templates as $pname => $template) {

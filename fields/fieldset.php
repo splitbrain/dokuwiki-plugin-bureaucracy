@@ -31,8 +31,29 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
         }
     }
 
-    function handle_post($param) {
-        return isset($this->depends_on) ? $this->depends_on : true;
+    function handle_post($param, $my_id, &$data) {
+        if(!isset($this->depends_on)) {
+            return true;
+        }
+        for ($n = 0 ; $n < $my_id; ++$n) {
+            if ($data[$n]->getParam('label') != $this->depends_on[0]) {
+                continue;
+            }
+            $hidden = (count($this->depends_on) > 1) ?
+                      ($data[$n]->getParam('value') != $this->depends_on[1]) :
+                      !($data[$n]->getParam('value'));
+            break;
+        }
+        if ($hidden) {
+            $this->hidden = true;
+            for ($n = $my_id + 1 ; $n < count($data) ; ++$n) {
+                if ($data[$n]->getFieldType() === 'fieldset') {
+                    break;
+                }
+                $data[$n]->hidden = true;
+            }
+        }
+        return true;
     }
 
     function getParam($name) {

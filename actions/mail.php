@@ -8,7 +8,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
     /**
      * Build a nice email from the submitted data and send it
      */
-    function run($data, $thanks, $argv, &$errors) {
+    function run($data, $thanks, $argv) {
         global $ID;
         global $conf;
 
@@ -34,8 +34,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
         }
 
         if(!mail_send($to, $sub, $txt, $conf['mailfrom'])) {
-            msg($this->getLang('e_mail'), -1);
-            return false;
+            throw new Exception($this->getLang('e_mail'));
         }
         return $thanks;
     }

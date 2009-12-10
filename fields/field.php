@@ -15,6 +15,8 @@ class syntax_plugin_bureaucracy_field {
     var $checks = array();
     var $checktypes = array('/' => 'match', '<' => 'max', '>' => 'min');
     var $syntax_plugin = null;
+    var $hidden = false;
+    var $error = false;
 
     /**
      * Construct a syntax_plugin_bureaucracy_field object
@@ -91,6 +93,10 @@ class syntax_plugin_bureaucracy_field {
         if(!$form->_infieldset){
             $form->startFieldset('');
         }
+        if ($this->error) {
+            $params['class'] = 'bureaucracy_error';
+        }
+
         $params = array_merge($this->opt, $params);
         $form->addElement($this->_parse_tpl($this->tpl, $params));
     }
@@ -106,9 +112,13 @@ class syntax_plugin_bureaucracy_field {
      *                    an array specifying their dependency state.
      **/
     function handle_post($value) {
+        if ($this->hidden) {
+            return true;
+        }
         if (trim($value) === '') {
             if(isset($this->opt['optional'])) return true;
             msg(sprintf($this->getLang('e_required'),hsc($this->opt['label'])),-1);
+            $this->error = true;
             return false;
         }
         $this->opt['value'] = $value;
@@ -118,6 +128,7 @@ class syntax_plugin_bureaucracy_field {
             if (!call_user_func(array($this, 'validate_' . $checktype), $check['d'], $value)) {
                 msg(sprintf($this->getLang('e_' . $checktype),
                             hsc($this->opt['label']), hsc($check['d'])), -1);
+                $this->error = true;
                 return false;
             }
         }
@@ -136,7 +147,8 @@ class syntax_plugin_bureaucracy_field {
      * Get an arbitrary parameter
      **/
     function getParam($name) {
-        if (!isset($this->opt[$name])) {
+        if (!isset($this->opt[$name]) ||
+            $name === 'value' && $this->hidden) {
             return null;
         }
         return $this->opt[$name];

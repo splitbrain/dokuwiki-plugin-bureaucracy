@@ -1,9 +1,13 @@
 <?php
 /**
- * Bureaucracy Plugin: Creates forms and submits them via email
+ * Bureaucracy Plugin: Allows flexible creation of forms
+ *
+ * This plugin allows definition of forms in wiki pages. The forms can be
+ * submitted via email or used to create new pages from templates.
  *
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  * @author     Andreas Gohr <andi@splitbrain.org>
+ * @author     Adrian Lang <dokuwiki@cosmocode.de>
  */
 // must be run within Dokuwiki
 if (!defined('DOKU_INC')) die();
@@ -139,74 +143,56 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $R->info['cache'] = false; // don't cache
 
         $this->form_id++;
-        $errors = array();
-        if (isset($_POST['bureaucracy']) && $_POST['bureaucracy_id'] == $this->form_id) {
-            list($errors, $hiddens) = $this->_checkpost($data['data']);
-
-            if (count($errors) === 0 && $data['action']) {
-                require_once DOKU_PLUGIN . 'bureaucracy/actions/action.php';
-                require_once DOKU_PLUGIN . 'bureaucracy/actions/' . $data['action']['type'] . '.php';
-                $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
-                $action = new $class();
-
-                $out_data = array();
-                foreach ($data['data'] as $id => $dat) {
-                    if (!isset($hiddens[$id])) $out_data[$id] = $dat;
-                }
-
-                $success = $action->run($out_data, $data['thanks'],
-                                        $data['action']['argv'], $errors);
-                if ($success) {
-                    $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">';
-                    $R->doc .= $success;
-                    $R->doc .= '</div>';
-                    return true;
-                }
-
-            }
+        if (isset($_POST['bureaucracy']) &&
+            $_POST['bureaucracy_id'] == $this->form_id &&
+            $this->_handlepost($data)) {
+            return true;
         }
-        $R->doc .= $this->_htmlform($data['data'],$errors);
+        $R->doc .= $this->_htmlform($data['data']);
 
         return true;
     }
 
     /**
-     * Validate any posted data, display errors using the msg() function,
-     * put a list of bad fields in the return array
+     * Validate data, perform action
      */
-    function _checkpost($data){
-        $errors = array();
-        $hiddens = array();
-        foreach ($data as $id => $opt) {
-            if ($id > 0 && isset($hiddens[$id - 1]) &&
-                $opt->getFieldType() !== 'fieldset') {
-                $hiddens[$id] = 1;
-                continue;
+    function _handlepost($data) {
+        $success = true;
+        foreach ($data['data'] as $id => $opt) {
+            if ($opt->getFieldType() === 'fieldset') {
+                $_ret = $opt->handle_post($_POST['bureaucracy'][$id], $id, $data['data']);
+            } else {
+                $_ret = $opt->handle_post($_POST['bureaucracy'][$id]);
             }
-            $_res = $opt->handle_post($_POST['bureaucracy'][$id]);
-            if ($_res === false) {
-                $errors[$id] = 1;
-                continue;
-            } elseif ($_res !== true) {
-                for ($n = 0 ; $n < $id; ++$n) {
-                    if ($data[$n]->getParam('label') != $_res[0]) {
-                        continue;
-                    }
-                    $hidden = $data[$n]->getParam('value') != $_res[1];
-                    if ($hidden) {
-                        $hiddens[$id] = 1;
-                    }
-                    break;
-                }
+            if (!$_ret) {
+                $success = false;
             }
         }
-        return array($errors, $hiddens);
+        if (!$success) {
+            return false;
+        }
+
+        require_once DOKU_PLUGIN . 'bureaucracy/actions/action.php';
+        require_once DOKU_PLUGIN . 'bureaucracy/actions/' . $data['action']['type'] . '.php';
+        $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
+        $action = new $class();
+
+        try {
+            $success = $action->run($data['data'], $data['thanks'],
+                                    $data['action']['argv']);
+            $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">'
+                    .  $success . '</div>';
+        } catch (Exception $e) {
+            msg($e->getMessage());
+            return false;
+        }
+        return true;
     }
 
     /**
      * Create the form
      */
-    function _htmlform($data,$errors){
+    function _htmlform($data){
         global $ID;
 
         $form = new Doku_Form(array('class' => 'bureaucracy__plugin',
@@ -215,11 +201,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $form->addHidden('bureaucracy_id', $this->form_id);
 
         foreach ($data as $id => $opt) {
-            $params = array('name' => 'bureaucracy['.$id.']');
-            if (isset($errors[$id])) {
-                $params['class'] = 'bureaucracy_error';
-            }
-            $opt->render($params, $form);
+            $opt->render(array('name' => 'bureaucracy['.$id.']'), $form);
         }
 
         ob_start();

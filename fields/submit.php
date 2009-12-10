@@ -17,6 +17,9 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
     }
 
     function handle_post($param) {
+        if ($this->hidden) {
+            return true;
+        }
         if(!syntax_plugin_bureaucracy_field_submit::$captcha_checked){
             syntax_plugin_bureaucracy_field_submit::$captcha_checked = true;
             // check CAPTCHA
