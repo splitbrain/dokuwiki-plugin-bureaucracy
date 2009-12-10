@@ -17,22 +17,36 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $pagename = '';
         $patterns = array();
         $values   = array();
+        $templates = array();
 
-        // run through fields and prepare replacements
+        // run through fields
         foreach($data as $opt) {
             $value = $opt->getParam('value');
-            $label = preg_quote($opt->getParam('label'),'/');
-            if($value === null || $label === null) continue;
-            // handle pagenames:
-            if(!is_null($opt->getParam('pagename'))){
+            $label = $opt->getParam('label');
+
+            // prepare replacements
+            if(!is_null($value) && !is_null($label)) {
+                $patterns[] = '/(@@|##)'.preg_quote($label, '/').'(@@|##)/i';
+                $values[]   = $value;
+            }
+
+            // handle pagenames
+            if(!is_null($opt->getParam('pagename')) && !is_null($value)){
                 // no namespace separators in input allowed:
                 $name = $value;
                 if($conf['useslash']) $name = str_replace('/',' ',$name);
                 $name = str_replace(':',' ',$name);
                 $pagename .= $sep . $name;
             }
-            $patterns[] = '/(@@|##)'.$label.'(@@|##)/i';
-            $values[]   = $value;
+
+            if (!is_null($opt->getParam('page_tpl')) &&
+                !is_null($opt->getParam('page_tgt'))) {
+                $page_tpl = preg_replace($patterns, $values, $opt->getParam('page_tpl'));
+                if (auth_aclcheck($page_tpl, $runs ? $runas : $_SERVER['REMOTE_USER'],
+                                  $USERINFO['grps']) >= AUTH_READ) {
+                    $templates[$opt->getParam('page_tgt')] = rawWiki($page_tpl);
+                }
+            }
         }
 
         // check pagename
@@ -45,6 +59,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             throw new Exception(sprintf($this->getLang('e_pageexists'), html_wikilink($pagename)));
         }
 
+        $_templates = array();
+        foreach($templates as $k => $v) {
+            $_templates["$pagename:$k"] = $v;
+        }
+        $templates = $_templates;
+
         // check auth
         $runas = $this->getConf('runas');
         if($runas){
@@ -56,12 +76,11 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             throw new Exception($this->getLang('e_denied'));
         }
 
-        $templates = array();
         // get templates
         if($tpl == '_'){
             // use namespace template
             $templates[$pagename] = pageTemplate(array($pagename));
-        } else {
+        } elseif($tpl !== '!') {
             // Namespace link
             require_once DOKU_INC.'inc/search.php';
             if ($runas) {
