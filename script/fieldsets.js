@@ -42,7 +42,7 @@ addInitEvent(function () {
             for (var i = 0; i < inputs.length ; ++i) {
                 if (inputs[i].dpar) handle_update.call(inputs[i]);
             }
-       }
+        }
 
         /* All labels in the form. */
         var labels = form.getElementsByTagName('label');

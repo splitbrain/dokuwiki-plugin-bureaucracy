@@ -99,7 +99,7 @@ var calendar = {
         if(current_year < 1900) current_year += 1900;
 
         for(var i=current_year-70; i<current_year+10; i++) {
-            this.wrt("<option value='"+i+"'")
+            this.wrt("<option value='"+i+"'");
             if(i == year) this.wrt(" selected='selected'");
             this.wrt(">"+i+"</option>");
         }
