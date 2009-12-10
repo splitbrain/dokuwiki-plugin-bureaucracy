@@ -30,17 +30,19 @@ addInitEvent(function () {
          * value and the depending fieldset.
          **/
         function handle_update() {
-            this.dpar.fset.style.display = (this.parentNode.parentNode.style.display !== 'none' &&
+            for (var n = 0 ; n < this.dpar.length ; ++n) {
+                this.dpar[n].fset.style.display = (this.parentNode.parentNode.style.display !== 'none' &&
                                             (this.checked || this.type !== 'checkbox' &&
-                                             (this.dpar.tval === true && this.value !== '') ||
-                                             this.value === this.dpar.tval)) ? 'block' : 'none';
-            var inputs = this.dpar.fset.getElementsByTagName('input');
-            for (var i = 0; i < inputs.length ; ++i) {
-                if (inputs[i].dpar) handle_update.call(inputs[i]);
-            }
-            var inputs = this.dpar.fset.getElementsByTagName('select');
-            for (var i = 0; i < inputs.length ; ++i) {
-                if (inputs[i].dpar) handle_update.call(inputs[i]);
+                                             (this.dpar[n].tval === true && this.value !== '') ||
+                                             this.value === this.dpar[n].tval)) ? 'block' : 'none';
+                var inputs = this.dpar[n].fset.getElementsByTagName('input');
+                for (var i = 0; i < inputs.length ; ++i) {
+                    if (inputs[i].dpar) handle_update.call(inputs[i]);
+                }
+                var inputs = this.dpar[n].fset.getElementsByTagName('select');
+                for (var i = 0; i < inputs.length ; ++i) {
+                    if (inputs[i].dpar) handle_update.call(inputs[i]);
+                }
             }
         }
 
@@ -70,7 +72,8 @@ addInitEvent(function () {
             /* Get the input or select determining the visibility of this
                fieldset. Take the last one to ignore the hidden checkbox input. */
             var dvalue = tvalues[tvalues.length - 1];
-            dvalue.dpar = {fset: depends[i].parentNode, tval: fvalue};
+            if (!dvalue.dpar) dvalue.dpar = [];
+            dvalue.dpar.push({fset: depends[i].parentNode, tval: fvalue});
             addEvent(dvalue, 'change', handle_update);
             todos.push(dvalue);
             depends[i].style.display = 'none';
