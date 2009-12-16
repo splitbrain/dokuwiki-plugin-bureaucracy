@@ -10,10 +10,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     function run($data, $thanks, $argv) {
         global $ID;
         global $conf;
+        global $USERINFO;
 
         list($tpl, $ns, $sep) = $argv;
         if(is_null($sep)) $sep = $conf['sepchar'];
 
+        $runas = $this->getConf('runas');
         $pagename = '';
         $patterns = array();
         $values   = array();
@@ -42,7 +44,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             if (!is_null($opt->getParam('page_tpl')) &&
                 !is_null($opt->getParam('page_tgt'))) {
                 $page_tpl = preg_replace($patterns, $values, $opt->getParam('page_tpl'));
-                if (auth_aclcheck($page_tpl, $runs ? $runas : $_SERVER['REMOTE_USER'],
+                if (auth_aclcheck($page_tpl, $runas ? $runas : $_SERVER['REMOTE_USER'],
                                   $USERINFO['grps']) >= AUTH_READ) {
                     $templates[$opt->getParam('page_tgt')] = rawWiki($page_tpl);
                 }
@@ -66,7 +68,6 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $templates = $_templates;
 
         // check auth
-        $runas = $this->getConf('runas');
         if($runas){
             $auth = auth_aclcheck($pagename,$runas,array());
         }else{
@@ -93,7 +94,8 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $USERINFO['grps'] = array();
             }
             $t_pages = array();
-            search($t_pages, $conf['datadir'], 'search_index', array(),
+            search($t_pages, $conf['datadir'], 'search_universal',
+                   array('depth' => 0, 'listfiles' => true),
                    str_replace(':', '/', getNS($tpl)));
             foreach($t_pages as $t_page) {
                 $t_name = cleanID($t_page['id']);
