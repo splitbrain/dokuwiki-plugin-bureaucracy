@@ -79,7 +79,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         // get templates
         if($tpl == '_'){
             // use namespace template
-            $templates[$pagename] = pageTemplate(array($pagename));
+            if (!isset($templates[$pagename])) {
+                $templates[$pagename] = pageTemplate(array($pagename));
+            }
         } elseif($tpl !== '!') {
             // Namespace link
             require_once DOKU_INC.'inc/search.php';
@@ -101,7 +103,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                        in the same namespace. */
                     continue;
                 }
-                $templates[$p_name] = rawWiki($t_name);
+                if (!isset($templates[$p_name])) {
+                    $templates[$p_name] = rawWiki($t_name);
+                }
             }
 
             if ($runas) {
