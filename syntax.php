@@ -15,22 +15,25 @@ if (!defined('DOKU_INC')) die();
 if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 
-require_once DOKU_PLUGIN . 'bureaucracy/fields/field.php';
-
 function syntax_plugin_bureaucracy_autoload($name) {
-    if (strpos($name, 'syntax_plugin_bureaucracy_field_') !== 0) {
+    if (!preg_match('/^syntax_plugin_bureaucracy_(field|action)(?:_(\w+))?$/', $name, $matches)) {
         return false;
     }
 
-    $subclass = substr($name, 32);
-    if (!@file_exists(DOKU_PLUGIN . 'bureaucracy/fields/' . $subclass . '.php')) {
+    if (!isset($matches[2])) {
+        // Autoloading the field / action base class
+        $matches[2] = $matches[1];
+    }
+
+    $filename = DOKU_PLUGIN . "bureaucracy/{$matches[1]}s/{$matches[2]}.php";
+    if (!@file_exists($filename)) {
         $plg = new syntax_plugin_bureaucracy;
-        msg(sprintf($plg->getLang('e_unknowntype'),hsc($subclass)),-1);
-        eval("class syntax_plugin_bureaucracy_field_$subclass extends " .
-             'syntax_plugin_bureaucracy_field { };');
+        msg(sprintf($plg->getLang($matches[1] === 'field' ? 'e_unknowntype' : 'e_noaction'),
+                    hsc($matches[2])), -1);
+        eval("class $name extends syntax_plugin_bureaucracy_{$matches[1]} { };");
         return true;
     }
-    require_once DOKU_PLUGIN . 'bureaucracy/fields/' . $subclass . '.php';
+    include $filename;
     return true;
 }
 
@@ -177,8 +180,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             return false;
         }
 
-        require_once DOKU_PLUGIN . 'bureaucracy/actions/action.php';
-        require_once DOKU_PLUGIN . 'bureaucracy/actions/' . $data['action']['type'] . '.php';
         $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
         $action = new $class();
 
