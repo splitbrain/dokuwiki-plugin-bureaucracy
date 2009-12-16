@@ -144,9 +144,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         $this->form_id++;
         if (isset($_POST['bureaucracy']) &&
-            $_POST['bureaucracy_id'] == $this->form_id &&
-            $this->_handlepost($data)) {
-            return true;
+            $_POST['bureaucracy_id'] == $this->form_id) {
+            $success = $this->_handlepost($data);
+            if ($success !== false) {
+                $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">'
+                        .  $success . '</div>';
+                return true;
+            }
         }
         $R->doc .= $this->_htmlform($data['data']);
 
@@ -165,6 +169,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $_ret = $opt->handle_post($_POST['bureaucracy'][$id]);
             }
             if (!$_ret) {
+                // Do not return instantly to allow validation of all fields.
                 $success = false;
             }
         }
@@ -180,13 +185,11 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         try {
             $success = $action->run($data['data'], $data['thanks'],
                                     $data['action']['argv']);
-            $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">'
-                    .  $success . '</div>';
         } catch (Exception $e) {
             msg($e->getMessage());
             return false;
         }
-        return true;
+        return $success;
     }
 
     /**
