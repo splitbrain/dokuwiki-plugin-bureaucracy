@@ -37,20 +37,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     var $nofield = array('action','static','fieldset','submit','thanks');
 
     /**
-     * return some info
-     */
-    function getInfo(){
-        return array(
-            'author' => 'Andreas Gohr',
-            'email'  => 'andi@splitbrain.org',
-            'date'   => '2009-08-16',
-            'name'   => 'Bureaucracy Plugin',
-            'desc'   => 'A simple form generator/emailer',
-            'url'    => 'http://dokuwiki.org/plugin:bureaucracy',
-        );
-    }
-
-    /**
      * What kind of syntax are we?
      */
     function getType(){
