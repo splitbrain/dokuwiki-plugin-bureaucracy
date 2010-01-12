@@ -62,6 +62,7 @@ div.dokuwiki form.bureaucracy__plugin label.bureaucracy_error span {
     position:absolute;
     width:250px;
     padding: 0 5px;
+    z-index: 99;
 }
 .calendar-box select.calendar-month {
     width:7em;
