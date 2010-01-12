@@ -4,6 +4,8 @@
  * @author Adrian Lang <lang@cosmocode.de>
  */
 addInitEvent(function () {
+    if(typeof Delay == 'undefined') return;
+
     var regexes = {
         'userpicker': /^()(.*)$/,
         'userspicker': /^((?:.*,)?)\s*([^,]*)$/
