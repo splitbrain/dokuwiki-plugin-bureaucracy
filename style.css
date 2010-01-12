@@ -45,6 +45,10 @@ div.dokuwiki form.bureaucracy__plugin label input.edit {
     margin-left: 5px;
 }
 
+div.dokuwiki form.bureaucracy__plugin label input.datepicker{
+    width: 8em;
+}
+
 div.dokuwiki form.bureaucracy__plugin label select {
     display: block;
     float: left;
