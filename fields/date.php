@@ -11,7 +11,7 @@ class syntax_plugin_bureaucracy_field_date extends syntax_plugin_bureaucracy_fie
             return false;
         }
 
-        if (!preg_match('/d{4}-\d{2}-\d{2}/', $value)) {
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
             msg(sprintf($this->getLang('e_date'),hsc($this->getParam('label'))),-1);
             return false;
         }
