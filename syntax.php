@@ -146,7 +146,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $R->info['cache'] = false; // don't cache
 
         $this->form_id++;
-        if (isset($_POST['bureaucracy']) &&
+        if (isset($_POST['bureaucracy']) && checkSecurityToken() &&
             $_POST['bureaucracy_id'] == $this->form_id) {
             $success = $this->_handlepost($data);
             if ($success !== false) {
