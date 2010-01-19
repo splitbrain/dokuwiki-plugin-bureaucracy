@@ -125,12 +125,35 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             // do the replacements
             $template = preg_replace($patterns,$values,$template);
 
-            // save page and return
+            // save page
             saveWikiText($pname, $template, sprintf($this->getLang('summary'),$ID));
 
         }
-        return $thanks.' '.implode(', ', array_map('html_wikilink', array_keys($templates)));
+
+        // Build result tree
+        $pages = array_keys($templates);
+        usort($pages, array($this, '_sort'));
+
+        $data = array();
+        $last_folder = array();
+        foreach($pages as $page) {
+            $lvl = substr_count($page, ':');
+            for ($n = 0 ; $n < $lvl ; ++$n) {
+                if (!isset($last_folder[$n]) || strpos($page, $last_folder[$n]['id']) !== 0) {
+                    $last_folder[$n] = array('id' => substr($page, 0, strpos($page, ':', ($n > 0 ? strlen($last_folder[$n - 1]['id']) : 0) + 1) + 1),
+                                             'level' => $n + 1,
+                                             'open' => 1);
+                    $data[] = $last_folder[$n];
+                }
+            }
+            $data[] = array('id' => $page, 'level' => 1 + substr_count($page, ':'), 'type' => 'f');
+        }
+        return '<p>' . $thanks . '</p>' . html_buildlist($data, 'idx', 'html_list_index', 'html_li_index');
     }
 
+    static function _sort($a, $b) {
+        $ns_diff = substr_count($a, ':') - substr_count($b, ':');
+        return ($ns_diff === 0) ? strcmp($a, $b) : ($ns_diff > 0 ? -1 : 1);
+    }
 }
 // vim:ts=4:sw=4:et:enc=utf-8:
