@@ -123,7 +123,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         foreach($templates as $pname => $template) {
 
             // do the replacements
-            $template = preg_replace($patterns,$values,$template);
+            $template = strftime(preg_replace($patterns,$values,$template));
 
             // save page
             saveWikiText($pname, $template, sprintf($this->getLang('summary'),$ID));
