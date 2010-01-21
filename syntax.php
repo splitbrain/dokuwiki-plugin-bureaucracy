@@ -168,7 +168,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         foreach ($data['data'] as $id => $opt) {
             if ($opt->getFieldType() === 'fieldset') {
                 $_ret = $opt->handle_post($_POST['bureaucracy'][$id], $id, $data['data']);
-            } else {
+            } elseif(!$opt->hidden) {
                 $_ret = $opt->handle_post($_POST['bureaucracy'][$id]);
             }
             if (!$_ret) {
