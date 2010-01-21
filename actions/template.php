@@ -148,12 +148,26 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             }
             $data[] = array('id' => $page, 'level' => 1 + substr_count($page, ':'), 'type' => 'f');
         }
-        return '<p>' . $thanks . '</p>' . html_buildlist($data, 'idx', 'html_list_index', 'html_li_index');
+        return '<p>' . $thanks . '</p>' . html_buildlist($data, 'idx', array($this, 'html_list_index'), 'html_li_index');
     }
 
     static function _sort($a, $b) {
         $ns_diff = substr_count($a, ':') - substr_count($b, ':');
         return ($ns_diff === 0) ? strcmp($a, $b) : ($ns_diff > 0 ? -1 : 1);
     }
+
+    static function html_list_index($item){
+        global $ID;
+        $ret = '';
+        $base = ':'.$item['id'];
+        $base = substr($base,strrpos($base,':')+1);
+        if($item['type']=='f'){
+            $ret .= html_wikilink(':'.$item['id']);
+        } else {
+            $ret .= '<strong>' . trim(substr($item['id'], strrpos($item['id'], ':', -2)), ':') . '</strong>';
+        }
+        return $ret;
+    }
+
 }
 // vim:ts=4:sw=4:et:enc=utf-8:
