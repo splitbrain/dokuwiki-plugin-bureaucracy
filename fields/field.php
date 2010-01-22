@@ -73,6 +73,10 @@ class syntax_plugin_bureaucracy_field {
                     }
                     $d = substr($d, 0, -1);
                 }
+                if (!function_exists('validate_' . $this->checktypes[$t])) {
+                    msg(sprintf($this->getLang('e_unknownconstraint'), hsc($t)), -1);
+                    return;
+                }
                 $this->checks[] = array('t' => $t, 'd' => $d);
             }
         }
