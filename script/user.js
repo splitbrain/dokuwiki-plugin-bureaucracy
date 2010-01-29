@@ -57,6 +57,9 @@ addInitEvent(function () {
             ul.appendChild(li);
             addEvent(li, 'click', function () {
                 input.value = (input.value.replace(regex, '$1 ' + this._user)).match(/\s*(.*)\s*/)[1];
+                if (input.className.match(/userspicker/)) {
+                    input.value += ', ';
+                }
                 this.parentNode.parentNode.removeChild(this.parentNode);
                 input.focus();
                 return false;
