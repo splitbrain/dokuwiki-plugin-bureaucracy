@@ -29,6 +29,9 @@ class syntax_plugin_bureaucracy_field {
      * default value, mark the field as optional or define that the field is
      * part of a pagename (when using the template action).
      *
+     * Since the field objects are cached, this constructor may not reference
+     * request data.
+     *
      * @param syntax_plugin_bureaucracy $syntax_plugin A syntax plugin; used
      *                                                 for getLang
      * @param array                     $args          The tokenized definition
@@ -94,6 +97,7 @@ class syntax_plugin_bureaucracy_field {
      * @params Doku_Form $form   The target Doku_Form object
      **/
     function render($params, $form) {
+        $this->_handlePreload();
         if(!$form->_infieldset){
             $form->startFieldset('');
         }
@@ -105,6 +109,16 @@ class syntax_plugin_bureaucracy_field {
         $form->addElement($this->_parse_tpl($this->tpl, $params));
     }
 
+
+    /**
+     * Check for preload value in the request
+     */
+    function _handlePreload() {
+        $preload_name = '@' . $this->getParam('label') . '@';
+        if (isset($_GET[$preload_name])) {
+            $this->setVal($_GET[$preload_name]);
+        }
+    }
 
     /**
      * Handle a post to the field

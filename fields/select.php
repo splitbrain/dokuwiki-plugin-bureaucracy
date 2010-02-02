@@ -3,6 +3,7 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
     var $extraargs = 2;
 
     function render($params, $form) {
+        $this->_handlePreload();
         if(!$form->_infieldset){
             $form->startFieldset('');
         }
