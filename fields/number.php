@@ -1,8 +1,8 @@
 <?php
 require_once DOKU_PLUGIN . 'bureaucracy/fields/textbox.php';
 class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_field_textbox {
-    function handle_post($value) {
-        if (!parent::handle_post($value)) {
+    function setVal($value) {
+        if (!parent::setVal($value)) {
             return false;
         }
 

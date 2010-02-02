@@ -6,8 +6,8 @@ class syntax_plugin_bureaucracy_field_date extends syntax_plugin_bureaucracy_fie
         $this->tpl = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@LABEL@@', '', '@@CLASS@@', array('class' => 'datepicker edit','maxlength'=>'10'));
     }
 
-    function handle_post($value) {
-        if (!parent::handle_post($value)) {
+    function setVal($value) {
+        if (!parent::setVal($value)) {
             return false;
         }
 

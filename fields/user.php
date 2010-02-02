@@ -6,8 +6,8 @@ class syntax_plugin_bureaucracy_field_user extends syntax_plugin_bureaucracy_fie
         $this->tpl['class'] .= ' userpicker';
     }
 
-    function handle_post($value) {
-        if (!parent::handle_post($value)) {
+    function setVal($value) {
+        if (!parent::setVal($value)) {
             return false;
         }
 

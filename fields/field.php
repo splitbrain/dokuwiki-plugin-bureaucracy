@@ -54,7 +54,7 @@ class syntax_plugin_bureaucracy_field {
         // parse additional arguments
         foreach($add_args as $arg){
             if ($arg[0] == '=') {
-                $this->opt['value'] = substr($arg,1);
+                $this->setVal(substr($arg,1));
             } elseif ($arg == '!') {
                 $this->opt['optional'] = true;
             } elseif($arg == '@') {
@@ -105,6 +105,7 @@ class syntax_plugin_bureaucracy_field {
         $form->addElement($this->_parse_tpl($this->tpl, $params));
     }
 
+
     /**
      * Handle a post to the field
      *
@@ -116,9 +117,17 @@ class syntax_plugin_bureaucracy_field {
      *                    an array specifying their dependency state.
      **/
     function handle_post($value) {
-        if ($this->hidden) {
-            return true;
-        }
+        return $this->hidden || $this->setVal($value);
+    }
+
+    /**
+     * Get the field type
+     **/
+    function getFieldType() {
+        return $this->opt['cmd'];
+    }
+
+    function setVal($value) {
         if (trim($value) === '') {
             if(isset($this->opt['optional'])) return true;
             msg(sprintf($this->getLang('e_required'),hsc($this->opt['label'])),-1);
@@ -138,13 +147,6 @@ class syntax_plugin_bureaucracy_field {
         }
 
         return true;
-    }
-
-    /**
-     * Get the field type
-     **/
-    function getFieldType() {
-        return $this->opt['cmd'];
     }
 
     /**
