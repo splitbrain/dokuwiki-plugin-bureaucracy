@@ -147,7 +147,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         $this->form_id++;
         if (isset($_POST['bureaucracy']) && checkSecurityToken() &&
-            $_POST['bureaucracy_id'] == $this->form_id) {
+            $_POST['bureaucracy']['$$id'] == $this->form_id) {
             $success = $this->_handlepost($data);
             if ($success !== false) {
                 $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">'
@@ -202,7 +202,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $form = new Doku_Form(array('class' => 'bureaucracy__plugin',
                                     'id'    => 'bureaucracy__plugin' . $this->form_id));
         $form->addHidden('id', $ID);
-        $form->addHidden('bureaucracy_id', $this->form_id);
+        $form->addHidden('bureaucracy[$$id]', $this->form_id);
 
         foreach ($data as $id => $opt) {
             $opt->render(array('name' => 'bureaucracy['.$id.']'), $form);
