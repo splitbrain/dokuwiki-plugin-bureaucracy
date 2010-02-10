@@ -13,7 +13,7 @@ class syntax_plugin_bureaucracy_field_user extends syntax_plugin_bureaucracy_fie
 
         global $auth;
 
-        if ($auth->getUserData($value) === false) {
+        if ($value !== '' && $auth->getUserData($value) === false) {
             msg(sprintf($this->getLang('e_user'),hsc($this->getParam('label'))),-1);
             return false;
         }

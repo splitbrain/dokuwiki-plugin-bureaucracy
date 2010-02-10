@@ -87,7 +87,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             // Namespace link
             require_once DOKU_INC.'inc/search.php';
             if ($runas) {
-                /* Hack user credentials. */
+                // Hack user credentials.
                 global $USERINFO;
                 $backup = array($_SERVER['REMOTE_USER'],$USERINFO['grps']);
                 $_SERVER['REMOTE_USER'] = $runas;

@@ -142,7 +142,7 @@ class syntax_plugin_bureaucracy_field {
     }
 
     function setVal($value) {
-        if (trim($value) === '') {
+        if ($value === '') {
             if(isset($this->opt['optional'])) return true;
             msg(sprintf($this->getLang('e_required'),hsc($this->opt['label'])),-1);
             $this->error = true;
