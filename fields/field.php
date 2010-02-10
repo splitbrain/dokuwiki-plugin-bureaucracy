@@ -142,25 +142,32 @@ class syntax_plugin_bureaucracy_field {
     }
 
     function setVal($value) {
-        if ($value === '') {
-            if(isset($this->opt['optional'])) return true;
-            msg(sprintf($this->getLang('e_required'),hsc($this->opt['label'])),-1);
+        try {
+            $this->_validate($value);
+            $this->opt['value'] = $value;
+            $this->error = false;
+        } catch (Exception $e) {
+            msg($e->getMessage(), -1);
             $this->error = true;
-            return false;
         }
-        $this->opt['value'] = $value;
+        return !$this->error;
+    }
+
+    protected function _validate($value) {
+         if ($value === '') {
+            if(!isset($this->opt['optional'])) {
+                throw new Exception(sprintf($this->getLang('e_required'),hsc($this->opt['label'])));
+            }
+            return;
+        }
 
         foreach ($this->checks as $check) {
             $checktype = $this->checktypes[$check['t']];
             if (!call_user_func(array($this, 'validate_' . $checktype), $check['d'], $value)) {
-                msg(sprintf($this->getLang('e_' . $checktype),
-                            hsc($this->opt['label']), hsc($check['d'])), -1);
-                $this->error = true;
-                return false;
+                throw new Exception(sprintf($this->getLang('e_' . $checktype),
+                                            hsc($this->opt['label']), hsc($check['d'])));
             }
         }
-
-        return true;
     }
 
     /**

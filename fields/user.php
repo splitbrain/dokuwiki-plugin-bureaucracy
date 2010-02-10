@@ -6,18 +6,13 @@ class syntax_plugin_bureaucracy_field_user extends syntax_plugin_bureaucracy_fie
         $this->tpl['class'] .= ' userpicker';
     }
 
-    function setVal($value) {
-        if (!parent::setVal($value)) {
-            return false;
-        }
+    function _validate($value) {
+        parent::_validate($value);
 
         global $auth;
 
         if ($value !== '' && $auth->getUserData($value) === false) {
-            msg(sprintf($this->getLang('e_user'),hsc($this->getParam('label'))),-1);
-            return false;
+            throw new Exception(sprintf($this->getLang('e_user'),hsc($this->getParam('label'))));
         }
-
-        return true;
     }
 }
