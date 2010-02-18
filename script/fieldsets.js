@@ -32,7 +32,7 @@ addInitEvent(function () {
         function handle_update() {
             for (var n = 0 ; n < this.dpar.length ; ++n) {
                 this.dpar[n].fset.style.display = (this.parentNode.parentNode.style.display !== 'none' &&
-                                            (this.checked || this.type !== 'checkbox' &&
+                                            ((this.checked == this.dpar[n].tval) || this.type !== 'checkbox' &&
                                              (this.dpar[n].tval === true && this.value !== '') ||
                                              this.value === this.dpar[n].tval)) ? 'block' : 'none';
                 var inputs = this.dpar[n].fset.getElementsByTagName('input');
