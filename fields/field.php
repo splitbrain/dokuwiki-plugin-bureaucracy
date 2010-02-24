@@ -181,6 +181,17 @@ class syntax_plugin_bureaucracy_field {
             $name === 'value' && $this->hidden) {
             return null;
         }
+        if ($name === 'pagename') {
+            // If $this->opt['pagename'] is set, return the escaped value of
+            // the field.
+            $value = $this->getParam('value');
+            if (is_null($value)) {
+                return null;
+            }
+            global $conf;
+            if($conf['useslash']) $value = str_replace('/',' ',$value);
+            return str_replace(':',' ',$value);
+        }
         return $this->opt[$name];
     }
 

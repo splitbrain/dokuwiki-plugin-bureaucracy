@@ -33,12 +33,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             }
 
             // handle pagenames
-            if(!is_null($opt->getParam('pagename')) && !is_null($value)){
-                // no namespace separators in input allowed:
-                $name = $value;
-                if($conf['useslash']) $name = str_replace('/',' ',$name);
-                $name = str_replace(':',' ',$name);
-                $pagename .= $sep . $name;
+            $pname = $opt->getParam('pagename');
+            if(!is_null($pname)){
+                $pagename .= $sep . $pname;
             }
 
             if (!is_null($opt->getParam('page_tpl')) &&
