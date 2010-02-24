@@ -142,9 +142,9 @@ class syntax_plugin_bureaucracy_field {
     }
 
     function setVal($value) {
+        $this->opt['value'] = $value;
         try {
             $this->_validate($value);
-            $this->opt['value'] = $value;
             $this->error = false;
         } catch (Exception $e) {
             msg($e->getMessage(), -1);
