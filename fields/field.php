@@ -142,9 +142,11 @@ class syntax_plugin_bureaucracy_field {
     }
 
     function setVal($value) {
-        $this->opt['value'] = $value;
+        if ($value !== '') {
+            $this->opt['value'] = $value;
+        }
         try {
-            $this->_validate($value);
+            $this->_validate();
             $this->error = false;
         } catch (Exception $e) {
             msg($e->getMessage(), -1);
@@ -153,8 +155,9 @@ class syntax_plugin_bureaucracy_field {
         return !$this->error;
     }
 
-    protected function _validate($value) {
-         if ($value === '') {
+    protected function _validate() {
+        $value = $this->getParam('value');
+        if (is_null($value)) {
             if(!isset($this->opt['optional'])) {
                 throw new Exception(sprintf($this->getLang('e_required'),hsc($this->opt['label'])));
             }

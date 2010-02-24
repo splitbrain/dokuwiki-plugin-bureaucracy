@@ -6,11 +6,11 @@ class syntax_plugin_bureaucracy_field_users extends syntax_plugin_bureaucracy_fi
         $this->tpl['class'] .= ' userspicker';
     }
 
-    function _validate($value) {
-        parent::_validate($value);
+    function _validate() {
+        parent::_validate();
 
         global $auth;
-        $users = array_filter(preg_split('/\s*,\s*/', $value));
+        $users = array_filter(preg_split('/\s*,\s*/', $this->getParam('value')));
         foreach ($users as $user) {
             if ($auth->getUserData($user) === false) {
                 throw new Exception(sprintf($this->getLang('e_user'), hsc($this->getParam('label'))));

@@ -6,10 +6,11 @@ class syntax_plugin_bureaucracy_field_date extends syntax_plugin_bureaucracy_fie
         $this->tpl = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@LABEL@@', '', '@@CLASS@@', array('class' => 'datepicker edit','maxlength'=>'10'));
     }
 
-    function _validate($value) {
-        parent::_validate($value);
+    function _validate() {
+        parent::_validate();
 
-        if ($value !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+        $value = $this->getParam('value');
+        if (!is_null($value) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
             throw new Exception(sprintf($this->getLang('e_date'),hsc($this->getParam('label'))));
         }
     }
