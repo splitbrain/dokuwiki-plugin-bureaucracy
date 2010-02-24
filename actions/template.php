@@ -96,7 +96,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                    str_replace(':', '/', getNS($tpl)));
             foreach($t_pages as $t_page) {
                 $t_name = cleanID($t_page['id']);
-                $p_name = preg_replace('/^' . preg_quote_cb(cleanID($tpl)) . '/', $pagename, $t_name);
+                $p_name = preg_replace('/^' . preg_quote_cb(cleanID($tpl)) . ':/', $pagename . ':', $t_name);
                 if ($p_name === $t_name) {
                     // When using a single-page template, ignore other pages
                     // in the same namespace.
