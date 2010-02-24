@@ -52,10 +52,10 @@ class syntax_plugin_bureaucracy_field {
         $keep = $this->extraargs - 1;
         if($keep > 0){
             $this->opt['args'] = array_slice($args,0,$keep);
+            $args = array_slice($args, $keep);
         }
-        $add_args = array_slice($args, $keep);
         // parse additional arguments
-        foreach($add_args as $arg){
+        foreach($args as $arg){
             if ($arg[0] == '=') {
                 $this->setVal(substr($arg,1));
             } elseif ($arg == '!') {
