@@ -208,11 +208,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             $opt->render(array('name' => 'bureaucracy['.$id.']'), $form);
         }
 
-        ob_start();
-        $form->printForm();
-        $out = ob_get_contents();
-        ob_end_clean();
-        return $out;
+        return $form->getForm();
     }
 
     /**
