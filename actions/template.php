@@ -12,11 +12,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         global $conf;
         global $USERINFO;
 
-        list($tpl, $ns, $sep) = $argv;
+        list($tpl, $pagename, $sep) = $argv;
         if(is_null($sep)) $sep = $conf['sepchar'];
 
         $runas = $this->getConf('runas');
-        $pagename = '';
         $patterns = array();
         $values   = array();
         $templates = array();
@@ -50,10 +49,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
         // check pagename
         $pagename = cleanID($pagename);
-        if(!$pagename) {
+        if ($pagename === '') {
             throw new Exception($this->getLang('e_pagename'));
         }
-        $pagename = cleanID($ns).':'.$pagename;
         if(page_exists($pagename)) {
             throw new Exception(sprintf($this->getLang('e_pageexists'), html_wikilink($pagename)));
         }
@@ -96,7 +94,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                    str_replace(':', '/', getNS($tpl)));
             foreach($t_pages as $t_page) {
                 $t_name = cleanID($t_page['id']);
-                $p_name = preg_replace('/^' . preg_quote_cb(cleanID($tpl)) . ':/', $pagename . ':', $t_name);
+                $p_name = preg_replace('/^' . preg_quote_cb(cleanID($tpl)) . '($|:)/', $pagename . '$1', $t_name);
                 if ($p_name === $t_name) {
                     // When using a single-page template, ignore other pages
                     // in the same namespace.
