@@ -1,7 +1,5 @@
 <?php
 class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_field {
-    var $extraargs = 1;
-
     function render($params, $form) {
         $params = array_merge(array('value' => false), $this->opt, $params);
         $check = $params['value'] ? 'checked="checked"' : '';

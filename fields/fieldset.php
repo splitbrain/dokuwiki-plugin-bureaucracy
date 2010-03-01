@@ -1,6 +1,5 @@
 <?php
 class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy_field {
-    var $extraargs = 0;
 
     function syntax_plugin_bureaucracy_field_fieldset($syntax_plugin, $args) {
         $this->syntax_plugin = $syntax_plugin;
