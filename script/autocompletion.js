@@ -44,6 +44,7 @@ function AutoCompletion(input, ajaxcall, multi, prepare_li) {
         // Strip out already selected values
         var n_values = [];
         for (var value in values) {
+            if (value === '') continue;
             var str = input.value.match(regex)[1];
             do {
                 var index = str.indexOf(value);
