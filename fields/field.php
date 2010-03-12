@@ -38,7 +38,7 @@ class syntax_plugin_bureaucracy_field {
      **/
     function syntax_plugin_bureaucracy_field($syntax_plugin, $args) {
         $this->syntax_plugin = $syntax_plugin;
-        if(count($args) < $this->extraargs + 1){
+        if(count($args) < $this->extraargs + 2){
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
                         hsc($args[1])), -1);
             return;
@@ -49,10 +49,9 @@ class syntax_plugin_bureaucracy_field {
                            'label' => array_shift($args));
 
         // save additional minimum args here
-        $keep = $this->extraargs - 1;
-        if($keep > 0){
-            $this->opt['args'] = array_slice($args,0,$keep);
-            $args = array_slice($args, $keep);
+        if($this->extraargs > 0){
+            $this->opt['args'] = array_slice($args,0,$this->extraargs);
+            $args = array_slice($args, $this->extraargs);
         }
         // parse additional arguments
         foreach($args as $arg){
