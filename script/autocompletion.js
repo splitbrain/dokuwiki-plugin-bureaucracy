@@ -68,7 +68,7 @@ function AutoCompletion(input, ajaxcall, multi, prepare_li) {
         ul.id = autoid;
         ul.style.top = (findPosY(input) + input.offsetHeight - 1) + 'px';
         ul.style.left = findPosX(input) + 'px';
-        ul.style.width = (input.offsetWidth - 10) + 'px';
+        ul.style.minWidth = (input.offsetWidth - 10) + 'px';
         ul._rm = function () { this.parentNode.removeChild(this); };
 
         for (var index in values) {
