@@ -1,5 +1,6 @@
 <?php
 class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_field {
+    var $mandatory_args = 1;
     static $captcha_displayed = false;
     static $captcha_checked = false;
 

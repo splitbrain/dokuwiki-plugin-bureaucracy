@@ -1,6 +1,15 @@
 <?php
 class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_field {
-    var $extraargs = 1;
+    var $mandatory_args = 3;
+
+    function __construct($syntax_plugin, $args) {
+        $this->init($syntax_plugin, $args);
+        $this->opt['args'] = array_filter(array_map('trim', explode('|',array_shift($args))));
+        $this->standardArgs($args);
+        if (!isset($params['value']) && isset($params['optional'])) {
+            array_unshift($this->opt['args'],' ');
+        }
+    }
 
     function render($params, $form) {
         $this->_handlePreload();
@@ -10,17 +19,10 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
         if ($this->error) {
             $params['class'] = 'bureaucracy_error';
         }
-
         $params = array_merge($this->opt, $params);
-        $vals = explode('|',$params['args'][0]);
-        $vals = array_map('trim',$vals);
-        $vals = array_filter($vals);
-        if (!isset($params['value']) && isset($params['optional'])) {
-            array_unshift($vals,' ');
-        }
         $form->addElement(call_user_func_array('form_makeListboxField',
                                                $this->_parse_tpl(array('@@NAME@@',
-                                                $vals, '@@VALUE|' . $vals[0] . '@@',
+                                                $params['args'], '@@VALUE|' . $params['args'][0] . '@@',
                                                 '@@LABEL@@', '', '@@CLASS@@'),
                                                 $params)));
     }

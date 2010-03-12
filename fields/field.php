@@ -10,7 +10,7 @@
  **/
 
 class syntax_plugin_bureaucracy_field {
-    var $extraargs = 0;
+    var $mandatory_args = 2;
     var $opt = array();
     var $checks = array();
     var $checktypes = array('/' => 'match', '<' => 'max', '>' => 'min');
@@ -37,22 +37,27 @@ class syntax_plugin_bureaucracy_field {
      * @param array                     $args          The tokenized definition
      **/
     function syntax_plugin_bureaucracy_field($syntax_plugin, $args) {
+        $this->init($syntax_plugin, $args);
+        $this->standardArgs($args);
+    }
+
+    function init($syntax_plugin, &$args) {
         $this->syntax_plugin = $syntax_plugin;
-        if(count($args) < $this->extraargs + 2){
+        if(count($args) < $this->mandatory_args){
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
                         hsc($args[1])), -1);
             return;
         }
 
         // get standard arguments
-        $this->opt = array('cmd'   => array_shift($args),
-                           'label' => array_shift($args));
-
-        // save additional minimum args here
-        if($this->extraargs > 0){
-            $this->opt['args'] = array_slice($args,0,$this->extraargs);
-            $args = array_slice($args, $this->extraargs);
+        $this->opt = array();
+        foreach (array('cmd', 'label') as $key) {
+            if (count($args) === 0) break;
+            $this->opt[$key] = array_shift($args);
         }
+    }
+
+    function standardArgs($args) {
         // parse additional arguments
         foreach($args as $arg){
             if ($arg[0] == '=') {
