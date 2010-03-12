@@ -96,7 +96,7 @@ div.dokuwiki form.bureaucracy__plugin label.bureaucracy_error span {
     background-color:#c9ff8b;
 }
 
-div.dokuwiki ul.bureaucracy_user_auto {
+div.dokuwiki ul.autocompletion {
     background:__background__ none repeat scroll 0 0;
     border:1px solid;
     list-style-image:none;
@@ -108,16 +108,16 @@ div.dokuwiki ul.bureaucracy_user_auto {
     position:absolute;
 }
 
-div.dokuwiki ul.bureaucracy_user_auto li {
+div.dokuwiki ul.autocompletion li {
     width: 100%;
     text-align: left;
 }
 
-div.dokuwiki ul.bureaucracy_user_auto li a {
+div.dokuwiki ul.autocompletion li a {
     width: 100%;
     display: block;
 }
 
-div.dokuwiki ul.bureaucracy_user_auto li a:hover {
+div.dokuwiki ul.autocompletion li a:hover {
     background: __background_alt__;
 }
