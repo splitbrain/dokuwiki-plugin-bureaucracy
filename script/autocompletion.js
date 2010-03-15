@@ -15,7 +15,7 @@
  */
 
 
-function AutoCompletion(input, ajaxcall, multi, prepare_li) {
+function AutoCompletion(input, ajaxcall, multi) {
     if (typeof Delay === 'undefined') return;
 
     var regex = multi ? /^((?:.*,)?)\s*([^,]*)$/
@@ -31,6 +31,7 @@ function AutoCompletion(input, ajaxcall, multi, prepare_li) {
                 return false;
     }
 
+    var _this = this;
     var ajax = new sack(DOKU_BASE + 'lib/exe/ajax.php');
     ajax.onCompletion = function () {
         var autoid = input.name.replace(/[\[\]]/g, '') + '__auto';
@@ -66,13 +67,12 @@ function AutoCompletion(input, ajaxcall, multi, prepare_li) {
         var ul = document.createElement('ul');
         ul.className = 'autocompletion ' + ajaxcall + '__auto';
         ul.id = autoid;
-        ul.style.top = (findPosY(input) + input.offsetHeight - 1) + 'px';
-        ul.style.left = findPosX(input) + 'px';
-        ul.style.minWidth = (input.offsetWidth - 10) + 'px';
         ul._rm = function () { this.parentNode.removeChild(this); };
+        _this.styleList(ul, input);
 
         for (var index in values) {
-            var li = prepare_li(document.createElement('li'), values[index]);
+            var li = document.createElement('li');
+            _this.prepareLi(li, values[index]);
             addEvent(li, 'click', handle_click);
             ul.appendChild(li);
         }
@@ -88,3 +88,16 @@ function AutoCompletion(input, ajaxcall, multi, prepare_li) {
 
     addEvent(input, 'keyup', function (e) { delay.start(this, e); });
 }
+
+AutoCompletion.prototype = {
+    styleList: function (ul, input) {
+        ul.style.top = (findPosY(input) + input.offsetHeight - 1) + 'px';
+        ul.style.left = findPosX(input) + 'px';
+        ul.style.minWidth = (input.offsetWidth - 10) + 'px';
+    },
+
+    prepareLi: function (li, value) {
+        li.innerHTML = '<a href="#">' + value[1] + '</a>';
+        li._value = value[1];
+    }
+};
