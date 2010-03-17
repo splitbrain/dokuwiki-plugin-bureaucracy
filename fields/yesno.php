@@ -1,11 +1,44 @@
 <?php
 class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_field {
+    public function __construct($syntax_plugin, $args) {
+        $this->init($syntax_plugin, $args);
+        $newargs = array();
+        foreach ($args as $arg) {
+            switch ($arg[0]) {
+            case '=':
+                $this->opt['true_value'] = substr($arg, 1);
+                break;
+            case '!':
+                $this->opt['false_value'] = substr($arg, 1);
+                break;
+            default:
+                $newargs[] = $arg;
+            }
+        }
+        $this->standardArgs($newargs);
+    }
+
+    public function getParam($key) {
+        if ($key === value) {
+            if ($this->opt['value'] === '1') {
+                return isset($this->opt['true_value']) ?
+                       $this->opt['true_value'] :
+                       '1';
+            } elseif ($this->opt['value'] === '0') {
+                return isset($this->opt['false_value']) ?
+                       $this->opt['false_value'] :
+                       '0';
+            }
+        }
+        return parent::getParam($key);
+    }
+
     function render($params, $form) {
         $params = array_merge(array('value' => false), $this->opt, $params);
         $check = $params['value'] ? 'checked="checked"' : '';
         $this->tpl = '<label class="@@CLASS@@"><span>@@LABEL@@</span>'.
                      '<input type="hidden" name="@@NAME@@" value="0" />' .
-                     '<input type="checkbox" name="@@NAME@@" value="Yes" ' .
+                     '<input type="checkbox" name="@@NAME@@" value="1" ' .
                      $check . ' /></label>';
         parent::render($params, $form);
     }
