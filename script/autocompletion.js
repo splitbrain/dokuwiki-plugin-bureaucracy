@@ -6,14 +6,9 @@
  * @param ajaxcall   string                  The ajax request ›call‹ parameter
  * @param multi      bool                    Whether the input can hold
  *                                           multiple values
- * @param prepare_li DOMref (DOMref, mixed)  Callback for styling the li from a
- *                                           backend response list item; this
- *                                           function should set the _value
- *                                           property of the DOMref parameter
  *
  * @author Adrian Lang <lang@cosmocode.de>
  */
-
 
 function AutoCompletion(input, ajaxcall, multi) {
     if (typeof Delay === 'undefined') return;
