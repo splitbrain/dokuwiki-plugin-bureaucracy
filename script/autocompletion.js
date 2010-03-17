@@ -17,13 +17,13 @@ function AutoCompletion(input, ajaxcall, multi) {
                       : /^()(.*)$/;
 
     function handle_click () {
-                this.parentNode._rm();
-                input.value = (input.value.replace(regex, '$1 ' + this._value)).match(/^\s*(.*)\s*$/)[1];
-                if (multi) {
-                    input.value += ', ';
-                }
-                input.focus();
-                return false;
+        this.parentNode._rm();
+        input.value = (input.value.replace(regex, '$1 ' + this._value)).match(/^\s*(.*)\s*$/)[1];
+        if (multi) {
+            input.value += ', ';
+        }
+        input.focus();
+        return false;
     }
 
     var _this = this;
@@ -62,7 +62,10 @@ function AutoCompletion(input, ajaxcall, multi) {
         var ul = document.createElement('ul');
         ul.className = 'autocompletion ' + ajaxcall + '__auto';
         ul.id = autoid;
-        ul._rm = function () { this.parentNode.removeChild(this); };
+        ul._rm = function () {
+            this.parentNode.removeChild(this);
+            this._rm = function () {};
+        };
         _this.styleList(ul, input);
 
         for (var index in values) {
@@ -72,6 +75,7 @@ function AutoCompletion(input, ajaxcall, multi) {
             ul.appendChild(li);
         }
 
+        addEvent(input, 'blur', function () { ul._rm();});
         input.parentNode.insertBefore(ul, input.nextSibling);
     };
 
@@ -82,6 +86,7 @@ function AutoCompletion(input, ajaxcall, multi) {
     });
 
     addEvent(input, 'keyup', function (e) { delay.start(this, e); });
+    addEvent(input, 'focus', function (e) { delay.start(this, e); });
 }
 
 AutoCompletion.prototype = {
