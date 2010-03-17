@@ -75,7 +75,6 @@ function AutoCompletion(input, ajaxcall, multi) {
             ul.appendChild(li);
         }
 
-        addEvent(input, 'blur', function () { ul._rm();});
         input.parentNode.insertBefore(ul, input.nextSibling);
     };
 
