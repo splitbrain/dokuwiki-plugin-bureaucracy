@@ -26,9 +26,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $label = $opt->getParam('label');
 
             // prepare replacements
-            if(!is_null($value) && !is_null($label)) {
-                $patterns[] = '/(@@|##)'.preg_quote($label, '/').'(@@|##)/i';
-                $values[]   = $value;
+            if(!is_null($label)) {
+                $patterns[] = '/(@@|##)'.preg_quote($label, '/').'\|(.*?)(@@|##)/i';
+                $values[] = is_null($value) ? '$2' : $value;
             }
 
             // handle pagenames
