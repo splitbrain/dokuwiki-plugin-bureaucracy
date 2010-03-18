@@ -19,11 +19,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $patterns = array();
         $values   = array();
         $templates = array();
-
         // run through fields
         foreach($data as $opt) {
-            $value = $opt->getParam('value');
             $label = $opt->getParam('label');
+            $value = $opt->getParam('value');
 
             // prepare replacements
             if(!is_null($label)) {

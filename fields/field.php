@@ -146,9 +146,10 @@ class syntax_plugin_bureaucracy_field {
     }
 
     function setVal($value) {
-        if ($value !== '') {
-            $this->opt['value'] = $value;
+        if ($value === '') {
+            $value = null;
         }
+        $this->opt['value'] = $value;
         try {
             $this->_validate();
             $this->error = false;
