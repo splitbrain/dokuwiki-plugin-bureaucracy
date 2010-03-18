@@ -1,8 +1,6 @@
 <?php
 class syntax_plugin_bureaucracy_field_addpage extends syntax_plugin_bureaucracy_field {
     function __construct($syntax_plugin, $args) {
-        $this->use = false;
-
         $this->syntax_plugin = $syntax_plugin;
         if(count($args) < 3){
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
@@ -18,12 +16,13 @@ class syntax_plugin_bureaucracy_field_addpage extends syntax_plugin_bureaucracy_
     }
 
     function handle_post($param) {
-        $this->use = true;
         return true;
     }
 
     function getParam($name) {
-        return ($name === 'value' || !$this->use) ? null : parent::getParam($name);
+        return ($name === 'value' ||
+                (in_array($name, array('page_tpl', 'page_tgt')) && $this->hidden)) ?
+               null :
+               parent::getParam($name);
     }
-
 }
