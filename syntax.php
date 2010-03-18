@@ -89,11 +89,10 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         // parse the lines into an command/argument array
         $cmds = array();
-        foreach ($lines as $line) {
-            $line = trim($line);
+        while (count($lines) > 0) {
+            $line = trim(array_shift($lines));
             if (!$line) continue;
-
-            $args = $this->_parse_line($line);
+            $args = $this->_parse_line($line, $lines);
             $args[0] = strtolower($args[0]);
 
             if (in_array($args[0], array('action', 'thanks'))) {
@@ -216,35 +215,40 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      *
      * @author William Fletcher <wfletcher@applestone.co.za>
      */
-    function _parse_line($line) {
+    function _parse_line($line, &$lines) {
         $args = array();
         $inQuote = false;
-        $len = strlen($line);
         $arg = '';
-        for ( $i = 0 ; $i < $len; $i++ ) {
-            if ( $line{$i} == '"' ) {
-                if ($inQuote) {
-                    array_push($args, $arg);
-                    $inQuote = false;
-                    $arg = '';
-                    continue;
-                } else {
-                    $inQuote = true;
-                    continue;
+        do {
+            $len = strlen($line);
+            for ( $i = 0 ; $i < $len; $i++ ) {
+                if ( $line{$i} == '"' ) {
+                    if ($inQuote) {
+                        array_push($args, $arg);
+                        $inQuote = false;
+                        $arg = '';
+                        continue;
+                    } else {
+                        $inQuote = true;
+                        continue;
+                    }
+                } else if ( $line{$i} == ' ' ) {
+                    if ($inQuote) {
+                        $arg .= ' ';
+                        continue;
+                    } else {
+                        if ( strlen($arg) < 1 ) continue;
+                        array_push($args, $arg);
+                        $arg = '';
+                        continue;
+                    }
                 }
-            } else if ( $line{$i} == ' ' ) {
-                if ($inQuote) {
-                    $arg .= ' ';
-                    continue;
-                } else {
-                    if ( strlen($arg) < 1 ) continue;
-                    array_push($args, $arg);
-                    $arg = '';
-                    continue;
-                }
+                $arg .= $line{$i};
             }
-            $arg .= $line{$i};
-        }
+            if (!$inQuote) break;
+            $line = array_shift($lines);
+            $arg .= "\n";
+        } while (true);
         if ( strlen($arg) > 0 ) array_push($args, $arg);
         return $args;
     }
