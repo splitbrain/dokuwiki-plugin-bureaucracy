@@ -41,7 +41,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
             }
             $hidden = (count($this->depends_on) > 1) ?
                       ($data[$n]->getParam('value') != $this->depends_on[1]) :
-                      !($data[$n]->getParam('value'));
+                      !($data[$n]->isSet_());
             break;
         }
         if ($hidden) {

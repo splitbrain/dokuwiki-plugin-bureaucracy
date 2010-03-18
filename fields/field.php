@@ -160,15 +160,19 @@ class syntax_plugin_bureaucracy_field {
         return !$this->error;
     }
 
+    public function isSet_() {
+        return !is_null($this->getParam('value'));
+    }
+
     protected function _validate() {
-        $value = $this->getParam('value');
-        if (is_null($value)) {
+        if (!$this->isSet_()) {
             if(!isset($this->opt['optional'])) {
                 throw new Exception(sprintf($this->getLang('e_required'),hsc($this->opt['label'])));
             }
             return;
         }
 
+        $value = $this->getParam('value');
         foreach ($this->checks as $check) {
             $checktype = $this->checktypes[$check['t']];
             if (!call_user_func(array($this, 'validate_' . $checktype), $check['d'], $value)) {
