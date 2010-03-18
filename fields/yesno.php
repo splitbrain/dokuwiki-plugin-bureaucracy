@@ -16,18 +16,19 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
             }
         }
         $this->standardArgs($newargs);
+        $this->opt['optional'] = true;
     }
 
     public function getParam($key) {
-        if ($key === value) {
+        if ($key === 'value') {
             if ($this->opt['value'] === '1') {
                 return isset($this->opt['true_value']) ?
                        $this->opt['true_value'] :
-                       '1';
+                       null;
             } elseif ($this->opt['value'] === '0') {
                 return isset($this->opt['false_value']) ?
                        $this->opt['false_value'] :
-                       '0';
+                       null;
             }
         }
         return parent::getParam($key);
