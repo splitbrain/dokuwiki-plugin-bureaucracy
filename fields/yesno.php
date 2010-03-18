@@ -35,7 +35,7 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
     }
 
     public function isSet_() {
-        return $this->opt['value'] === 1;
+        return $this->opt['value'] === '1';
     }
 
     function render($params, $form) {
