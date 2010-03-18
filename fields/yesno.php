@@ -16,6 +16,7 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
             }
         }
         $this->standardArgs($newargs);
+        $this->opt['optional'] = true;
     }
 
     public function getParam($key) {
@@ -34,7 +35,7 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
     }
 
     public function isSet_() {
-        return true;
+        return $this->opt['value'] === 1;
     }
 
     function render($params, $form) {
