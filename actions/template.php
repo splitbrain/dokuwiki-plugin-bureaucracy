@@ -26,10 +26,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
             // prepare replacements
             if(!is_null($label)) {
-                $patterns[] = '/(?:@@|##)' . preg_quote($label, '/') .
+                $patterns[] = '/(@@|##)' . preg_quote($label, '/') .
                               '(?:\|(.*?))' . (is_null($value) ? '' : '?') .
-                              '(?:@@|##)/i';
-                $values[] = is_null($value) ? '$1' : $value;
+                              '\1/i';
+                $values[] = is_null($value) ? '$2' : $value;
             }
 
             // handle pagenames
@@ -125,7 +125,6 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
             // save page
             saveWikiText($pname, $template, sprintf($this->getLang('summary'),$ID));
-
         }
 
         // Build result tree
