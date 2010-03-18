@@ -59,7 +59,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
         $_templates = array();
         foreach($templates as $k => $v) {
-            $_templates["$pagename:$k"] = $v;
+            $_templates[cleanID("$pagename:$k")] = $v;
         }
         $templates = $_templates;
 
