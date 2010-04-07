@@ -36,8 +36,7 @@ div.dokuwiki form.bureaucracy__plugin label input {
     margin-left: 5px;
 }
 
-div.dokuwiki form.bureaucracy__plugin label textarea.edit,
-div.dokuwiki form.bureaucracy__plugin label input.edit {
+div.dokuwiki form.bureaucracy__plugin label .edit {
     width: 48%;
     display: block;
     float: left;
