@@ -75,7 +75,10 @@ function AutoCompletion(input, ajaxcall, multi) {
             ul.appendChild(li);
         }
 
-        input.parentNode.insertBefore(ul, input.nextSibling);
+        var div = document.createElement('div');
+        div.appendChild(ul);
+        div.className = 'JSpopup';
+        input.parentNode.insertBefore(div, input.nextSibling);
     };
 
     var delay = new Delay(function () {
