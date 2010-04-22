@@ -26,7 +26,8 @@ function AutoCompletion(input, ajaxcall, multi) {
         return false;
     }
 
-    var _this = this;
+    // We cannot be sure that this function is called as a constructor
+    var _this = (this === window) ? arguments.callee.prototype : this;
     var ajax = new sack(DOKU_BASE + 'lib/exe/ajax.php');
     ajax.onCompletion = function () {
         var autoid = input.name.replace(/[\[\]]/g, '') + '__auto';
