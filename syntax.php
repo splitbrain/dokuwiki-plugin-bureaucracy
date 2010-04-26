@@ -16,7 +16,7 @@ if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'syntax.php');
 
 function syntax_plugin_bureaucracy_autoload($name) {
-    if (!preg_match('/^syntax_plugin_bureaucracy_(field|action)(?:_(\w+))?$/', $name, $matches)) {
+    if (!preg_match('/^syntax_plugin_bureaucracy_(field|action)(?:_(.*))?$/', $name, $matches)) {
         return false;
     }
 
@@ -93,7 +93,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             $line = trim(array_shift($lines));
             if (!$line) continue;
             $args = $this->_parse_line($line, $lines);
-            $args[0] = strtolower($args[0]);
+            $args[0] = $this->_sanitizeClassName($args[0]);
 
             if (in_array($args[0], array('action', 'thanks'))) {
                 if (count($args) < 2) {
@@ -121,7 +121,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
         // check if action is available
-        $action['type'] = preg_replace('/[^a-z]+/', '', $action['type']);
+        $action['type'] = $this->_sanitizeClassName($action['type']);
         if (!$action['type'] ||
             !@file_exists(DOKU_PLUGIN.'bureaucracy/actions/' .
                           $action['type'] . '.php')) {
@@ -251,6 +251,10 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         } while (true);
         if ( strlen($arg) > 0 ) array_push($args, $arg);
         return $args;
+    }
+
+    function _sanitizeClassName($classname) {
+        return preg_replace('/[^\w\x7f-\xff]/', '', strtolower($classname));
     }
 }
 
