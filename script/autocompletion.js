@@ -10,8 +10,19 @@
  * @author Adrian Lang <lang@cosmocode.de>
  */
 
-function AutoCompletion(input, ajaxcall, multi) {
+function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
     if (typeof Delay === 'undefined') return;
+
+    styleList = styleList || function (ul, input) {
+        ul.style.top = (findPosY(input) + input.offsetHeight - 1) + 'px';
+        ul.style.left = findPosX(input) + 'px';
+        ul.style.minWidth = (input.offsetWidth - 10) + 'px';
+    };
+
+    prepareLi = prepareLi || function (li, value) {
+        li.innerHTML = '<a href="#">' + value[1] + '</a>';
+        li._value = value[1];
+    };
 
     var regex = multi ? /^((?:.*,)?)\s*([^,]*)$/
                       : /^()(.*)$/;
@@ -26,8 +37,6 @@ function AutoCompletion(input, ajaxcall, multi) {
         return false;
     }
 
-    // We cannot be sure that this function is called as a constructor
-    var _this = (this === window) ? arguments.callee.prototype : this;
     var ajax = new sack(DOKU_BASE + 'lib/exe/ajax.php');
     ajax.onCompletion = function () {
         var autoid = input.name.replace(/[\[\]]/g, '') + '__auto';
@@ -67,11 +76,11 @@ function AutoCompletion(input, ajaxcall, multi) {
             this.parentNode.removeChild(this);
             this._rm = function () {};
         };
-        _this.styleList(ul, input);
+        styleList(ul, input);
 
         for (var index in values) {
             var li = document.createElement('li');
-            _this.prepareLi(li, values[index]);
+            prepareLi(li, values[index]);
             addEvent(li, 'click', handle_click);
             ul.appendChild(li);
         }
@@ -91,16 +100,3 @@ function AutoCompletion(input, ajaxcall, multi) {
     addEvent(input, 'keyup', function (e) { delay.start(this, e); });
     addEvent(input, 'focus', function (e) { delay.start(this, e); });
 }
-
-AutoCompletion.prototype = {
-    styleList: function (ul, input) {
-        ul.style.top = (findPosY(input) + input.offsetHeight - 1) + 'px';
-        ul.style.left = findPosX(input) + 'px';
-        ul.style.minWidth = (input.offsetWidth - 10) + 'px';
-    },
-
-    prepareLi: function (li, value) {
-        li.innerHTML = '<a href="#">' + value[1] + '</a>';
-        li._value = value[1];
-    }
-};
