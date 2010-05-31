@@ -27,6 +27,12 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
     var regex = multi ? /^((?:.*,)?)\s*([^,]*)$/
                       : /^()(.*)$/;
 
+    var delay = new Delay(function () {
+        ajax.setVar('call', ajaxcall);
+        ajax.setVar('search', this.value.match(regex)[2]);
+        ajax.runAJAX();
+    });
+
     function handle_click () {
         this.parentNode._rm();
         input.value = (input.value.replace(regex, '$1 ' + this._value)).match(/^\s*(.*)\s*$/)[1];
@@ -34,6 +40,7 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
             input.value += ', ';
         }
         input.focus();
+        delay.delTimer();
         return false;
     }
 
@@ -90,12 +97,6 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
         div.className = 'JSpopup';
         input.parentNode.insertBefore(div, input.nextSibling);
     };
-
-    var delay = new Delay(function () {
-        ajax.setVar('call', ajaxcall);
-        ajax.setVar('search', this.value.match(regex)[2]);
-        ajax.runAJAX();
-    });
 
     addEvent(input, 'keyup', function (e) { delay.start(this, e); });
     addEvent(input, 'focus', function (e) { delay.start(this, e); });
