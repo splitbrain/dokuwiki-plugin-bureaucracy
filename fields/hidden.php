@@ -8,7 +8,7 @@ class syntax_plugin_bureaucracy_field_hidden extends syntax_plugin_bureaucracy_f
 
     function getParam($name) {
         if (!isset($this->opt[$name]) ||
-            $name === 'value' && $this->hidden) {
+            in_array($name, array('pagename', 'value')) && $this->hidden) {
             return null;
         }
         if ($name === 'pagename') {
