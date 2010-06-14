@@ -245,7 +245,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 }
                 $arg .= $line{$i};
             }
-            if (!$inQuote) break;
+            if (!$inQuote || count($lines) === 0) break;
             $line = array_shift($lines);
             $arg .= "\n";
         } while (true);
