@@ -189,6 +189,11 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             msg($e->getMessage());
             return false;
         }
+
+        // Perform after_action hooks
+        foreach($data['data'] as $id => $field) {
+            $field->after_action();
+        }
         return $success;
     }
 

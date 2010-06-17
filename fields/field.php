@@ -257,4 +257,7 @@ class syntax_plugin_bureaucracy_field {
     function validate_max($d, $value) {
         return $value < $d;
     }
+
+    function after_action() {
+    }
 }
