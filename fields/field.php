@@ -228,7 +228,7 @@ class syntax_plugin_bureaucracy_field {
         foreach ($tpl as &$val) {
             /* Select box passes options as an array. We do not escape those. */
             if (is_array($val)) continue;
-            preg_match_all('/@@([A-Z]+)(?:\|((?:[^@]|@$|@[^@])+))?@@/', $val, &$pregs);
+            preg_match_all('/@@([A-Z]+)(?:\|((?:[^@]|@$|@[^@])+))?@@/', $val, $pregs);
             for ($i = 0 ; $i < count($pregs[2]) ; ++$i) {
                 if (isset($params[strtolower($pregs[1][$i])])) {
                     $pregs[2][$i] = $params[strtolower($pregs[1][$i])];
