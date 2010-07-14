@@ -40,7 +40,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
             if (!is_null($opt->getParam('page_tpl')) &&
                 !is_null($opt->getParam('page_tgt'))) {
-                $page_tpl = preg_replace($patterns, $values, $opt->getParam('page_tpl'));
+                $page_tpl = $this->replace($patterns, $values, $opt->getParam('page_tpl'));
                 if (auth_aclcheck($page_tpl, $runas ? $runas : $_SERVER['REMOTE_USER'],
                                   $USERINFO['grps']) >= AUTH_READ) {
                     $templates[$opt->getParam('page_tgt')] = rawWiki($page_tpl);
@@ -48,6 +48,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             }
         }
 
+        $pagename = $this->replace($patterns, $values, $pagename);
         // check pagename
         $pagename = cleanID($pagename);
         if ($pagename === '') {
@@ -117,14 +118,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         }
 
         foreach($templates as $pname => $template) {
-
-            // do the replacements
-            $template = preg_replace_callback('/%./',
-                                              create_function('$m','return strftime($m[0]);'),
-                                              preg_replace($patterns,$values,$template));
-
             // save page
-            saveWikiText($pname, $template, sprintf($this->getLang('summary'),$ID));
+            saveWikiText($pname,
+                         $this->replace($patterns, $values, $template),
+                         sprintf($this->getLang('summary'), $ID));
         }
 
         // Build result tree
@@ -164,6 +161,13 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $ret .= '<strong>' . trim(substr($item['id'], strrpos($item['id'], ':', -2)), ':') . '</strong>';
         }
         return $ret;
+    }
+
+    function replace($patterns, $values, $input) {
+        return preg_replace_callback('/%./',
+                                     create_function('$m','return strftime($m[0]);'),
+                                     preg_replace($patterns, $values, $input));
+
     }
 
 }
