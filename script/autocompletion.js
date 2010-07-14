@@ -95,9 +95,9 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
         var div = document.createElement('div');
         div.appendChild(ul);
         div.className = 'JSpopup';
-        input.parentNode.insertBefore(div, input.nextSibling);
+        getElementsByClass('dokuwiki', document.body, 'div')[0].appendChild(div);
     };
 
     addEvent(input, 'keyup', function (e) { delay.start(this, e); });
-    addEvent(input, 'focus', function (e) { delay.start(this, e); });
+    addEvent(input, 'click', function (e) { delay.start(this, e); });
 }
