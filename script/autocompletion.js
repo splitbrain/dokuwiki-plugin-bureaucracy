@@ -80,7 +80,7 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
         ul.className = 'autocompletion ' + ajaxcall + '__auto';
         ul.id = autoid;
         ul._rm = function () {
-            this.parentNode.removeChild(this);
+            this.parentNode.parentNode.removeChild(this.parentNode);
             this._rm = function () {};
         };
         styleList(ul, input);
