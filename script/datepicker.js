@@ -86,7 +86,7 @@ var calendar = {
         }
 
         this.wrt("<table>");
-        this.wrt("<tr><th><a href='javascript:calendar.makeCalendar("+(previous_month_year)+","+(previous_month)+");' title='"+this.month_names[previous_month]+" "+(previous_month_year)+"'>&lt;</a></th>");
+        this.wrt("<tr><th><a onclick='calendar.makeCalendar("+(previous_month_year)+","+(previous_month)+");' title='"+this.month_names[previous_month]+" "+(previous_month_year)+"'>&lt;</a></th>");
         this.wrt("<th colspan='5' class='calendar-title'><select name='calendar-month' class='calendar-month' onChange='calendar.makeCalendar("+year+",this.value);'>");
         for(var i in this.month_names) {
             this.wrt("<option value='"+i+"'");
@@ -104,7 +104,7 @@ var calendar = {
             this.wrt(">"+i+"</option>");
         }
         this.wrt("</select></th>");
-        this.wrt("<th><a href='javascript:calendar.makeCalendar("+(next_month_year)+","+(next_month)+");' title='"+this.month_names[next_month]+" "+(next_month_year)+"'>&gt;</a></th></tr>");
+        this.wrt("<th><a onclick='calendar.makeCalendar("+(next_month_year)+","+(next_month)+");' title='"+this.month_names[next_month]+" "+(next_month_year)+"'>&gt;</a></th></tr>");
         this.wrt("<tr class='header'>");
         for(var weekday=0; weekday<7; weekday++) this.wrt("<td>"+this.weekdays[weekday]+"</td>");
         this.wrt("</tr>");
@@ -145,7 +145,7 @@ var calendar = {
 
                     class_name += " " + this.weekdays[j].toLowerCase();
 
-                    this.wrt("<td class='days"+class_name+"'><a href='javascript:calendar.selectDate(\""+year+"\",\""+mon+"\",\""+w+"\")'>"+w+"</a></td>");
+                    this.wrt("<td class='days"+class_name+"'><a onclick='calendar.selectDate(\""+year+"\",\""+mon+"\",\""+w+"\")'>"+w+"</a></td>");
                     d++;
                 } else {
                     this.wrt("<td class='days'>&nbsp;</td>");
