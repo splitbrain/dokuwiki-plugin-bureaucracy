@@ -46,7 +46,7 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
 
     var ajax = new sack(DOKU_BASE + 'lib/exe/ajax.php');
     ajax.onCompletion = function () {
-        var autoid = input.name.replace(/[\[\]]/g, '') + '__auto';
+        var autoid = (input.name || input.id).replace(/[\[\]]/g, '') + '__auto';
         var values = eval(this.response);
         var oldul = $(autoid);
         if (oldul) {
