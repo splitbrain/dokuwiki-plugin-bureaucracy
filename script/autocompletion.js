@@ -14,9 +14,9 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
     if (typeof Delay === 'undefined') return;
 
     styleList = styleList || function (ul, input) {
-        ul.style.top = (findPosY(input) + input.offsetHeight - 1) + 'px';
-        ul.style.left = findPosX(input) + 'px';
-        ul.style.minWidth = (input.offsetWidth - 10) + 'px';
+        ul.style.top = (input.offsetTop + input.offsetHeight - 1) + 'px';
+        ul.style.left = input.offsetLeft + 'px';
+        ul.style.minWidth = input.offsetWidth - 10 + 'px';
     };
 
     prepareLi = prepareLi || function (li, value) {
@@ -95,7 +95,7 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
         var div = document.createElement('div');
         div.appendChild(ul);
         div.className = 'JSpopup';
-        getElementsByClass('dokuwiki', document.body, 'div')[0].appendChild(div);
+        input.parentNode.appendChild(div);
     };
 
     addEvent(input, 'keyup', function (e) { delay.start(this, e); });

@@ -9,6 +9,10 @@ div.dokuwiki form.bureaucracy__plugin {
     text-align: center;
 }
 
+div.dokuwiki form.bureaucracy__plugin input.button {
+    clear: left;
+}
+
 div.dokuwiki form.bureaucracy__plugin p {
     font-size: 90%;
     text-align: left;
@@ -20,8 +24,10 @@ div.dokuwiki form.bureaucracy__plugin fieldset {
 
 div.dokuwiki form.bureaucracy__plugin label {
     display: block;
-    overflow: auto;
     margin: 5px;
+    /* AutoCompletion anchor */
+    position: relative;
+/*    overflow: visible;*/
 }
 
 div.dokuwiki form.bureaucracy__plugin label span {
@@ -31,22 +37,16 @@ div.dokuwiki form.bureaucracy__plugin label span {
     float: left;
 }
 
-div.dokuwiki form.bureaucracy__plugin label input {
-    float: left;
-    margin-left: 5px;
-}
-
 div.dokuwiki form.bureaucracy__plugin label .edit {
     width: 48%;
-    display: block;
-    float: left;
-    margin-left: 5px;
 }
 
-div.dokuwiki form.bureaucracy__plugin label input.datepicker{
+div.dokuwiki form.bureaucracy__plugin label input.datepicker {
     width: 8em;
 }
 
+div.dokuwiki form.bureaucracy__plugin label input,
+div.dokuwiki form.bureaucracy__plugin label .edit,
 div.dokuwiki form.bureaucracy__plugin label select {
     display: block;
     float: left;
@@ -57,6 +57,7 @@ div.dokuwiki form.bureaucracy__plugin label.bureaucracy_error span {
     color: #F00;
 }
 
+/* CALENDAR */
 .calendar-box {
     display:none;
     background-color:#fff;
@@ -95,6 +96,7 @@ div.dokuwiki form.bureaucracy__plugin label.bureaucracy_error span {
     background-color:#c9ff8b;
 }
 
+/* AUTOCOMPLETION */
 div.dokuwiki ul.autocompletion {
     background:__background__ none repeat scroll 0 0;
     border:1px solid;
@@ -105,11 +107,14 @@ div.dokuwiki ul.autocompletion {
     padding:0.3em;
     margin:0;
     position:absolute;
+    z-index: 40;
+
+    /* IE 7 fix */
+    text-align: left;
 }
 
 div.dokuwiki ul.autocompletion li {
     width: 100%;
-    text-align: left;
 }
 
 div.dokuwiki ul.autocompletion li a {
