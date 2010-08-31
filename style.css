@@ -9,6 +9,8 @@ div.dokuwiki form.bureaucracy__plugin {
     text-align: center;
 }
 
+div.dokuwiki form.bureaucracy__plugin p,
+div.dokuwiki form.bureaucracy__plugin label span,
 div.dokuwiki form.bureaucracy__plugin input.button {
     clear: left;
 }
