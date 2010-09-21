@@ -106,7 +106,7 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
             prepareLi(li, values[index]);
             addEvent(li, 'click', handle_click);
             addEvent(li, 'mouseover', function (e) {
-                var p = e.relatedTarget || e.toElement;
+                var p = e.relatedTarget || e.fromElement;
                 while (p && p !== this) {
                     p = p.parentNode;
                 }
