@@ -12,6 +12,8 @@
 
 function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
     if (typeof Delay === 'undefined') return;
+    var autoid = (input.name || input.id).replace(/[\[\]]/g, '') + '__auto';
+    input.setAttribute('autocomplete', 'off');
 
     styleList = styleList || function (ul, input) {
         ul.style.top = (input.offsetTop + input.offsetHeight - 1) + 'px';
@@ -33,7 +35,22 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
         ajax.runAJAX();
     });
 
-    function handle_click () {
+    function getCurSel() {
+        var auto = $(autoid);
+        if (!auto) return;
+        var oldsel = getElementsByClass('auto_cur', auto, 'li');
+        return (oldsel.length > 0) ? oldsel[0] : null;
+    }
+
+    function highlight(item) {
+        var oldsel = getCurSel();
+        if (oldsel) {
+            oldsel.className = oldsel.className.replace(/\s+auto_cur\b/g, '');
+        }
+        item.className += ' auto_cur';
+    }
+
+    function handle_click() {
         this.parentNode._rm();
         input.value = (input.value.replace(regex, '$1 ' + this._value)).match(/^\s*(.*)\s*$/)[1];
         if (multi) {
@@ -46,7 +63,6 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
 
     var ajax = new sack(DOKU_BASE + 'lib/exe/ajax.php');
     ajax.onCompletion = function () {
-        var autoid = (input.name || input.id).replace(/[\[\]]/g, '') + '__auto';
         var values = eval(this.response);
         var oldul = $(autoid);
         if (oldul) {
@@ -89,6 +105,16 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
             var li = document.createElement('li');
             prepareLi(li, values[index]);
             addEvent(li, 'click', handle_click);
+            addEvent(li, 'mouseover', function (e) {
+                var p = e.relatedTarget || e.toElement;
+                while (p && p !== this) {
+                    p = p.parentNode;
+                }
+                if (p === this) {
+                    return;
+                }
+                highlight(this);
+            });
             ul.appendChild(li);
         }
 
@@ -98,6 +124,35 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
         input.parentNode.appendChild(div);
     };
 
-    addEvent(input, 'keyup', function (e) { delay.start(this, e); });
+    addEvent(input, 'keyup', function (e) {
+        if (e.keyCode !== 40 && e.keyCode !== 38) delay.start(this, e);
+    });
+
     addEvent(input, 'click', function (e) { delay.start(this, e); });
+
+    addEvent(input,'keydown', function (e) {
+        if (e.keyCode !== 40 && e.keyCode !== 38 && e.keyCode !== 39 &&
+            e.keyCode !== 13) {
+            return;
+        }
+        var oldsel = getCurSel();
+        if (e.keyCode === 13 || e.keyCode === 39) {
+            if (oldsel) {
+                handle_click.call(oldsel);
+                return false;
+            }
+            return;
+        }
+        var auto = $(autoid);
+        if (!auto) {
+            return;
+        }
+        var moves = e.keyCode === 40 ? ['firstChild', 'nextSibling'] :
+                                       ['lastChild', 'previousSibling'];
+        var target = auto[moves[0]];
+        if (oldsel && oldsel[moves[1]]) {
+            target = oldsel[moves[1]];
+        }
+        highlight(target);
+    });
 }

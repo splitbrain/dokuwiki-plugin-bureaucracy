@@ -124,6 +124,6 @@ div.dokuwiki ul.autocompletion li a {
     display: block;
 }
 
-div.dokuwiki ul.autocompletion li a:hover {
+div.dokuwiki ul.autocompletion li.auto_cur a {
     background: __background_alt__;
 }
