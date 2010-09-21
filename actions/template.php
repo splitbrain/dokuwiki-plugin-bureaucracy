@@ -124,25 +124,44 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                          sprintf($this->getLang('summary'), $ID));
         }
 
+        $ret = "<p>$thanks</p>";
         // Build result tree
         $pages = array_keys($templates);
         usort($pages, array($this, '_sort'));
 
         $data = array();
         $last_folder = array();
-        foreach($pages as $page) {
-            $lvl = substr_count($page, ':');
+        foreach($pages as $ID) {
+            $lvl = substr_count($ID, ':');
             for ($n = 0 ; $n < $lvl ; ++$n) {
-                if (!isset($last_folder[$n]) || strpos($page, $last_folder[$n]['id']) !== 0) {
-                    $last_folder[$n] = array('id' => substr($page, 0, strpos($page, ':', ($n > 0 ? strlen($last_folder[$n - 1]['id']) : 0) + 1) + 1),
+                if (!isset($last_folder[$n]) || strpos($ID, $last_folder[$n]['id']) !== 0) {
+                    $last_folder[$n] = array('id' => substr($ID, 0, strpos($ID, ':', ($n > 0 ? strlen($last_folder[$n - 1]['id']) : 0) + 1) + 1),
                                              'level' => $n + 1,
                                              'open' => 1);
                     $data[] = $last_folder[$n];
                 }
             }
-            $data[] = array('id' => $page, 'level' => 1 + substr_count($page, ':'), 'type' => 'f');
+            $data[] = array('id' => $ID, 'level' => 1 + substr_count($ID, ':'), 'type' => 'f');
         }
-        return '<p>' . $thanks . '</p>' . html_buildlist($data, 'idx', array($this, 'html_list_index'), 'html_li_index');
+        $ret .= html_buildlist($data, 'idx', array($this, 'html_list_index'),
+                               'html_li_index');
+
+        // Add indexer bugs for every just-created page
+        $ret .= '<div class="no">';
+        $oldid = $ID;
+        ob_start();
+        foreach($pages as $ID) {
+            // indexerWebBug uses ID and INFO[exists], but the bureaucracy form
+            // page always exists, as does the just-saved page, so INFO[exists]
+            // is correct in any case
+            tpl_indexerWebBug();
+        }
+        $ret .= ob_get_contents();
+        ob_end_clean();
+        $ID = $oldid;
+        $ret .= '</div>';
+
+        return $ret;
     }
 
     static function _sort($a, $b) {
