@@ -6,7 +6,7 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
         $this->init($syntax_plugin, $args);
         $this->opt['args'] = array_filter(array_map('trim', explode('|',array_shift($args))));
         $this->standardArgs($args);
-        if (!isset($params['value']) && isset($params['optional'])) {
+        if (!isset($this->opt['value']) && isset($this->opt['optional'])) {
             array_unshift($this->opt['args'],' ');
         }
     }
