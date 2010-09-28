@@ -10,13 +10,12 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
      */
     function run($data, $thanks, $argv) {
         global $ID;
-        global $conf;
 
         // get recipient address(es)
         $to = join(',',$argv);
 
         $sub = sprintf($this->getLang('mailsubject'),$ID);
-        $txt = sprintf($this->getLang('mailintro')."\n\n\n",strftime($conf['dformat']));
+        $txt = sprintf($this->getLang('mailintro')."\n\n\n", dformat());
 
         foreach($data as $opt){
             $value = $opt->getParam('value');
@@ -33,6 +32,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
             }
         }
 
+        global $conf;
         if(!mail_send($to, $sub, $txt, $conf['mailfrom'])) {
             throw new Exception($this->getLang('e_mail'));
         }
