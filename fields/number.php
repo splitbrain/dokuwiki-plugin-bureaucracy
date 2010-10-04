@@ -45,7 +45,10 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
             global $ID;
             p_set_metadata($ID, array('bureaucracy' => array($this->get_key() => $this->opt['value'] + 1)));
             // Force rerendering by removing the instructions cache file
-            unlink(getCacheName(wikiFN($ID).$_SERVER['HTTP_HOST'].$_SERVER['SERVER_PORT'],'.'.'i'));
+            $cache_fn = getCacheName(wikiFN($ID).$_SERVER['HTTP_HOST'].$_SERVER['SERVER_PORT'],'.'.'i');
+            if (file_exists($cache_fn)) {
+                unlink($cache_fn);
+            }
         }
     }
 }
