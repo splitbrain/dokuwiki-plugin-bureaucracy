@@ -129,6 +129,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $pages = array_keys($templates);
         usort($pages, array($this, '_sort'));
 
+        $oldid = $ID;
         $data = array();
         $last_folder = array();
         foreach($pages as $ID) {
@@ -148,7 +149,6 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
         // Add indexer bugs for every just-created page
         $ret .= '<div class="no">';
-        $oldid = $ID;
         ob_start();
         foreach($pages as $ID) {
             // indexerWebBug uses ID and INFO[exists], but the bureaucracy form

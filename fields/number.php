@@ -20,7 +20,7 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
                 if (!isset($this->opt['value'])) {
                     $this->opt['value'] = 0;
                 }
-                p_set_metadata($ID, array('bureaucracy' => array($this->get_key() => $this->opt['value'])));
+                p_set_metadata($ID, array('bureaucracy' => array($key => $this->opt['value'])));
             } else {
                 $this->opt['value'] = $c_val;
             }
