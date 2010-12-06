@@ -122,6 +122,11 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
         div.appendChild(ul);
         div.className = 'JSpopup';
         input.parentNode.appendChild(div);
+
+        if (ul.currentStyle) {
+            // IE fix: http://www.quirksmode.org/bugreports/archives/2006/01/Explorer_z_index_bug.html
+            input.parentNode.style.zIndex = 1 + ul.currentStyle.zIndex;
+        }
     };
 
     addEvent(input, 'keyup', function (e) {
