@@ -1,8 +1,8 @@
 <?php
 require_once DOKU_PLUGIN . 'bureaucracy/fields/textbox.php';
 class syntax_plugin_bureaucracy_field_users extends syntax_plugin_bureaucracy_field_textbox {
-    function __construct($syntax_plugin, $args) {
-        parent::__construct($syntax_plugin, $args);
+    function __construct($args) {
+        parent::__construct($args);
         $this->tpl['class'] .= ' userspicker';
     }
 

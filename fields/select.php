@@ -2,8 +2,8 @@
 class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_field {
     var $mandatory_args = 3;
 
-    function __construct($syntax_plugin, $args) {
-        $this->init($syntax_plugin, $args);
+    function __construct($args) {
+        $this->init($args);
         $this->opt['args'] = array_filter(array_map('trim', explode('|',array_shift($args))));
         $this->standardArgs($args);
         if (!isset($this->opt['value']) && isset($this->opt['optional'])) {

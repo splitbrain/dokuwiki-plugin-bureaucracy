@@ -2,8 +2,7 @@
 class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy_field {
     var $mandatory_args = 1;
 
-    function syntax_plugin_bureaucracy_field_fieldset($syntax_plugin, $args) {
-        $this->syntax_plugin = $syntax_plugin;
+    function syntax_plugin_bureaucracy_field_fieldset($args) {
         // get standard arguments
         $this->opt = array('cmd' => array_shift($args));
 

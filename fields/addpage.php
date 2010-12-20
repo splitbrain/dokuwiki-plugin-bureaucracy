@@ -1,7 +1,6 @@
 <?php
 class syntax_plugin_bureaucracy_field_addpage extends syntax_plugin_bureaucracy_field {
-    function __construct($syntax_plugin, $args) {
-        $this->syntax_plugin = $syntax_plugin;
+    function __construct($args) {
         if(count($args) < 3){
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
                         hsc($args[1])), -1);

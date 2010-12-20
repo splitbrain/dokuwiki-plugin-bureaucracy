@@ -1,7 +1,7 @@
 <?php
 class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_field {
-    public function __construct($syntax_plugin, $args) {
-        $this->init($syntax_plugin, $args);
+    public function __construct($args) {
+        $this->init($args);
         $newargs = array();
         foreach ($args as $arg) {
             switch ($arg[0]) {

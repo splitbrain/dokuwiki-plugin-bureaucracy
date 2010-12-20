@@ -3,14 +3,14 @@ require_once DOKU_PLUGIN . 'bureaucracy/fields/textbox.php';
 class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_field_textbox {
     private $autoinc = false;
 
-    function __construct($syntax_plugin, $args) {
+    function __construct($args) {
         $pp = array_search('++', $args, true);
         if ($pp !== false) {
             unset($args[$pp]);
             $this->autoinc = true;
         }
 
-        parent::__construct($syntax_plugin, $args);
+        parent::__construct($args);
 
         if ($this->autoinc) {
             global $ID;

@@ -9,12 +9,13 @@
  * @author Adrian Lang <lang@cosmocode.de>
  **/
 
-class syntax_plugin_bureaucracy_field {
+require_once DOKU_PLUGIN.'bureaucracy/syntax.php';
+
+class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
     var $mandatory_args = 2;
     var $opt = array();
     var $checks = array();
     var $checktypes = array('/' => 'match', '<' => 'max', '>' => 'min');
-    var $syntax_plugin = null;
     var $hidden = false;
     var $error = false;
 
@@ -32,17 +33,14 @@ class syntax_plugin_bureaucracy_field {
      * Since the field objects are cached, this constructor may not reference
      * request data.
      *
-     * @param syntax_plugin_bureaucracy $syntax_plugin A syntax plugin; used
-     *                                                 for getLang
      * @param array                     $args          The tokenized definition
      **/
-    function syntax_plugin_bureaucracy_field($syntax_plugin, $args) {
-        $this->init($syntax_plugin, $args);
+    function syntax_plugin_bureaucracy_field($args) {
+        $this->init($args);
         $this->standardArgs($args);
     }
 
-    function init($syntax_plugin, &$args) {
-        $this->syntax_plugin = $syntax_plugin;
+    function init(&$args) {
         if(count($args) < $this->mandatory_args){
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
                         hsc($args[1])), -1);
@@ -240,10 +238,6 @@ class syntax_plugin_bureaucracy_field {
             $val = str_replace($pregs[0], $pregs[2], $val);
         }
         return $esc ? $tpl[0] : $tpl;
-    }
-
-    function getLang($param) {
-        return $this->syntax_plugin->getLang($param);
     }
 
     function validate_match($d, $value) {
