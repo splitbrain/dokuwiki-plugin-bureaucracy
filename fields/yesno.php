@@ -39,11 +39,12 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
     }
 
     function render($params, $form) {
+        $id = 'bureaucracy__'.md5(rand());
         $params = array_merge(array('value' => false), $this->opt, $params);
         $check = $params['value'] ? 'checked="checked"' : '';
-        $this->tpl = '<label class="@@CLASS@@"><span>@@LABEL@@</span>'.
+        $this->tpl = '<label class="@@CLASS@@" for="'.$id.'"><span>@@LABEL@@</span>'.
                      '<input type="hidden" name="@@NAME@@" value="0" />' .
-                     '<input type="checkbox" name="@@NAME@@" value="1" ' .
+                     '<input type="checkbox" name="@@NAME@@" value="1" id="'.$id.'" ' .
                      $check . ' /></label>';
         parent::render($params, $form);
     }
