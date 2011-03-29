@@ -155,6 +155,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             // page always exists, as does the just-saved page, so INFO[exists]
             // is correct in any case
             tpl_indexerWebBug();
+
+            // the iframe will trigger real rendering of the pages to make sure
+            // any used plugins are initialized (eg. the do plugin)
+            echo '<iframe src="'.wl($ID,array('do'=>'export_html')).'" width="1" height="1" style="visibility:hidden"></iframe>';
         }
         $ret .= ob_get_contents();
         ob_end_clean();
