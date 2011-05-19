@@ -16,19 +16,7 @@ if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
 require_once(DOKU_PLUGIN.'action.php');
 
 class action_plugin_bureaucracy extends DokuWiki_Action_Plugin {
-    /**
-     * return some info
-     */
-    function getInfo(){
-        return array(
-            'author' => 'Andreas Gohr',
-            'email'  => 'andi@splitbrain.org',
-            'date'   => '2009-08-16',
-            'name'   => 'Bureaucracy Plugin',
-            'desc'   => 'A simple form generator/emailer',
-            'url'    => 'http://dokuwiki.org/plugin:bureaucracy',
-        );
-    }
+
 
     function register(&$controller) {
         $controller->register_hook('AJAX_CALL_UNKNOWN', 'BEFORE', $this,

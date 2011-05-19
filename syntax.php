@@ -238,5 +238,3 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         return preg_replace('/[^\w\x7f-\xff]/', '', strtolower($classname));
     }
 }
-
-//Setup VIM: ex: et ts=4 enc=utf-8 :

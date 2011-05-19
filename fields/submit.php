@@ -4,6 +4,12 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
     static $captcha_displayed = false;
     static $captcha_checked = false;
 
+    function __construct($args) {
+        parent::__construct($args);
+        // make always optional to prevent being marked as required
+        $this->opt['optional'] = true;
+    }
+
     function render($params, $form) {
         if(!syntax_plugin_bureaucracy_field_submit::$captcha_displayed){
             syntax_plugin_bureaucracy_field_submit::$captcha_displayed = true;

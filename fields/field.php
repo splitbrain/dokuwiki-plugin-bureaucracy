@@ -108,6 +108,9 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
         }
 
         $params = array_merge($this->opt, $params);
+        if(!isset($this->opt['optional'])) {
+            $params["label"].=" *";
+        }
         $form->addElement($this->_parse_tpl($this->tpl, $params));
     }
 

@@ -30,4 +30,3 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
         return false;
     }
 }
-// vim:ts=4:sw=4:et:enc=utf-8:
