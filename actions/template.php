@@ -54,25 +54,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         if ($pagename === '') {
             throw new Exception($this->getLang('e_pagename'));
         }
-        if(page_exists($pagename)) {
-            throw new Exception(sprintf($this->getLang('e_pageexists'), html_wikilink($pagename)));
-        }
 
         $_templates = array();
         foreach($templates as $k => $v) {
             $_templates[cleanID("$pagename:$k")] = $v;
         }
         $templates = $_templates;
-
-        // check auth
-        if($runas){
-            $auth = auth_aclcheck($pagename,$runas,array());
-        }else{
-            $auth = auth_quickaclcheck($pagename);
-        }
-        if($auth < AUTH_CREATE) {
-            throw new Exception($this->getLang('e_denied'));
-        }
 
         // get templates
         if($tpl == '_'){
@@ -115,6 +102,24 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         }
         if(empty($templates)) {
             throw new Exception(sprintf($this->getLang('e_template'), $tpl));
+        }
+
+        // check all target pagenames
+        foreach(array_keys($templates) as $pname) {
+            // prevent overriding already existing pages
+            if(page_exists($pname)) {
+                throw new Exception(sprintf($this->getLang('e_pageexists'), html_wikilink($pname)));
+            }
+
+            // check auth
+            if($runas){
+                $auth = auth_aclcheck($pname,$runas,array());
+            }else{
+                $auth = auth_quickaclcheck($pname);
+            }
+            if($auth < AUTH_CREATE) {
+                throw new Exception($this->getLang('e_denied'));
+            }
         }
 
         foreach($templates as $pname => $template) {
