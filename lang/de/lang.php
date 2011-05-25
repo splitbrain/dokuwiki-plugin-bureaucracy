@@ -29,6 +29,8 @@ $lang['template_thanks'] = 'Die Seite wurde angelegt, folgen Sie dem Link um die
 
 $lang['summary']         = 'Created from the formular at %s';
 
+$lang['submit']          = 'Absenden';
+
 $lang['js']['month_names'][0] = 'Januar';
 $lang['js']['month_names'][1] = 'Februar';
 $lang['js']['month_names'][2] = 'März';

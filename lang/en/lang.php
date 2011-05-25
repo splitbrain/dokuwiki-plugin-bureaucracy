@@ -29,6 +29,8 @@ $lang['template_thanks'] = 'The page has been created, follow the link to open i
 
 $lang['summary']         = 'Created from the form at %s';
 
+$lang['submit']         = 'Submit';
+
 $lang['js']['month_names'][0] = 'January';
 $lang['js']['month_names'][1] = 'February';
 $lang['js']['month_names'][2] = 'March';
