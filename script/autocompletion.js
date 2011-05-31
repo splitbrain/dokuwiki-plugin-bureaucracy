@@ -120,6 +120,9 @@ function addAutoCompletion(input, ajaxcall, multi, prepareLi, styleList) {
 
         var div = document.createElement('div');
         div.appendChild(ul);
+        // Since the div has no dimensions, the ul inside flows over,
+        // but JSpopup has overflow: hidden.
+        div.style.overflow = 'visible';
         div.className = 'JSpopup';
         input.parentNode.appendChild(div);
 
