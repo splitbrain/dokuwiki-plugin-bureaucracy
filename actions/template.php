@@ -90,7 +90,15 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                     continue;
                 }
                 if (!isset($templates[$p_name])) {
-                    $templates[$p_name] = rawWiki($t_name);
+                    // load page data and do default pattern replacements like
+                    // namespace templates do
+                    $data = array(
+                        'id'        => $p_name,
+                        'tpl'       => rawWiki($t_name),
+                        'doreplace' => true,
+                    );
+                    parsePageTemplate($data);
+                    $templates[$p_name] = $data['tpl'];
                 }
             }
 
@@ -125,7 +133,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         foreach($templates as $pname => $template) {
             // save page
             saveWikiText($pname,
-                         $this->replace($patterns, $values, $template),
+                         $this->replace($patterns, $values, $template, false),
                          sprintf($this->getLang('summary'), $ID));
         }
 
@@ -191,11 +199,22 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         return $ret;
     }
 
-    function replace($patterns, $values, $input) {
-        return preg_replace_callback('/%./',
-                                     create_function('$m','return strftime($m[0]);'),
-                                     preg_replace($patterns, $values, $input));
-
+    /**
+     * Apply given replacement patterns and values
+     *
+     * @param array  $patterns The patterns to replace
+     * @param array  $values   The values to use as replacement
+     * @param string $input    The text to work on
+     * @param bool   $strftime Apply strftime() replacements
+     */
+    function replace($patterns, $values, $input, $strftime=true) {
+        $input = preg_replace($patterns, $values, $input);
+        if($strftime){
+            $input = preg_replace_callback('/%./',
+                                           create_function('$m','return strftime($m[0]);'),
+                                           $input);
+        }
+        return $input;
     }
 
 }
