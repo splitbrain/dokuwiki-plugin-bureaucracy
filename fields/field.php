@@ -119,7 +119,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * Check for preload value in the request
      */
     function _handlePreload() {
-        $preload_name = '@' . $this->getParam('label') . '@';
+        $preload_name = '@' . strtr($this->getParam('label'),' .','__') . '@';
         if (isset($_GET[$preload_name])) {
             $this->setVal($_GET[$preload_name]);
         }
