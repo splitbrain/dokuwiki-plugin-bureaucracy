@@ -32,6 +32,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $values[$label] = is_null($value) ? '$2' : $value;
             }
 
+
             // handle pagenames
             $pname = $opt->getParam('pagename');
             if(!is_null($pname)){
@@ -131,6 +132,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         }
 
         foreach($templates as $pname => $template) {
+            // set NSBASE var to make certain dataplugin constructs easier
+            $patterns['__nsbase__'] = '/@NSBASE@/';
+            $values['__nsbase__']   = noNS(getNS($pname));
+
             // save page
             saveWikiText($pname,
                          $this->replace($patterns, $values, $template, false),
