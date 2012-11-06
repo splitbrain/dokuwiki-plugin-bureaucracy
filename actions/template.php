@@ -49,6 +49,11 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             }
         }
 
+        //handle relative pages
+        if($pagename[0] == '.'){
+            $pagename = getNS($ID).substr($pagename,1);
+        }
+
         $pagename = $this->replace($patterns, $values, $pagename);
         // check pagename
         $pagename = cleanID($pagename);
@@ -77,6 +82,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $backup = array($_SERVER['REMOTE_USER'],$USERINFO['grps']);
                 $_SERVER['REMOTE_USER'] = $runas;
                 $USERINFO['grps'] = array();
+            }
+            //handle relative template
+            if($tpl[0] == '.'){
+                $tpl = getNS($ID).substr($tpl,1);
             }
             $t_pages = array();
             search($t_pages, $conf['datadir'], 'search_universal',
