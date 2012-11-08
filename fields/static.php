@@ -15,4 +15,12 @@ class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_f
     function getParam($name) {
         return ($name === 'value') ? null : parent::getParam($name);
     }
+
+    function _parse_tpl($tpl, $params) {
+        $ins = array_slice(p_get_instructions($params['label']), 2, -2);
+        $params['label'] = p_render('xhtml', $ins, $byref_ignore);
+
+        $tpl = parent::_parse_tpl(array($tpl), $params);
+        return $tpl[0];
+    }
 }
