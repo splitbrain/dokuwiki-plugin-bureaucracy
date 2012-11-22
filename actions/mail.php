@@ -14,6 +14,9 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
         // get recipient address(es)
         $to = join(',',$argv);
 
+        global $conf;
+        $from = $conf['mailfrom'];
+
         $sub = sprintf($this->getLang('mailsubject'),$ID);
         $txt = sprintf($this->getLang('mailintro')."\n\n\n", dformat());
 
@@ -25,6 +28,11 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
                 case 'fieldset':
                     $txt .= "\n====== ".hsc($label)." ======\n\n";
                     break;
+                case 'fromemail':
+                    if($value === null || $label === null) break;
+                    $from = $value;
+                    $txt .= $label."\n";
+                    $txt .= "\t\t$value\n";
                 default:
                     if($value === null || $label === null) break;
                     $txt .= $label."\n";
@@ -32,8 +40,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
             }
         }
 
-        global $conf;
-        if(!mail_send($to, $sub, $txt, $conf['mailfrom'])) {
+        if(!mail_send($to, $sub, $txt, $from)) {
             throw new Exception($this->getLang('e_mail'));
         }
         return $thanks;
