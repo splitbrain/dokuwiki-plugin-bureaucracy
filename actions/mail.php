@@ -33,6 +33,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
                     $from = $value;
                     $txt .= $label."\n";
                     $txt .= "\t\t$value\n";
+                    break;
                 default:
                     if($value === null || $label === null) break;
                     $txt .= $label."\n";
