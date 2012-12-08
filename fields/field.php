@@ -66,6 +66,8 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 $this->opt['pagename'] = true;
             } elseif(preg_match('/x\d/', $arg)) {
                 $this->opt['rows'] = substr($arg,1);
+            } elseif($arg[0] == '.'){
+                $this->opt['class'] = substr($arg,1);
             } else {
                 $t = $arg[0];
                 $d = substr($arg,1);
