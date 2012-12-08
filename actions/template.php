@@ -147,7 +147,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
             // save page
             saveWikiText($pname,
-                         $this->replace($patterns, $values, $template, false),
+                         cleanText($this->replace($patterns, $values, $template, false)),
                          sprintf($this->getLang('summary'), $ID));
         }
 
