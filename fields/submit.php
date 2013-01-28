@@ -19,7 +19,7 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
                 $form->addElement($helper->getHTML());
             }
         }
-        $this->tpl = form_makeButton('submit','', '@@LABEL|' . $this->getLang('submit') . '@@');
+        $this->tpl = form_makeButton('submit','', '@@DISPLAY|' . $this->getLang('submit') . '@@');
         parent::render($params, $form);
     }
 

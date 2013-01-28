@@ -23,7 +23,7 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
         $form->addElement(call_user_func_array('form_makeListboxField',
                                                $this->_parse_tpl(array('@@NAME@@',
                                                 $params['args'], '@@VALUE|' . $params['args'][0] . '@@',
-                                                '@@LABEL@@', '', '@@CLASS@@'),
+                                                '@@DISPLAY@@', '', '@@CLASS@@'),
                                                 $params)));
     }
 }

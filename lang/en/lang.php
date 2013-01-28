@@ -5,6 +5,7 @@ $lang['e_missingargs']   = 'Not enough arguments for %s %s';
 $lang['e_noaction']      = 'No action defined - where should the data be sent to?';
 $lang['e_mail']          = 'Something went wrong with sending that data';
 $lang['e_unknownconstraint'] = 'Unknown field constraint %s';
+$lang['e_labelpage']     = 'Labelpage %s not found';
 
 $lang['e_required']      = '"%s" is required';
 $lang['e_match']         = '"%s" wasn\'t filled in correctly. (Checked against /%s/i)';

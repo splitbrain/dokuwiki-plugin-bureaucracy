@@ -62,6 +62,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $action = array('type' => '',
                         'argv' => array());
         $thanks = '';
+        $labels = '';
 
         // parse the lines into an command/argument array
         $cmds = array();
@@ -71,7 +72,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             $args = $this->_parse_line($line, $lines);
             $args[0] = $this->_sanitizeClassName($args[0]);
 
-            if (in_array($args[0], array('action', 'thanks'))) {
+            if (in_array($args[0], array('action', 'thanks', 'labels'))) {
                 if (count($args) < 2) {
                     msg(sprintf($this->getLang('e_missingargs'),hsc($args[0]),hsc($args[1])),-1);
                     continue;
@@ -88,6 +89,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 // is thank you text?
                 if ($args[0] == 'thanks') {
                     $thanks = $args[1];
+                    continue;
+                }
+
+                // is labels?
+                if ($args[0] == 'labels') {
+                    $labels = $args[1];
                     continue;
                 }
             }
@@ -109,7 +116,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         } else {
             $thanks = hsc($thanks);
         }
-        return array('data'=>$cmds,'action'=>$action,'thanks'=>$thanks);
+        return array('data'=>$cmds,'action'=>$action,'thanks'=>$thanks,'labels'=>$labels);
     }
 
     /**
@@ -130,10 +137,63 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 return true;
             }
         }
+
+        if($data['labels']) $this->loadlabels($data);
+
         $R->doc .= $this->_htmlform($data['data']);
 
         return true;
     }
+
+    /**
+     * Initializes the labels, loaded from a defined labelpage
+     *
+     * @param array $data all data passed to render()
+     */
+    protected function loadlabels(&$data){
+        global $INFO;
+        $labelpage = $data['labels'];
+        $exists = false;
+        resolve_pageid($INFO['namespace'], $labelpage, $exists);
+        if(!$exists){
+            msg(sprintf($this->getLang('e_labelpage'), html_wikilink($labelpage)),-1);
+            return;
+        }
+
+        // parse simple list (first level cdata only)
+        $labels = array();
+        $instructions = p_cached_instructions(wikiFN($labelpage));
+        $inli = 0;
+        $item = '';
+        foreach($instructions as $instruction){
+            if($instruction[0] == 'listitem_open'){
+                $inli++;
+                continue;
+            }
+            if($inli === 1 && $instruction[0] == 'cdata'){
+                $item .= $instruction[1][0];
+            }
+            if($instruction[0] == 'listitem_close'){
+                $inli--;
+                if($inli === 0 ){
+                    list($k, $v) = explode('=', $item, 2);
+                    $k = trim($k);
+                    $v = trim($v);
+                    if($k && $v) $labels[$k] = $v;
+                    $item = '';
+                }
+            }
+        }
+
+        // apply labels to all fields
+        $len = count($data['data']);
+        for($i=0; $i<$len; $i++){
+            if(!isset($data['data'][$i]->opt['label'])) continue;
+            $label = $data['data'][$i]->opt['label'];
+            if(isset($labels[$label])) $data['data'][$i]->opt['display'] = $labels[$label];
+        }
+    }
+
 
     /**
      * Validate data, perform action

@@ -42,7 +42,7 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
         $id = 'bureaucracy__'.md5(rand());
         $params = array_merge(array('value' => false), $this->opt, $params);
         $check = $params['value'] ? 'checked="checked"' : '';
-        $this->tpl = '<label class="@@CLASS@@" for="'.$id.'"><span>@@LABEL@@</span>'.
+        $this->tpl = '<label class="@@CLASS@@" for="'.$id.'"><span>@@DISPLAY@@</span>'.
                      '<input type="hidden" name="@@NAME@@" value="0" />' .
                      '<input type="checkbox" name="@@NAME@@" value="1" id="'.$id.'" ' .
                      $check . ' /></label>';

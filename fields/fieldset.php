@@ -8,6 +8,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
 
         if (count($args) > 0) {
             $this->opt['label'] = array_shift($args);
+            $this->opt['display'] = $this->opt['label'];
         }
 
         if (count($args) > 0) {
@@ -16,7 +17,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
     }
 
     function render($params, $form) {
-        $form->startFieldset($this->getParam('label'));
+        $form->startFieldset($this->getParam('display'));
         if (isset($this->depends_on)) {
             if (count($this->depends_on) > 1) {
                 $msg = 'Only edit this fieldset if ' .

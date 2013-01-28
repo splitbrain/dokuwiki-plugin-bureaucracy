@@ -12,7 +12,7 @@ class syntax_plugin_bureaucracy_field_user extends syntax_plugin_bureaucracy_fie
         global $auth;
         $value = $this->getParam('value');
         if (!is_null($value) && $auth->getUserData($value) === false) {
-            throw new Exception(sprintf($this->getLang('e_user'),hsc($this->getParam('label'))));
+            throw new Exception(sprintf($this->getLang('e_user'),hsc($this->getParam('display'))));
         }
     }
 }

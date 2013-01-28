@@ -13,7 +13,7 @@ class syntax_plugin_bureaucracy_field_users extends syntax_plugin_bureaucracy_fi
         $users = array_filter(preg_split('/\s*,\s*/', $this->getParam('value')));
         foreach ($users as $user) {
             if ($auth->getUserData($user) === false) {
-                throw new Exception(sprintf($this->getLang('e_users'), hsc($this->getParam('label'))));
+                throw new Exception(sprintf($this->getLang('e_users'), hsc($this->getParam('display'))));
             }
         }
     }

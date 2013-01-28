@@ -53,6 +53,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
             if (count($args) === 0) break;
             $this->opt[$key] = array_shift($args);
         }
+        $this->opt['display'] = $this->opt['label']; // allow to modify display value independently
     }
 
     function standardArgs($args) {
@@ -109,7 +110,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
 
         $params = array_merge($this->opt, $params);
         if(!isset($this->opt['optional'])) {
-            $params["label"].=" *";
+            $params["display"].=" *";
         }
         $form->addElement($this->_parse_tpl($this->tpl, $params));
     }

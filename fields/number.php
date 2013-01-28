@@ -30,7 +30,7 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
     function _validate() {
         $value = $this->getParam('value');
         if (!is_null($value) && !is_numeric($value)){
-            throw new Exception(sprintf($this->getLang('e_numeric'),hsc($this->getParam('label'))));
+            throw new Exception(sprintf($this->getLang('e_numeric'),hsc($this->getParam('display'))));
         }
 
         parent::_validate();
