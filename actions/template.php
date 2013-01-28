@@ -11,6 +11,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         global $ID;
         global $conf;
         global $USERINFO;
+        $myns = getNS($ID);
 
         list($tpl, $pagename, $sep) = $argv;
         if(is_null($sep)) $sep = $conf['sepchar'];
@@ -55,16 +56,18 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             }
         }
 
+        // build target pagename/namespace
         $pagename = $this->replace($patterns, $values, $pagename);
-        // check pagename
-        $pagename = cleanID($pagename);
+        resolve_pageid($myns, $pagename, $junk); // resolve relatives
         if ($pagename === '') {
             throw new Exception($this->getLang('e_pagename'));
         }
 
+        // resolve templates
         $_templates = array();
         foreach($templates as $k => $v) {
-            $_templates[cleanID("$pagename:$k")] = $v;
+            resolve_pageid($myns, $v, $junk); // resolve template
+            $_templates[cleanID("$pagename:$k")] = $v; // $pagename is already resolved
         }
         $templates = $_templates;
 
