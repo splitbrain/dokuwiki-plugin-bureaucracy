@@ -19,8 +19,14 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $patterns = array();
         $values   = array();
         $templates = array();
+
+        // set LANG var to reference translations
+        $patterns['__lang__'] = '/@LANG@/';
+        $values['__lang__']   = $conf['lang'];
+
         // run through fields
         foreach($data as $opt) {
+            /** @var $opt syntax_plugin_bureaucracy_field */
             $label = $opt->getParam('label');
             $value = $opt->getParam('value');
 
