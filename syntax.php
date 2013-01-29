@@ -120,6 +120,16 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         if ($format != 'xhtml') return false;
         $R->info['cache'] = false; // don't cache
 
+        /**
+         * replace some time and name placeholders in the default values
+         * @var $opt syntax_plugin_bureaucracy_field */
+        foreach ($data['data'] as $id => &$opt) {
+            if(isset($opt->opt['value'])) {
+                $opt->opt['value'] = $this->replace($opt->opt['value']);
+            }
+
+        }
+
         $this->form_id++;
         if (isset($_POST['bureaucracy']) && checkSecurityToken() &&
             $_POST['bureaucracy']['$$id'] == $this->form_id) {
@@ -236,5 +246,38 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
     function _sanitizeClassName($classname) {
         return preg_replace('/[^\w\x7f-\xff]/', '', strtolower($classname));
+    }
+
+    /**
+     * Replace some placeholders for userinfo and time
+     *   - more replacements are done in syntax_plugin_bureaucracy_action_template
+     * @param $input
+     * @return mixed
+     */
+    function replace($input) {
+        global $USERINFO;
+        global $conf;
+
+        // replace placeholders
+        return str_replace(array(
+                                '@USER@',
+                                '@NAME@',
+                                '@MAIL@',
+                                '@DATE@',
+                                '@YEAR@',
+                                '@MONTH@',
+                                '@DAY@',
+                                '@TIME@'
+                           ),
+                           array(
+                                $_SERVER['REMOTE_USER'],
+                                $USERINFO['name'],
+                                $USERINFO['mail'],
+                                strftime($conf['dformat']),
+                                date('Y'),
+                                date('m'),
+                                date('d'),
+                                date('H:i')
+                           ), $input);
     }
 }
