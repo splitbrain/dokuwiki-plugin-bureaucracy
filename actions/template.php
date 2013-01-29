@@ -25,6 +25,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $patterns['__lang__'] = '/@LANG@/';
         $values['__lang__']   = $conf['lang'];
 
+        // if translation plugin available, get current translation (empty for default lang)
+        $patterns['__trans__'] = '/@TRANS@/';
+        $values['__trans__']   = '';
+        $trans = plugin_load('helper','translation');
+        if($trans) $values['__trans__'] = $trans->getLangPart($ID);
+
         // run through fields
         foreach($data as $opt) {
             /** @var $opt syntax_plugin_bureaucracy_field */
