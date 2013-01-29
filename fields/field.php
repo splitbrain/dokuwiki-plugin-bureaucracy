@@ -67,6 +67,8 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 $this->opt['pagename'] = true;
             } elseif(preg_match('/x\d/', $arg)) {
                 $this->opt['rows'] = substr($arg,1);
+            } elseif($arg[0] == '.'){
+                $this->opt['class'] = substr($arg,1);
             } else {
                 $t = $arg[0];
                 $d = substr($arg,1);
@@ -80,7 +82,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                     $d = substr($d, 0, -1);
                 }
                 if (!isset($this->checktypes[$t]) || !method_exists($this, 'validate_' . $this->checktypes[$t])) {
-                    msg(sprintf($this->getLang('e_unknownconstraint'), hsc($t)), -1);
+                    msg(sprintf($this->getLang('e_unknownconstraint'), hsc($t).' ('.hsc($arg).')'), -1);
                     return;
                 }
                 $this->checks[] = array('t' => $t, 'd' => $d);
@@ -117,7 +119,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
 
 
     /**
-     * Check for preload value in the request
+     * Check for preload value in the request url
      */
     function _handlePreload() {
         $preload_name = '@' . strtr($this->getParam('label'),' .','__') . '@';
