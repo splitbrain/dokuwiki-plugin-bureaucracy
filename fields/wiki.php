@@ -1,5 +1,5 @@
 <?php
-class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_field {
+class syntax_plugin_bureaucracy_field_wiki extends syntax_plugin_bureaucracy_field {
     var $tpl = '<p>@@LABEL@@</p>';
 
     function __construct($args) {
@@ -14,5 +14,11 @@ class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_f
 
     function getParam($name) {
         return ($name === 'value') ? null : parent::getParam($name);
+    }
+
+    function _parse_tpl($tpl, $params) {
+        $ins = array_slice(p_get_instructions($params['display']), 2, -2);
+        $tpl = p_render('xhtml', $ins, $byref_ignore);
+        return '<p>'.$tpl.'</p>';
     }
 }

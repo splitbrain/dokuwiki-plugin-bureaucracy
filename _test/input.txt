@@ -13,6 +13,7 @@ textbox  "HTML check 1 <bold>bang</bold>"  "=<bold>bang</bold>"
 password "HTML check 2 <bold>bang</bold>"  "=<bold>bang</bold>"
 textarea "HTML check 3 <bold>bang</bold>"  "=<bold>bang</bold>"
 static   "HTML check 4 <bold>bang</bold>"
+wiki     "HTML check 5 <bold>bang</bold>"
 
 fieldset "even more fields"
 select   "Please select an option" "Peaches|Apples|Oranges"
