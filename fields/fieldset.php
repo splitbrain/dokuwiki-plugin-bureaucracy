@@ -17,8 +17,9 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
     }
 
     function render($params, $form) {
-        $form->startFieldset($this->getParam('display'));
+        $form->startFieldset(hsc($this->getParam('display')));
         if (isset($this->depends_on)) {
+            $dependencies = array_map('hsc',(array) $this->depends_on);
             if (count($this->depends_on) > 1) {
                 $msg = 'Only edit this fieldset if ' .
                        '“<span class="bureaucracy_depends_fname">%s</span>” '.
@@ -27,7 +28,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
                 $msg = 'Only edit this fieldset if ' .
                        '“<span class="bureaucracy_depends_fname">%s</span>” is set.';
             }
-            $form->addElement('<p class="bureaucracy_depends">' . vsprintf($msg, $this->depends_on) . '</p>');
+            $form->addElement('<p class="bureaucracy_depends">' . vsprintf($msg, $dependencies) . '</p>');
         }
     }
 

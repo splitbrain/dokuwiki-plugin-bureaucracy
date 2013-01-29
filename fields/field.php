@@ -111,9 +111,6 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
         }
 
         $params = array_merge($this->opt, $params);
-        if(!isset($this->opt['optional'])) {
-            $params["display"].=" *";
-        }
         $form->addElement($this->_parse_tpl($this->tpl, $params));
     }
 
@@ -223,27 +220,41 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @return string|array The parsed template
      **/
     function _parse_tpl($tpl, $params) {
-        /* addElement supports a special array format as well. In this case
-           elements should not be escaped. */
-        $esc = !is_array($tpl);
-        if ($esc) {
-            $tpl = array($tpl);
-        }
+        // addElement supports a special array format as well. In this case
+        // not all elements should be escaped.
+        $is_simple = !is_array($tpl);
+        if ($is_simple) $tpl = array($tpl);
+
         foreach ($tpl as &$val) {
-            /* Select box passes options as an array. We do not escape those. */
+            // Select box passes options as an array. We do not escape those.
             if (is_array($val)) continue;
+
+            // find all variables and their defaults or param values
             preg_match_all('/@@([A-Z]+)(?:\|((?:[^@]|@$|@[^@])+))?@@/', $val, $pregs);
             for ($i = 0 ; $i < count($pregs[2]) ; ++$i) {
                 if (isset($params[strtolower($pregs[1][$i])])) {
                     $pregs[2][$i] = $params[strtolower($pregs[1][$i])];
                 }
             }
-            if ($esc) {
-                $pregs[2] = array_map('hsc', $pregs[2]);
+            // we now have placeholders in $pregs[0] and their values in $pregs[2]
+            $replacements = array_combine($pregs[0], $pregs[2]);
+
+            if($is_simple){
+                // for simple string templates, we escape all replacements
+                $replacements = array_map('hsc', $replacements);
+            }else{
+                // for the array ones, we escape the label and display only
+                if(isset($replacements['@@LABEL@@']))   $replacements['@@LABEL@@']   = hsc($replacements['@@LABEL@@']);
+                if(isset($replacements['@@DISPLAY@@'])) $replacements['@@DISPLAY@@'] = hsc($replacements['@@DISPLAY@@']);
             }
-            $val = str_replace($pregs[0], $pregs[2], $val);
+
+            // we attach a mandatory marker to the display
+            if(isset($replacements['@@DISPLAY@@']) && !isset($params['optional'])){
+                $replacements['@@DISPLAY@@'] .= ' <sup>*</sup>';
+            }
+            $val = str_replace(array_keys($replacements), array_values($replacements), $val);
         }
-        return $esc ? $tpl[0] : $tpl;
+        return $is_simple ? $tpl[0] : $tpl;
     }
 
     function validate_match($d, $value) {
