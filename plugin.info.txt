@@ -1,7 +1,7 @@
 base    bureaucracy
 author  Andreas Gohr
 email   andi@splitbrain.org
-date    2011-11-24
+date    2013-02-06
 name    Bureaucracy Plugin
 desc    Create forms and generate pages or emails from them
 url     http://www.dokuwiki.org/plugin:bureaucracy
