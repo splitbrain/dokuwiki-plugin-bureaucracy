@@ -237,7 +237,10 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 }
             }
             // we now have placeholders in $pregs[0] and their values in $pregs[2]
-            $replacements = array_combine($pregs[0], $pregs[2]);
+            $replacements = array(); // check if empty to prevent php 5.3 warning
+            if (!empty($pregs[0])) {
+                $replacements = array_combine($pregs[0], $pregs[2]);
+            }
 
             if($is_simple){
                 // for simple string templates, we escape all replacements
