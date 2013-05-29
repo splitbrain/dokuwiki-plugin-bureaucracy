@@ -72,7 +72,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         // resolve templates
         $_templates = array();
         foreach($templates as $k => $v) {
-            resolve_pageid($myns, $v, $junk); // resolve template
+            resolve_pageid($myns, $k, $junk); // resolve template
             $_templates[cleanID("$pagename:$k")] = $v; // $pagename is already resolved
         }
         $templates = $_templates;
