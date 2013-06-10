@@ -57,7 +57,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $page_tpl = $this->replace($patterns, $values, $opt->getParam('page_tpl'));
                 if (auth_aclcheck($page_tpl, $runas ? $runas : $_SERVER['REMOTE_USER'],
                                   $USERINFO['grps']) >= AUTH_READ) {
-                    $templates[$opt->getParam('page_tgt')] = rawWiki($page_tpl);
+                    $templates[$opt->getParam('page_tgt')] = $this->replace(array(), array(), rawWiki($page_tpl));
                 }
             }
         }
@@ -153,7 +153,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
             // save page
             saveWikiText($pname,
-                         cleanText($this->replace($patterns, $values, $template)),
+                         cleanText($this->replace($patterns, $values, $template, false)),
                          sprintf($this->getLang('summary'), $ID));
         }
 
