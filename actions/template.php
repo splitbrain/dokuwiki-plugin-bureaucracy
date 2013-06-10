@@ -42,7 +42,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $patterns[$label] = '/(@@|##)' . preg_quote($label, '/') .
                               '(?:\|(.*?))' . (is_null($value) ? '' : '?') .
                               '\1/si';
-                $values[$label] = is_null($value) ? '$2' : $value;
+                $values[$label] = is_null($value) || $value === false ? '$2' : $value;
             }
 
 
