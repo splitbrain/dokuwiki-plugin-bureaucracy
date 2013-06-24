@@ -137,6 +137,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         }
 
+        if($data['labels']) $this->loadlabels($data);
+
         $this->form_id++;
         if (isset($_POST['bureaucracy']) && checkSecurityToken() &&
             $_POST['bureaucracy']['$$id'] == $this->form_id) {
@@ -147,8 +149,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 return true;
             }
         }
-
-        if($data['labels']) $this->loadlabels($data);
 
         $R->doc .= $this->_htmlform($data['data']);
 
@@ -200,8 +200,23 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         for($i=0; $i<$len; $i++){
             if(!isset($data['data'][$i]->opt['label'])) continue;
             $label = $data['data'][$i]->opt['label'];
-            if(isset($labels[$label])) $data['data'][$i]->opt['display'] = $labels[$label];
+
+            if(isset($labels[$label])) {
+                if (    $data['data'][$i] instanceof syntax_plugin_bureaucracy_field_static
+                     || $data['data'][$i] instanceof syntax_plugin_bureaucracy_field_dataplugin) {
+                    $data['data'][$i]->opt['label'] = $labels[$label];
+                } else {
+                    $data['data'][$i]->opt['display'] = $labels[$label];
+                }
+            }
         }
+
+        if (isset($data['thanks'])) {
+            if (isset($labels[$data['thanks']])) {
+                $data['thanks'] = $labels[$data['thanks']];
+            }
+        }
+
     }
 
 

@@ -101,7 +101,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
      **/
-    function render($params, $form) {
+    function render($params, Doku_Form $form) {
         $this->_handlePreload();
         if(!$form->_infieldset){
             $form->startFieldset('');
