@@ -137,6 +137,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         }
 
+        if($data['labels']) $this->loadlabels($data);
+
         $this->form_id++;
         if (isset($_POST['bureaucracy']) && checkSecurityToken() &&
             $_POST['bureaucracy']['$$id'] == $this->form_id) {
@@ -147,8 +149,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 return true;
             }
         }
-
-        if($data['labels']) $this->loadlabels($data);
 
         $R->doc .= $this->_htmlform($data['data']);
 
@@ -210,6 +210,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 }
             }
         }
+
+        if (isset($data['thanks'])) {
+            if (isset($labels[$data['thanks']])) {
+                $data['thanks'] = $labels[$data['thanks']];
+            }
+        }
+
     }
 
 
