@@ -226,6 +226,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
      * @param array  $values   The values to use as replacement
      * @param string $input    The text to work on
      * @param bool   $strftime Apply strftime() replacements
+     * @return string processed text
      */
     function replace($patterns, $values, $input, $strftime=true) {
         $input = preg_replace($patterns, $values, $input);
