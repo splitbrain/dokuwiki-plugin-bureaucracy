@@ -1,6 +1,6 @@
 <?php
 class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_field {
-    var $tpl = '<p>@@LABEL@@</p>';
+    var $tpl = '<p>@@DISPLAY@@</p>';
 
     function __construct($args) {
         parent::__construct($args);
@@ -15,4 +15,13 @@ class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_f
     function getParam($name) {
         return ($name === 'value') ? null : parent::getParam($name);
     }
+
+    function render($params, Doku_Form $form) {
+        if (!isset($this->opt['display'])) {
+            $this->opt['display'] = $this->opt['label'];
+        }
+        parent::render($params, $form);
+    }
+
+
 }
