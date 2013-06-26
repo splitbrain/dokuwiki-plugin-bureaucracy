@@ -202,12 +202,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             $label = $data['data'][$i]->opt['label'];
 
             if(isset($labels[$label])) {
-                if (    $data['data'][$i] instanceof syntax_plugin_bureaucracy_field_static
-                     || $data['data'][$i] instanceof syntax_plugin_bureaucracy_field_dataplugin) {
-                    $data['data'][$i]->opt['label'] = $labels[$label];
-                } else {
-                    $data['data'][$i]->opt['display'] = $labels[$label];
-                }
+                $data['data'][$i]->opt['display'] = $labels[$label];
             }
         }
 
