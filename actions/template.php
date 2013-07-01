@@ -84,6 +84,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $templates[$pagename] = pageTemplate(array($pagename));
             }
         } elseif($tpl !== '!') {
+            $tpl = $this->replace($patterns, $values, $tpl);
             // Namespace link
             require_once DOKU_INC.'inc/search.php';
             if ($runas) {
