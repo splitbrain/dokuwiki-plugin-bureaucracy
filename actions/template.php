@@ -133,8 +133,6 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 list($_SERVER['REMOTE_USER'],$USERINFO['grps']) = $backup;
             }
         }
-        dbg($patterns);
-
 
         if(empty($templates)) {
             throw new Exception(sprintf($this->getLang('e_template'), $tpl));
