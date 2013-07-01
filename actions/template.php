@@ -28,8 +28,13 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         // if translation plugin available, get current translation (empty for default lang)
         $patterns['__trans__'] = '/@TRANS@/';
         $values['__trans__']   = '';
+        /** @var helper_plugin_translation $trans */
         $trans = plugin_load('helper','translation');
-        if($trans) $values['__trans__'] = $trans->getLangPart($ID);
+        if($trans) {
+            $values['__trans__'] = $trans->getLangPart($ID);
+            $values['__lang__'] = $trans->realLC('');
+        }
+
 
         // run through fields
         foreach($data as $opt) {
@@ -115,7 +120,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                         'doreplace' => true,
                     );
                     parsePageTemplate($data);
-                    $templates[$p_name] = $data['tpl'];
+                    $templates[$p_name] = $this->replace(
+                            array('__lang__' => $patterns['__lang__'], '__trans__' => $patterns['__trans__']),
+                            array('__lang__' => $values['__lang__'], '__trans__' => $values['__trans__']),
+                            $data['tpl']);
                 }
             }
 
@@ -125,6 +133,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 list($_SERVER['REMOTE_USER'],$USERINFO['grps']) = $backup;
             }
         }
+        dbg($patterns);
+
+
         if(empty($templates)) {
             throw new Exception(sprintf($this->getLang('e_template'), $tpl));
         }
