@@ -123,7 +123,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                     $templates[$p_name] = $this->replace(
                             array('__lang__' => $patterns['__lang__'], '__trans__' => $patterns['__trans__']),
                             array('__lang__' => $values['__lang__'], '__trans__' => $values['__trans__']),
-                            $data['tpl']);
+                            $data['tpl'], false);
                 }
             }
 
