@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @group plugin_bureaucracy
+ */
 class syntax_plugin_bureaucracy_test extends DokuWikiTest {
 
     protected $pluginsEnabled = array('bureaucracy');
