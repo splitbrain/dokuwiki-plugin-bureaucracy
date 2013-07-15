@@ -124,6 +124,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      */
     function render($format, &$R, $data) {
         global $ID;
+        $revalidate = false;
+        
         if ($format != 'xhtml') return false;
         $R->info['cache'] = false; // don't cache
 
@@ -132,7 +134,9 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
          * @var $opt syntax_plugin_bureaucracy_field */
         foreach ($data['data'] as $id => &$opt) {
             if(isset($opt->opt['value'])) {
+                $opt->opt['value'] == "@MAIL@" && $revalidate = true;
                 $opt->opt['value'] = $this->replace($opt->opt['value']);
+                $revalidate && $opt->setVal($opt->opt['value']);
             }
 
         }
