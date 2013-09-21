@@ -31,24 +31,3 @@ $lang['template_thanks'] = 'The page has been created, follow the link to open i
 $lang['summary']         = 'Created from the form at %s';
 
 $lang['submit']         = 'Submit';
-
-$lang['js']['month_names'][0] = 'January';
-$lang['js']['month_names'][1] = 'February';
-$lang['js']['month_names'][2] = 'March';
-$lang['js']['month_names'][3] = 'April';
-$lang['js']['month_names'][4] = 'May';
-$lang['js']['month_names'][5] = 'June';
-$lang['js']['month_names'][6] = 'July';
-$lang['js']['month_names'][7] = 'August';
-$lang['js']['month_names'][8] = 'September';
-$lang['js']['month_names'][9] = 'October';
-$lang['js']['month_names'][10] = 'November';
-$lang['js']['month_names'][11] = 'December';
-
-$lang['js']['weekdays'][0] = 'Sun';
-$lang['js']['weekdays'][1] = 'Mon';
-$lang['js']['weekdays'][2] = 'Tue';
-$lang['js']['weekdays'][3] = 'Wed';
-$lang['js']['weekdays'][4] = 'Thu';
-$lang['js']['weekdays'][5] = 'Fri';
-$lang['js']['weekdays'][6] = 'Sat';
