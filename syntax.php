@@ -197,12 +197,20 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         // apply labels to all fields
         $len = count($data['data']);
-        for($i=0; $i<$len; $i++){
-            if(!isset($data['data'][$i]->opt['label'])) continue;
-            $label = $data['data'][$i]->opt['label'];
+        for($i = 0; $i < $len; $i++) {
+            if(isset($data['data'][$i]->depends_on)) {
+                // translate dependency on fieldsets
+                $label = $data['data'][$i]->depends_on[0];
+                if(isset($labels[$label])) {
+                    $data['data'][$i]->depends_on[0] = $labels[$label];
+                }
 
-            if(isset($labels[$label])) {
-                $data['data'][$i]->opt['display'] = $labels[$label];
+            } else if(isset($data['data'][$i]->opt['label'])) {
+                // translate field labels
+                $label = $data['data'][$i]->opt['label'];
+                if(isset($labels[$label])) {
+                    $data['data'][$i]->opt['display'] = $labels[$label];
+                }
             }
         }
 
