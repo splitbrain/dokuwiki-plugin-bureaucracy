@@ -4,7 +4,7 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
 
     function __construct($args) {
         $this->init($args);
-        $this->opt['args'] = array_filter(array_map('trim', explode('|',array_shift($args))));
+        $this->opt['args'] = array_map('trim', explode('|',array_shift($args)));
         $this->standardArgs($args);
         if (!isset($this->opt['value']) && isset($this->opt['optional'])) {
             array_unshift($this->opt['args'],' ');
