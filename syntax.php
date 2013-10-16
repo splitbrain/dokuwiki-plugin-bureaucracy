@@ -56,7 +56,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, &$handler){
+    function handle($match, $state, $pos, Doku_Handler &$handler){
         $match = substr($match,6,-7); // remove form wrap
         $lines = explode("\n",$match);
         $action = array('type' => '',
@@ -122,7 +122,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Create output
      */
-    function render($format, &$R, $data) {
+    function render($format, Doku_Renderer &$R, $data) {
         global $ID;
         if ($format != 'xhtml') return false;
         $R->info['cache'] = false; // don't cache
@@ -132,7 +132,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
          * @var $opt syntax_plugin_bureaucracy_field */
         foreach ($data['data'] as $id => &$opt) {
             if(isset($opt->opt['value'])) {
-                $opt->opt['value'] = $this->replace($opt->opt['value']);
+                $opt->opt['value'] = $this->replaceNSTemplatePlaceholders($opt->opt['value']);
             }
 
         }
@@ -229,8 +229,11 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     function _handlepost($data) {
         $success = true;
         foreach ($data['data'] as $id => $opt) {
+            /** @var $opt syntax_plugin_bureaucracy_field */
+            $_ret = false;
             if ($opt->getFieldType() === 'fieldset') {
-                $_ret = $opt->handle_post($_POST['bureaucracy'][$id], $id, $data['data']);
+                $params = array($_POST['bureaucracy'][$id], $id, &$data['data']);
+                $_ret = $opt->handle_post($params);
             } elseif(!$opt->hidden) {
                 $_ret = $opt->handle_post($_POST['bureaucracy'][$id]);
             }
@@ -243,6 +246,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             return false;
         }
 
+        /** @var syntax_plugin_bureaucracy_action $action */
         $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
         $action = new $class();
 
@@ -256,6 +260,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         // Perform after_action hooks
         foreach($data['data'] as $id => $field) {
+            /** @var $field syntax_plugin_bureaucracy_field */
             $field->after_action();
         }
         return $success;
@@ -273,7 +278,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $form->addHidden('bureaucracy[$$id]', $this->form_id);
 
         foreach ($data as $id => $opt) {
-            $opt->render(array('name' => 'bureaucracy['.$id.']'), $form);
+            /** @var $opt syntax_plugin_bureaucracy_field */
+            $opt->renderfield(array('name' => 'bureaucracy['.$id.']'), $form);
         }
 
         return $form->getForm();
@@ -322,17 +328,23 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         return $args;
     }
 
+    /**
+     * Clean class name
+     *
+     * @param string $classname
+     * @return string cleaned name
+     */
     function _sanitizeClassName($classname) {
         return preg_replace('/[^\w\x7f-\xff]/', '', strtolower($classname));
     }
 
     /**
-     * Replace some placeholders for userinfo and time
+     * Replace some placeholders (default available for namespace templates) for userinfo and time
      *   - more replacements are done in syntax_plugin_bureaucracy_action_template
      * @param $input
      * @return mixed
      */
-    function replace($input) {
+    function replaceNSTemplatePlaceholders($input) {
         global $USERINFO;
         global $conf;
 

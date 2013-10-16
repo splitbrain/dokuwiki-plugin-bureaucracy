@@ -16,7 +16,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
         }
     }
 
-    function render($params, $form) {
+    function renderfield($params, Doku_Form $form) {
         $form->startFieldset(hsc($this->getParam('display')));
         if (isset($this->depends_on)) {
             $dependencies = array_map('hsc',(array) $this->depends_on);
@@ -32,7 +32,19 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
         }
     }
 
-    function handle_post($param, $my_id, &$data) {
+    /**
+     *
+     * @param array $params
+     *  when fieldset $params is an array of entries:
+     *    [0] field value
+     *    [1] my_id
+     *    [2] data of fields
+     * @return array|bool
+     */
+    function handle_post(&$params) {
+        $my_id = $params[1];
+        $data = &$params[2];
+
         if(!isset($this->depends_on)) {
             return true;
         }

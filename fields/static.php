@@ -8,7 +8,7 @@ class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_f
         $this->opt['optional'] = true;
     }
 
-    function handle_post($param) {
+    function handle_post(&$param) {
         return true;
     }
 
@@ -16,11 +16,11 @@ class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_f
         return ($name === 'value') ? null : parent::getParam($name);
     }
 
-    function render($params, Doku_Form $form) {
+    function renderfield($params, Doku_Form $form) {
         if (!isset($this->opt['display'])) {
             $this->opt['display'] = $this->opt['label'];
         }
-        parent::render($params, $form);
+        parent::renderfield($params, $form);
     }
 
 

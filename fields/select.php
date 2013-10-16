@@ -11,7 +11,7 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
         }
     }
 
-    function render($params, $form) {
+    function renderfield($params, Doku_Form $form) {
         $this->_handlePreload();
         if(!$form->_infieldset){
             $form->startFieldset('');

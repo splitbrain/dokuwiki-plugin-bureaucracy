@@ -10,7 +10,7 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
         $this->opt['optional'] = true;
     }
 
-    function render($params, $form) {
+    function renderfield($params, Doku_Form $form) {
         if(!syntax_plugin_bureaucracy_field_submit::$captcha_displayed){
             syntax_plugin_bureaucracy_field_submit::$captcha_displayed = true;
             $helper = null;
@@ -20,16 +20,17 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
             }
         }
         $this->tpl = form_makeButton('submit','', '@@DISPLAY|' . $this->getLang('submit') . '@@');
-        parent::render($params, $form);
+        parent::renderfield($params, $form);
     }
 
-    function handle_post($param) {
+    function handle_post(&$param) {
         if ($this->hidden) {
             return true;
         }
         if(!syntax_plugin_bureaucracy_field_submit::$captcha_checked){
             syntax_plugin_bureaucracy_field_submit::$captcha_checked = true;
             // check CAPTCHA
+            /** @var helper_plugin_captcha $helper */
             $helper = null;
             if(@is_dir(DOKU_PLUGIN.'captcha')) $helper = plugin_load('helper','captcha');
             if(!is_null($helper) && $helper->isEnabled()){
