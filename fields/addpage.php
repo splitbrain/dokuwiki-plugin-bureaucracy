@@ -11,10 +11,10 @@ class syntax_plugin_bureaucracy_field_addpage extends syntax_plugin_bureaucracy_
         $this->opt = array_combine(array('cmd', 'page_tpl', 'page_tgt'), $args);
     }
 
-    function render($params, $form) {
+    function renderfield($params, Doku_Form $form) {
     }
 
-    function handle_post($param) {
+    function handle_post(&$param) {
         return true;
     }
 

@@ -70,7 +70,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
      */
     function replace($patterns, $values, $input, $strftime=true) {
         $input = preg_replace($patterns, $values, $input);
-        $input = parent::replace($input);
+        $input = parent::replaceNSTemplatePlaceholders($input);
         if($strftime){
             $input = preg_replace_callback('/%./',
                     create_function('$m','return strftime($m[0]);'),

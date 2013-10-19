@@ -8,7 +8,7 @@ class syntax_plugin_bureaucracy_field_wiki extends syntax_plugin_bureaucracy_fie
         $this->opt['optional'] = true;
     }
 
-    function handle_post($param) {
+    function handle_post(&$param) {
         return true;
     }
 

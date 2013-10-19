@@ -101,7 +101,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
      **/
-    function render($params, Doku_Form $form) {
+    function renderfield($params, Doku_Form $form) {
         $this->_handlePreload();
         if(!$form->_infieldset){
             $form->startFieldset('');
@@ -130,12 +130,13 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * Accepts and validates a posted value.
      *
-     * @param string $value The passed value or null if none given
+     * (Overridden by fieldset, which has as argument an array with the form array by reference)
      *
-     * @return bool|array Wether the passed value is valid; Fieldsets return
+     * @param string $value The passed value or array or null if none given
+     * @return bool|array Whether the passed value is valid; Fieldsets return
      *                    an array specifying their dependency state.
-     **/
-    function handle_post($value) {
+     */
+    function handle_post(&$value) {
         return $this->hidden || $this->setVal($value);
     }
 

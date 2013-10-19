@@ -38,7 +38,7 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
         return $this->opt['value'] === '1';
     }
 
-    function render($params, $form) {
+    function renderfield($params, Doku_Form $form) {
         $id = 'bureaucracy__'.md5(rand());
         $params = array_merge(array('value' => false), $this->opt, $params);
         $check = $params['value'] ? 'checked="checked"' : '';
@@ -46,6 +46,6 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
                      '<input type="hidden" name="@@NAME@@" value="0" />' .
                      '<input type="checkbox" name="@@NAME@@" value="1" id="'.$id.'" ' .
                      $check . ' /></label>';
-        parent::render($params, $form);
+        parent::renderfield($params, $form);
     }
 }
