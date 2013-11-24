@@ -59,8 +59,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     function handle($match, $state, $pos, Doku_Handler &$handler){
         $match = substr($match,6,-7); // remove form wrap
         $lines = explode("\n",$match);
-        $action = array('type' => '',
-                        'argv' => array());
+        $actions = array();
         $thanks = '';
         $labels = '';
 
@@ -81,8 +80,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 // is action element?
                 if ($args[0] == 'action') {
                     array_shift($args);
-                    $action['type'] = array_shift($args);
-                    $action['argv'] = $args;
+                    $actions[] = array('type' => array_shift($args), 'argv' => $args);
                     continue;
                 }
 
@@ -103,20 +101,25 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             $cmds[] = new $class($args);
         }
 
-        // check if action is available
-        $action['type'] = $this->_sanitizeClassName($action['type']);
-        if (!$action['type'] ||
-            !@file_exists(DOKU_PLUGIN.'bureaucracy/actions/' .
-                          $action['type'] . '.php')) {
-            msg(sprintf($this->getLang('e_noaction'), $action), -1);
+        foreach($actions as $action) {
+            // check if action is available
+            $action['type'] = $this->_sanitizeClassName($action['type']);
+            if (!$action['type'] ||
+                !@file_exists(DOKU_PLUGIN.'bureaucracy/actions/' .
+                              $action['type'] . '.php')) {
+                msg(sprintf($this->getLang('e_noaction'), $action), -1);
+            }
         }
         // set thank you message
         if (!$thanks) {
-            $thanks = $this->getLang($action['type'].'_thanks');
+            $thanks = "";
+            foreach($actions as $action) {
+                $thanks .= $this->getLang($action['type'].'_thanks');
+            }
         } else {
             $thanks = hsc($thanks);
         }
-        return array('data'=>$cmds,'action'=>$action,'thanks'=>$thanks,'labels'=>$labels);
+        return array('data'=>$cmds,'actions'=>$actions,'thanks'=>$thanks,'labels'=>$labels);
     }
 
     /**
@@ -246,16 +249,18 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             return false;
         }
 
-        /** @var syntax_plugin_bureaucracy_action $action */
-        $class = 'syntax_plugin_bureaucracy_action_' . $data['action']['type'];
-        $action = new $class();
+        foreach($data['actions'] as $actionData) {
+            /** @var syntax_plugin_bureaucracy_action $action */
+            $class = 'syntax_plugin_bureaucracy_action_' . $actionData['type'];
+            $action = new $class();
 
-        try {
-            $success = $action->run($data['data'], $data['thanks'],
-                                    $data['action']['argv']);
-        } catch (Exception $e) {
-            msg($e->getMessage());
-            return false;
+            try {
+                $success = $action->run($data['data'], $data['thanks'],
+                                        $actionData['argv']);
+            } catch (Exception $e) {
+                msg($e->getMessage());
+                return false;
+            }
         }
 
         // Perform after_action hooks
