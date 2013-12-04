@@ -9,8 +9,8 @@ jQuery(function () {
      * Ajax request for user suggestions
      *
      * @param {Object} request object, with single 'term' property
-     * @param {Function} response(data) callback, argument: the data to suggest to the user.
-     * @param {Function} getterm(request) callback, argument: the request Object, returns: search term
+     * @param {Function} response callback, argument: the data array to suggest to the user.
+     * @param {Function} getterm callback, argument: the request Object, returns: search term
      */
     function ajaxsource(request, response, getterm) {
         jQuery.getJSON(
@@ -68,11 +68,8 @@ jQuery(function () {
             },
             search: function () {
                 // custom minLength
-                console.log(this);
                 var term = extractLast(this.value);
-                if (term.length < 2) {
-                    return false;
-                }
+                return term.length >= 2;
             },
             focus: function () {
                 // prevent value inserted on focus
