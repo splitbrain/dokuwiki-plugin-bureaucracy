@@ -1,7 +1,7 @@
 <?php
-
 /**
  * @group plugin_bureaucracy
+ * @group plugins
  */
 class syntax_plugin_bureaucracy_action_template_test extends DokuWikiTest {
 
