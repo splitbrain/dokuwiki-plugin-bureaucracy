@@ -7,6 +7,7 @@ number   "Your Age" >13 <99
 email    "Your E-Mail Address"
 textbox  "Occupation (optional)" !
 password "Some password"
+file     "File1"
 
 fieldset "HTML Checks  <bold>bang</bold>"  "<bold>bang</bold>" "<bold>bang</bold>"
 textbox  "HTML check 1 <bold>bang</bold>"  "=<bold>bang</bold>"

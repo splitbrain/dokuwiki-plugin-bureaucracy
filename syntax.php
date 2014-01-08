@@ -237,6 +237,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             if ($opt->getFieldType() === 'fieldset') {
                 $params = array($_POST['bureaucracy'][$id], $id, &$data['data']);
                 $_ret = $opt->handle_post($params);
+            } elseif ($opt->getFieldType() === 'file') {
+                $file = array();
+                foreach($_FILES['bureaucracy'] as $key=>$value) {
+                    $file[$key] = $value[$id];
+                }
+                $_ret = $opt->handle_post($file);
             } elseif(!$opt->hidden) {
                 $_ret = $opt->handle_post($_POST['bureaucracy'][$id]);
             }
@@ -278,7 +284,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         global $ID;
 
         $form = new Doku_Form(array('class' => 'bureaucracy__plugin',
-                                    'id'    => 'bureaucracy__plugin' . $this->form_id));
+                                    'id'    => 'bureaucracy__plugin' . $this->form_id,
+                                    'enctype'=>'multipart/form-data'));
         $form->addHidden('id', $ID);
         $form->addHidden('bureaucracy[$$id]', $this->form_id);
 
