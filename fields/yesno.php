@@ -1,5 +1,20 @@
 <?php
+/**
+ * Class syntax_plugin_bureaucracy_field_yesno
+ *
+ * Creates a checkbox
+ */
 class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_field {
+
+    /**
+     * Arguments:
+     *  - cmd
+     *  - label
+     *  - =yesvalue
+     *  - !falsevalue
+     *
+     * @param array $args The tokenized definition, only split at spaces
+     */
     public function __construct($args) {
         $this->init($args);
         $newargs = array();
@@ -19,6 +34,12 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
         $this->opt['optional'] = true;
     }
 
+    /**
+     * Get an arbitrary parameter
+     *
+     * @param string $key
+     * @return mixed|null
+     */
     public function getParam($key) {
         if ($key === 'value') {
             if ($this->opt['value'] === '1') {
@@ -34,11 +55,22 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
         return parent::getParam($key);
     }
 
+    /**
+     * Whether the field is true (used for depending fieldsets)
+     *
+     * @return bool whether field is set
+     */
     public function isSet_() {
         return $this->opt['value'] === '1';
     }
 
-    function renderfield($params, Doku_Form $form) {
+    /**
+     * Render the field as XHTML
+     *
+     * @params array     $params Additional HTML specific parameters
+     * @params Doku_Form $form   The target Doku_Form object
+     */
+    public function renderfield($params, Doku_Form $form) {
         $id = 'bureaucracy__'.md5(rand());
         $params = array_merge(array('value' => false), $this->opt, $params);
         $check = $params['value'] ? 'checked="checked"' : '';
