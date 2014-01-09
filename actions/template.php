@@ -12,7 +12,17 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     var $templates;
     var $pagename;
 
-    function run($data, $thanks, $argv) {
+    /**
+     * Performs template action
+     *
+     * @param array  $fields  array with form fields
+     * @param string $thanks  thanks message
+     * @param array  $argv    array with arguments: template, pagename, separator
+     * @return array|mixed
+     *
+     * @throws Exception
+     */
+    public function run($fields, $thanks, $argv) {
         global $conf;
 
         list($tpl, $this->pagename, $sep) = $argv;
@@ -24,10 +34,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $this->templates = array();
 
         $this->prepareLanguagePlaceholder();
-        $this->processFields($data, $sep, $runas);
+        $this->processFields($fields, $sep, $runas);
         $this->buildTargetPageName();
         $this->resolveTemplates();
-        $tpl = $this->getTemplates($data, $tpl, $runas);
+        list($tpl,,) = $this->getTemplates($fields, $tpl, $runas);
 
         if(empty($this->templates)) {
             throw new Exception(sprintf($this->getLang('e_template'), $tpl));
@@ -146,7 +156,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * @throws Exception
+     * @throws Exception missing pagename
      */
     function buildTargetPageName() {
         global $ID;

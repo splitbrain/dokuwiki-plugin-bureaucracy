@@ -8,7 +8,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
     /**
      * Build a nice email from the submitted data and send it
      */
-    function run($data, $thanks, $argv) {
+    function run($fields, $thanks, $argv) {
         global $ID;
 
         // get recipient address(es)
@@ -17,7 +17,8 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
         $sub = sprintf($this->getLang('mailsubject'),$ID);
         $txt = sprintf($this->getLang('mailintro')."\n\n\n", dformat());
 
-        foreach($data as $opt){
+        foreach($fields as $opt){
+            /** @var syntax_plugin_bureaucracy_field $opt */
             $value = $opt->getParam('value');
             $label = $opt->getParam('label');
 
