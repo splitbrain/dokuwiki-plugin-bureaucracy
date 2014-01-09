@@ -21,26 +21,26 @@ require_once(DOKU_PLUGIN.'syntax.php');
  */
 class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     // allowed types and the number of arguments
-    var $form_id = 0;
+    private $form_id = 0;
 
     /**
      * What kind of syntax are we?
      */
-    function getType(){
+    public function getType(){
         return 'substition';
     }
 
     /**
      * What about paragraphs?
      */
-    function getPType(){
+    public function getPType(){
         return 'block';
     }
 
     /**
      * Where to sort in?
      */
-    function getSort(){
+    public function getSort(){
         return 155;
     }
 
@@ -48,7 +48,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Connect pattern to lexer
      */
-    function connectTo($mode) {
+    public function connectTo($mode) {
         $this->Lexer->addSpecialPattern('<form>.*?</form>',$mode,'plugin_bureaucracy');
     }
 
@@ -56,7 +56,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    function handle($match, $state, $pos, Doku_Handler &$handler){
+    public function handle($match, $state, $pos, Doku_Handler &$handler){
         $match = substr($match,6,-7); // remove form wrap
         $lines = explode("\n",$match);
         $actions = array();
@@ -125,15 +125,14 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Create output
      */
-    function render($format, Doku_Renderer &$R, $data) {
-        global $ID;
+    public function render($format, Doku_Renderer &$R, $data) {
         if ($format != 'xhtml') return false;
         $R->info['cache'] = false; // don't cache
 
         /**
          * replace some time and name placeholders in the default values
          * @var $opt syntax_plugin_bureaucracy_field */
-        foreach ($data['data'] as $id => &$opt) {
+        foreach ($data['data'] as &$opt) {
             if(isset($opt->opt['value'])) {
                 $opt->opt['value'] = $this->replaceNSTemplatePlaceholders($opt->opt['value']);
             }
@@ -225,15 +224,17 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
     }
 
-
     /**
-     * Validate data, perform action
+     * Validate posted data, perform action(s)
+     *
+     * @param array $data all data passed to render()
+     * @return bool whether fields validated and performed the action(s) succesfully
      */
-    function _handlepost($data) {
+    private function _handlepost($data) {
         $success = true;
         foreach ($data['data'] as $id => $opt) {
             /** @var $opt syntax_plugin_bureaucracy_field */
-            $_ret = false;
+            $_ret = true;
             if ($opt->getFieldType() === 'fieldset') {
                 $params = array($_POST['bureaucracy'][$id], $id, &$data['data']);
                 $_ret = $opt->handle_post($params);
@@ -258,13 +259,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $success = $action->run($data['data'], $data['thanks'],
                                         $actionData['argv']);
             } catch (Exception $e) {
-                msg($e->getMessage());
+                msg($e->getMessage(), -1);
                 return false;
             }
         }
 
         // Perform after_action hooks
-        foreach($data['data'] as $id => $field) {
+        foreach($data['data'] as $field) {
             /** @var $field syntax_plugin_bureaucracy_field */
             $field->after_action();
         }
@@ -273,8 +274,11 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
     /**
      * Create the form
+     *
+     * @param array $data array with form fields
+     * @return string html of the form
      */
-    function _htmlform($data){
+    private function _htmlform($data){
         global $ID;
 
         $form = new Doku_Form(array('class' => 'bureaucracy__plugin',
@@ -292,10 +296,15 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
     /**
      * Parse a line into (quoted) arguments
+     * Splits line at spaces, except when quoted
      *
      * @author William Fletcher <wfletcher@applestone.co.za>
+     *
+     * @param string $line line to parse
+     * @param array  $lines all remaining lines
+     * @return array with all the arguments
      */
-    function _parse_line($line, &$lines) {
+    private function _parse_line($line, &$lines) {
         $args = array();
         $inQuote = false;
         $arg = '';
@@ -339,7 +348,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @param string $classname
      * @return string cleaned name
      */
-    function _sanitizeClassName($classname) {
+    private function _sanitizeClassName($classname) {
         return preg_replace('/[^\w\x7f-\xff]/', '', strtolower($classname));
     }
 
@@ -349,7 +358,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @param $input
      * @return mixed
      */
-    function replaceNSTemplatePlaceholders($input) {
+    protected function replaceNSTemplatePlaceholders($input) {
         global $USERINFO;
         global $conf;
 

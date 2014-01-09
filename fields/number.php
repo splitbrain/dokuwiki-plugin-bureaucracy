@@ -1,9 +1,23 @@
 <?php
 require_once DOKU_PLUGIN . 'bureaucracy/fields/textbox.php';
+/**
+ * Class syntax_plugin_bureaucracy_field_number
+ *
+ * Creates a single line input field, where input is validated to be numeric
+ */
 class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_field_textbox {
+
     private $autoinc = false;
 
-    function __construct($args) {
+    /**
+     * Arguments:
+     *  - cmd
+     *  - label
+     *  - ++ (optional)
+     *
+     * @param array $args The tokenized definition, only split at spaces
+     */
+    public function __construct($args) {
         $pp = array_search('++', $args, true);
         if ($pp !== false) {
             unset($args[$pp]);
@@ -27,7 +41,12 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
         }
     }
 
-    function _validate() {
+    /**
+     * Validate field value
+     *
+     * @throws Exception when not a number
+     */
+    protected function _validate() {
         $value = $this->getParam('value');
         if (!is_null($value) && !is_numeric($value)){
             throw new Exception(sprintf($this->getLang('e_numeric'),hsc($this->getParam('display'))));
@@ -36,11 +55,21 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
         parent::_validate();
     }
 
+    /**
+     * Returns the cleaned key for this field required for metadata
+     *
+     * @return string key
+     */
     private function get_key() {
         return preg_replace('/\W/', '', $this->opt['label']) . '_autoinc';
     }
 
-    function after_action() {
+    /**
+     * Executed after performing the action hooks
+     *
+     * Increases counter and purge cache
+     */
+    public function after_action() {
         if ($this->autoinc) {
             global $ID;
             p_set_metadata($ID, array('bureaucracy' => array($this->get_key() => $this->opt['value'] + 1)));
