@@ -225,15 +225,17 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
     }
 
-
     /**
-     * Validate data, perform action
+     * Validate posted data, perform action(s)
+     *
+     * @param array $data all data passed to render()
+     * @return bool whether fields validated and performed the action(s) succesfully
      */
-    function _handlepost($data) {
+    private function _handlepost($data) {
         $success = true;
         foreach ($data['data'] as $id => $opt) {
             /** @var $opt syntax_plugin_bureaucracy_field */
-            $_ret = false;
+            $_ret = true;
             if ($opt->getFieldType() === 'fieldset') {
                 $params = array($_POST['bureaucracy'][$id], $id, &$data['data']);
                 $_ret = $opt->handle_post($params);
