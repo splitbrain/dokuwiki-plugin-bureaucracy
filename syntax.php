@@ -119,7 +119,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         } else {
             $thanks = hsc($thanks);
         }
-        return array('data'=>$cmds,'actions'=>$actions,'thanks'=>$thanks,'labels'=>$labels);
+        return array('fields'=>$cmds,'actions'=>$actions,'thanks'=>$thanks,'labels'=>$labels);
     }
 
     /**
@@ -132,7 +132,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         /**
          * replace some time and name placeholders in the default values
          * @var $opt syntax_plugin_bureaucracy_field */
-        foreach ($data['data'] as &$opt) {
+        foreach ($data['fields'] as &$opt) {
             if(isset($opt->opt['value'])) {
                 $opt->opt['value'] = $this->replaceNSTemplatePlaceholders($opt->opt['value']);
             }
@@ -152,7 +152,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             }
         }
 
-        $R->doc .= $this->_htmlform($data['data']);
+        $R->doc .= $this->_htmlform($data['fields']);
 
         return true;
     }
@@ -198,20 +198,20 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
         // apply labels to all fields
-        $len = count($data['data']);
+        $len = count($data['fields']);
         for($i = 0; $i < $len; $i++) {
-            if(isset($data['data'][$i]->depends_on)) {
+            if(isset($data['fields'][$i]->depends_on)) {
                 // translate dependency on fieldsets
-                $label = $data['data'][$i]->depends_on[0];
+                $label = $data['fields'][$i]->depends_on[0];
                 if(isset($labels[$label])) {
-                    $data['data'][$i]->depends_on[0] = $labels[$label];
+                    $data['fields'][$i]->depends_on[0] = $labels[$label];
                 }
 
-            } else if(isset($data['data'][$i]->opt['label'])) {
+            } else if(isset($data['fields'][$i]->opt['label'])) {
                 // translate field labels
-                $label = $data['data'][$i]->opt['label'];
+                $label = $data['fields'][$i]->opt['label'];
                 if(isset($labels[$label])) {
-                    $data['data'][$i]->opt['display'] = $labels[$label];
+                    $data['fields'][$i]->opt['display'] = $labels[$label];
                 }
             }
         }
@@ -228,15 +228,17 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * Validate posted data, perform action(s)
      *
      * @param array $data all data passed to render()
-     * @return bool whether fields validated and performed the action(s) succesfully
+     * @return bool|string
+     *      returns thanks message when fields validated and performed the action(s) succesfully;
+     *      otherwise returns false.
      */
     private function _handlepost($data) {
         $success = true;
-        foreach ($data['data'] as $id => $opt) {
+        foreach ($data['fields'] as $id => $opt) {
             /** @var $opt syntax_plugin_bureaucracy_field */
             $_ret = true;
             if ($opt->getFieldType() === 'fieldset') {
-                $params = array($_POST['bureaucracy'][$id], $id, &$data['data']);
+                $params = array($_POST['bureaucracy'][$id], $id, &$data['fields']);
                 $_ret = $opt->handle_post($params);
             } elseif(!$opt->hidden) {
                 $_ret = $opt->handle_post($_POST['bureaucracy'][$id]);
@@ -256,7 +258,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             $action = new $class();
 
             try {
-                $success = $action->run($data['data'], $data['thanks'],
+                $return = $action->run($data['fields'], $data['thanks'],
                                         $actionData['argv']);
             } catch (Exception $e) {
                 msg($e->getMessage(), -1);
@@ -265,7 +267,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
         // Perform after_action hooks
-        foreach($data['data'] as $field) {
+        foreach($data['fields'] as $field) {
             /** @var $field syntax_plugin_bureaucracy_field */
             $field->after_action();
         }
@@ -275,10 +277,10 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Create the form
      *
-     * @param array $data array with form fields
+     * @param array $fields array with form fields
      * @return string html of the form
      */
-    private function _htmlform($data){
+    private function _htmlform($fields){
         global $ID;
 
         $form = new Doku_Form(array('class' => 'bureaucracy__plugin',
@@ -286,7 +288,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $form->addHidden('id', $ID);
         $form->addHidden('bureaucracy[$$id]', $this->form_id);
 
-        foreach ($data as $id => $opt) {
+        foreach ($fields as $id => $opt) {
             /** @var $opt syntax_plugin_bureaucracy_field */
             $opt->renderfield(array('name' => 'bureaucracy['.$id.']'), $form);
         }
