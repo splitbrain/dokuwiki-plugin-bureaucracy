@@ -233,8 +233,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * @param $thanks
-     * @return array
+     * Build thanks message, trigger indexing and rendering of new pages.
+     *
+     * @param string $thanks
+     * @return string html of thanks message or when redirect the first page id of created pages
      */
     function buildThankYouPage($thanks) {
         global $ID;
@@ -250,16 +252,17 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $lvl = substr_count($ID, ':');
             for ($n = 0; $n < $lvl; ++$n) {
                 if (!isset($last_folder[$n]) || strpos($ID, $last_folder[$n]['id']) !== 0) {
-                    $last_folder[$n] = array('id' => substr($ID, 0, strpos($ID, ':', ($n > 0 ? strlen($last_folder[$n - 1]['id']) : 0) + 1) + 1),
+                    $last_folder[$n] = array(
+                        'id' => substr($ID, 0, strpos($ID, ':', ($n > 0 ? strlen($last_folder[$n - 1]['id']) : 0) + 1) + 1),
                         'level' => $n + 1,
-                        'open' => 1);
+                        'open' => 1
+                    );
                     $data[] = $last_folder[$n];
                 }
             }
             $data[] = array('id' => $ID, 'level' => 1 + substr_count($ID, ':'), 'type' => 'f');
         }
-        $ret .= html_buildlist($data, 'idx', array($this, 'html_list_index'),
-            'html_li_index');
+        $ret .= html_buildlist($data, 'idx', array($this, 'html_list_index'), 'html_li_index');
 
         // Add indexer bugs for every just-created page
         $ret .= '<div class="no">';
