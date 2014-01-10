@@ -93,13 +93,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $this->pagename .= $sep . $pname;
             }
 
-            if (!is_null($opt->getParam('page_tpl')) &&
-                !is_null($opt->getParam('page_tgt'))
-            ) {
+            if (!is_null($opt->getParam('page_tpl')) && !is_null($opt->getParam('page_tgt')) ) {
                 $page_tpl = $this->replaceDefault($opt->getParam('page_tpl'));
-                if (auth_aclcheck($page_tpl, $runas ? $runas : $_SERVER['REMOTE_USER'],
-                        $USERINFO['grps']) >= AUTH_READ
-                ) {
+                $user = $runas ? $runas : $_SERVER['REMOTE_USER'];
+                if (auth_aclcheck($page_tpl, $user, $USERINFO['grps']) >= AUTH_READ ) {
                     $this->templates[$opt->getParam('page_tgt')] = $this->replace(array(), array(), rawWiki($page_tpl));
                 }
             }
@@ -107,6 +104,8 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
+     * Prepare and resolve target page
+     *
      * @throws Exception missing pagename
      */
     function buildTargetPageName() {
@@ -119,6 +118,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         }
     }
 
+    /**
+     * Resolve pageids of target pages
+     */
     function resolveTemplates() {
         global $ID;
         $_templates = array();
@@ -131,12 +133,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * @param $data
+     * @param $fields
      * @param $tpl
      * @param $runas
-     * @return array
+     * @return string template
      */
-    function getTemplates($data, $tpl, $runas) {
+    function getTemplates($fields, $tpl, $runas) {
         global $USERINFO;
         global $conf;
 
@@ -144,15 +146,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             // use namespace template
             if (!isset($this->templates[$this->pagename])) {
                 $this->templates[$this->pagename] = pageTemplate(array($this->pagename));
-                return array($tpl, $USERINFO, $data);
             }
-            return array($tpl, $USERINFO, $data);
         } elseif ($tpl !== '!') {
             $tpl = $this->replaceDefault($tpl);
             // Namespace link
             if ($runas) {
                 // Hack user credentials.
-                global $USERINFO;
                 $backup = array($_SERVER['REMOTE_USER'], $USERINFO['grps']);
                 $_SERVER['REMOTE_USER'] = $runas;
                 $USERINFO['grps'] = array();
@@ -188,13 +187,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
             if ($runas) {
                 /* Restore user credentials. */
-                global $USERINFO;
                 list($_SERVER['REMOTE_USER'], $USERINFO['grps']) = $backup;
-                return array($tpl, $USERINFO, $data);
             }
-            return array($tpl, $USERINFO, $data);
         }
-        return array($tpl);
+        return $tpl;
     }
 
     /**
