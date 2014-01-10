@@ -21,44 +21,53 @@ jQuery(function () {
         //show/hide fieldset and trigger depending children
         function updateFieldset(input) {
             jQuery.each(jQuery(input).data('dparray'), function (i, dp) {
-                dp.fset.toggle(input.parentNode.parentNode.style.display !== 'none' && // input/checkbox is displayed AND
-                    ((input.checked === dp.tval) ||                                               //  ( checkbox is checked
-                        (input.type !== 'checkbox' && (dp.tval === true && input.value !== '')) || //  OR no checkbox, but input is set
-                        input.value === dp.tval));                                               //  OR input === dp.tval )
+                dp.fset.toggle(
+                    input.parentNode.parentNode.style.display !== 'none' &&                     // input/checkbox is displayed AND
+                    ((input.checked === dp.tval) ||                                             //  ( checkbox is checked
+                     (input.type !== 'checkbox' && (dp.tval === true && input.value !== '')) || //  OR no checkbox, but input is set
+                     input.value === dp.tval)                                                   //  OR input === dp.tval )
+                );
 
-                dp.fset.find('input,select').each(function () {
-                    if (jQuery(this).data('dparray')) {
-                        jQuery(this).change();
-                    }
-                });
+                dp.fset.find('input,select')
+                    .each(function () {
+                        if (jQuery(this).data('dparray')) {
+                            jQuery(this).change();
+                        }
+                    });
             });
         }
 
         //look for p (with info about controller) in depending fieldsets
-        jQuery('p.bureaucracy_depends', this).each(function () {
-            //get controller info
-            var fname = jQuery(this).find('span.bureaucracy_depends_fname').html(),
-                fvalue = jQuery(this).find('span.bureaucracy_depends_fvalue');
-            fvalue = (fvalue.length ? fvalue.html() : true);
+        jQuery('p.bureaucracy_depends', this)
+            .each(function () {
+                //get controller info
+                var fname = jQuery(this).find('span.bureaucracy_depends_fname').html(),
+                    fvalue = jQuery(this).find('span.bureaucracy_depends_fvalue');
+                fvalue = (fvalue.length ? fvalue.html() : true);
 
-            //get controller field and add info and change event to the input that controls depending fieldset
-            var fieldsetinfo = {
-                fset: jQuery(this).parent(),
-                tval: fvalue
-            };
-            jQuery("label").has(":first-child:contains('" + fname + "')").first()
-                .find("select,input:last").each(function () { //yesno field contains first a hidden input
-                    if (!jQuery(this).data('dparray')) {
-                        jQuery(this).data('dparray', [fieldsetinfo]);
-                    } else {
-                        jQuery(this).data('dparray').push(fieldsetinfo);
-                    }
-                }).bind('change keyup', function () {
-                    updateFieldset(this);
-                }).change();
+                //get controller field and add info and change event to the input that controls depending fieldset
+                var fieldsetinfo = {
+                    fset: jQuery(this).parent(),
+                    tval: fvalue
+                };
 
-            //hide p.bureaucracy_depends in fieldset
-        }).hide();
+                jQuery("label")
+                    .has(":first-child:contains('" + fname + "')").first()
+                    .find("select,input:last")  //yesno field contains first a hidden input
+                    .each(function () {
+                        if (!jQuery(this).data('dparray')) {
+                            jQuery(this).data('dparray', [fieldsetinfo]);
+                        } else {
+                            jQuery(this).data('dparray').push(fieldsetinfo);
+                        }
+                    })
+                    .bind('change keyup', function () {
+                        updateFieldset(this);
+                    })
+                    .change();
+
+            })
+            .hide(); //hide p.bureaucracy_depends in fieldset
 
     });
 });
