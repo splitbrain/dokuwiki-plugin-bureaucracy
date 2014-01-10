@@ -32,6 +32,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $this->templates = array();
 
         $this->prepareLanguagePlaceholder();
+        $this->prepareNoincludeReplacement();
         $this->processFields($fields, $sep, $runas);
         $this->buildTargetPageName();
         $this->resolveTemplates();

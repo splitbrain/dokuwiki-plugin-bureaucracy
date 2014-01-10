@@ -95,6 +95,9 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
         }
     }
 
-
+    function prepareNoincludeReplacement() {
+        $this->patterns['__noinclude__'] = '/<noinclude>(.*?)<\/noinclude>/is';
+        $this->values['__noinclude__'] = '';
+    }
 
 }
