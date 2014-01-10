@@ -252,13 +252,14 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             return false;
         }
 
+        $thanks = '';
         foreach($data['actions'] as $actionData) {
             /** @var syntax_plugin_bureaucracy_action $action */
             $class = 'syntax_plugin_bureaucracy_action_' . $actionData['type'];
             $action = new $class();
 
             try {
-                $return = $action->run($data['fields'], $data['thanks'],
+                $thanks .= $action->run($data['fields'], $data['thanks'],
                                         $actionData['argv']);
             } catch (Exception $e) {
                 msg($e->getMessage(), -1);
@@ -271,7 +272,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             /** @var $field syntax_plugin_bureaucracy_field */
             $field->after_action();
         }
-        return $success;
+        return $thanks;
     }
 
     /**
