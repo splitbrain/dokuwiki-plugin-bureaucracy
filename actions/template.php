@@ -208,7 +208,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             }
             $t_pages = array();
             search($t_pages, $conf['datadir'], 'search_universal',
-                array('depth' => 0, 'listfiles' => true),
+                array('depth' => 0, 'listfiles' => true, 'showhidden' => true),
                 str_replace(':', '/', getNS($tpl)));
             foreach ($t_pages as $t_page) {
                 $t_name = cleanID($t_page['id']);
