@@ -7,8 +7,6 @@
 
 class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucracy_action {
 
-    var $patterns;
-    var $values;
     var $templates;
     var $pagename;
 
@@ -34,6 +32,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $this->templates = array();
 
         $this->prepareLanguagePlaceholder();
+        $this->prepareNoincludeReplacement();
         $this->processFields($fields, $sep, $runas);
         $this->buildTargetPageName();
         $this->resolveTemplates();
@@ -69,47 +68,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         return $ret;
     }
 
-    /**
-     * Apply given replacement patterns and values
-     *
-     * @param string $patterns The patterns to replace
-     * @param string $values   The values to use as replacement
-     * @param string $input    The text to work on
-     * @param bool   $strftime Apply strftime() replacements
-     * @return string processed text
-     */
-    function replace($patterns, $values, $input, $strftime=true) {
-        $input = preg_replace($patterns, $values, $input);
-        $input = parent::replaceNSTemplatePlaceholders($input);
-        if($strftime){
-            $input = preg_replace_callback('/%./',
-                    create_function('$m','return strftime($m[0]);'),
-                    $input);
-        }
-        return $input;
-    }
 
-    function replaceDefault($input, $strftime=true) {
-        return $this->replace($this->patterns, $this->values, $input, $strftime);
-    }
-
-    function prepareLanguagePlaceholder() {
-        global $ID;
-        global $conf;
-
-        $this->patterns['__lang__'] = '/@LANG@/';
-        $this->values['__lang__'] = $conf['lang'];
-
-        $this->patterns['__trans__'] = '/@TRANS@/';
-        $this->values['__trans__'] = '';
-
-        /** @var helper_plugin_translation $trans */
-        $trans = plugin_load('helper', 'translation');
-        if (!$trans) return;
-
-        $this->values['__trans__'] = $trans->getLangPart($ID);
-        $this->values['__lang__'] = $trans->realLC('');
-    }
 
     /**
      * - Generate field replacements
@@ -127,14 +86,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $label = $opt->getParam('label');
             $value = $opt->getParam('value');
 
-            // prepare replacements
-            if (!is_null($label)) {
-                $this->patterns[$label] = '/(@@|##)' . preg_quote($label, '/') .
-                    '(?:\|(.*?))' . (is_null($value) ? '' : '?') .
-                    '\1/si';
-                $this->values[$label] = is_null($value) || $value === false ? '$2' : $value;
-            }
-
+            $this->prepareFieldReplacements($label, $value);
 
             // handle pagenames
             $pname = $opt->getParam('pagename');
@@ -142,13 +94,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $this->pagename .= $sep . $pname;
             }
 
-            if (!is_null($opt->getParam('page_tpl')) &&
-                !is_null($opt->getParam('page_tgt'))
-            ) {
+            if (!is_null($opt->getParam('page_tpl')) && !is_null($opt->getParam('page_tgt')) ) {
                 $page_tpl = $this->replaceDefault($opt->getParam('page_tpl'));
-                if (auth_aclcheck($page_tpl, $runas ? $runas : $_SERVER['REMOTE_USER'],
-                        $USERINFO['grps']) >= AUTH_READ
-                ) {
+                $user = $runas ? $runas : $_SERVER['REMOTE_USER'];
+                if (auth_aclcheck($page_tpl, $user, $USERINFO['grps']) >= AUTH_READ ) {
                     $this->templates[$opt->getParam('page_tgt')] = $this->replace(array(), array(), rawWiki($page_tpl));
                 }
             }
@@ -156,6 +105,8 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
+     * Prepare and resolve target page
+     *
      * @throws Exception missing pagename
      */
     function buildTargetPageName() {
@@ -168,6 +119,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         }
     }
 
+    /**
+     * Resolve pageids of target pages
+     */
     function resolveTemplates() {
         global $ID;
         $_templates = array();
@@ -180,12 +134,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * @param $data
+     * @param $fields
      * @param $tpl
      * @param $runas
-     * @return array
+     * @return string template
      */
-    function getTemplates($data, $tpl, $runas) {
+    function getTemplates($fields, $tpl, $runas) {
         global $USERINFO;
         global $conf;
 
@@ -193,15 +147,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             // use namespace template
             if (!isset($this->templates[$this->pagename])) {
                 $this->templates[$this->pagename] = pageTemplate(array($this->pagename));
-                return array($tpl, $USERINFO, $data);
             }
-            return array($tpl, $USERINFO, $data);
         } elseif ($tpl !== '!') {
             $tpl = $this->replaceDefault($tpl);
             // Namespace link
             if ($runas) {
                 // Hack user credentials.
-                global $USERINFO;
                 $backup = array($_SERVER['REMOTE_USER'], $USERINFO['grps']);
                 $_SERVER['REMOTE_USER'] = $runas;
                 $USERINFO['grps'] = array();
@@ -237,13 +188,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
             if ($runas) {
                 /* Restore user credentials. */
-                global $USERINFO;
                 list($_SERVER['REMOTE_USER'], $USERINFO['grps']) = $backup;
-                return array($tpl, $USERINFO, $data);
             }
-            return array($tpl, $USERINFO, $data);
         }
-        return array($tpl);
+        return $tpl;
     }
 
     /**
