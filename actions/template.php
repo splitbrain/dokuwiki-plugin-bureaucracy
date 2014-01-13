@@ -11,6 +11,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     var $values;
     var $templates;
     var $pagename;
+    var $uploads;
 
     function run($data, $thanks, $argv) {
         global $conf;
@@ -22,6 +23,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $this->patterns = array();
         $this->values   = array();
         $this->templates = array();
+        $this->uploads = array();
 
         $this->prepareLanguagePlaceholder();
         $this->processFields($data, $sep, $runas);
@@ -34,7 +36,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         }
 
         $this->checkTargetPageNames($runas);
-
+        
+        $this->processUploads($runas);
+        
         $this->replaceAndSavePages();
 
         $ret = $this->buildThankYouPage($thanks);
@@ -113,10 +117,20 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     function processFields($data, $sep, $runas) {
         global $USERINFO;
         foreach ($data as $opt) {
+
             /** @var $opt syntax_plugin_bureaucracy_field */
             $label = $opt->getParam('label');
             $value = $opt->getParam('value');
-
+            
+            if($opt->getFieldType() == 'file') {
+                if(!$value['size']) {
+                    $value = '';
+                } else {
+                    $this->uploads[] = $opt;
+                    $value = $value['name'];
+                }
+            }
+            
             // prepare replacements
             if (!is_null($label)) {
                 $this->patterns[$label] = '/(@@|##)' . preg_quote($label, '/') .
@@ -322,6 +336,29 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $ID = $oldid;
         $ret .= '</div>';
         return $ret;
+    }
+    
+    /**
+     * move the files to <pagename>:FILENAME 
+     *
+     */
+    function processUploads($runas) {
+        $ns = $this->pagename;
+        foreach($this->uploads as $upload) {
+            $value = $upload->getParam('value');
+            $label = $upload->getParam('label');
+            $id = $ns.':'.$value['name'];
+            $res = media_save(
+                        array('name' => $value['tmp_name']), 
+                        $id,
+                        0, 
+                        auth_aclcheck($id, $runas ? $runas : $_SERVER['REMOTE_USER'],array()), 
+                        'copy_uploaded_file');
+            
+            if(is_array($res)) throw new Exception($res[0]);
+            
+            $this->values[$label] = $res;
+        }
     }
 
 }

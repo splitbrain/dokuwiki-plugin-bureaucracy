@@ -20,4 +20,9 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
             throw new Exception(hsc($this->opt['label']) .' '. $lang['uploadfail'] . ' (' .$value['error'] . ')' );
         }
     }
+    
+    //validate against filename
+    function validate_match($d, $value) {
+        return @preg_match('/' . $d . '/i', $value['name']);
+    }
 }
