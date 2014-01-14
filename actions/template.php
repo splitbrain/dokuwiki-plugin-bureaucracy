@@ -7,13 +7,21 @@
 
 class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucracy_action {
 
-    var $patterns;
-    var $values;
     var $templates;
     var $pagename;
     var $uploads;
 
-    function run($data, $thanks, $argv) {
+    /**
+     * Performs template action
+     *
+     * @param array  $fields  array with form fields
+     * @param string $thanks  thanks message
+     * @param array  $argv    array with arguments: template, pagename, separator
+     * @return array|mixed
+     *
+     * @throws Exception
+     */
+    public function run($fields, $thanks, $argv) {
         global $conf;
 
         list($tpl, $this->pagename, $sep) = $argv;
@@ -26,10 +34,11 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $this->uploads = array();
 
         $this->prepareLanguagePlaceholder();
-        $this->processFields($data, $sep, $runas);
+        $this->prepareNoincludeReplacement();
+        $this->processFields($fields, $sep, $runas);
         $this->buildTargetPageName();
         $this->resolveTemplates();
-        $tpl = $this->getTemplates($data, $tpl, $runas);
+        list($tpl,,) = $this->getTemplates($fields, $tpl, $runas);
 
         if(empty($this->templates)) {
             throw new Exception(sprintf($this->getLang('e_template'), $tpl));
@@ -63,47 +72,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         return $ret;
     }
 
-    /**
-     * Apply given replacement patterns and values
-     *
-     * @param string $patterns The patterns to replace
-     * @param string $values   The values to use as replacement
-     * @param string $input    The text to work on
-     * @param bool   $strftime Apply strftime() replacements
-     * @return string processed text
-     */
-    function replace($patterns, $values, $input, $strftime=true) {
-        $input = preg_replace($patterns, $values, $input);
-        $input = parent::replaceNSTemplatePlaceholders($input);
-        if($strftime){
-            $input = preg_replace_callback('/%./',
-                    create_function('$m','return strftime($m[0]);'),
-                    $input);
-        }
-        return $input;
-    }
 
-    function replaceDefault($input, $strftime=true) {
-        return $this->replace($this->patterns, $this->values, $input, $strftime);
-    }
-
-    function prepareLanguagePlaceholder() {
-        global $ID;
-        global $conf;
-
-        $this->patterns['__lang__'] = '/@LANG@/';
-        $this->values['__lang__'] = $conf['lang'];
-
-        $this->patterns['__trans__'] = '/@TRANS@/';
-        $this->values['__trans__'] = '';
-
-        /** @var helper_plugin_translation $trans */
-        $trans = plugin_load('helper', 'translation');
-        if (!$trans) return;
-
-        $this->values['__trans__'] = $trans->getLangPart($ID);
-        $this->values['__lang__'] = $trans->realLC('');
-    }
 
     /**
      * - Generate field replacements
@@ -131,14 +100,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 }
             }
             
-            // prepare replacements
-            if (!is_null($label)) {
-                $this->patterns[$label] = '/(@@|##)' . preg_quote($label, '/') .
-                    '(?:\|(.*?))' . (is_null($value) ? '' : '?') .
-                    '\1/si';
-                $this->values[$label] = is_null($value) || $value === false ? '$2' : $value;
-            }
-
+            $this->prepareFieldReplacements($label, $value);
 
             // handle pagenames
             $pname = $opt->getParam('pagename');
@@ -146,13 +108,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $this->pagename .= $sep . $pname;
             }
 
-            if (!is_null($opt->getParam('page_tpl')) &&
-                !is_null($opt->getParam('page_tgt'))
-            ) {
+            if (!is_null($opt->getParam('page_tpl')) && !is_null($opt->getParam('page_tgt')) ) {
                 $page_tpl = $this->replaceDefault($opt->getParam('page_tpl'));
-                if (auth_aclcheck($page_tpl, $runas ? $runas : $_SERVER['REMOTE_USER'],
-                        $USERINFO['grps']) >= AUTH_READ
-                ) {
+                $user = $runas ? $runas : $_SERVER['REMOTE_USER'];
+                if (auth_aclcheck($page_tpl, $user, $USERINFO['grps']) >= AUTH_READ ) {
                     $this->templates[$opt->getParam('page_tgt')] = $this->replace(array(), array(), rawWiki($page_tpl));
                 }
             }
@@ -160,7 +119,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * @throws Exception
+     * Prepare and resolve target page
+     *
+     * @throws Exception missing pagename
      */
     function buildTargetPageName() {
         global $ID;
@@ -172,6 +133,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         }
     }
 
+    /**
+     * Resolve pageids of target pages
+     */
     function resolveTemplates() {
         global $ID;
         $_templates = array();
@@ -184,12 +148,12 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * @param $data
+     * @param $fields
      * @param $tpl
      * @param $runas
-     * @return array
+     * @return string template
      */
-    function getTemplates($data, $tpl, $runas) {
+    function getTemplates($fields, $tpl, $runas) {
         global $USERINFO;
         global $conf;
 
@@ -197,22 +161,19 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             // use namespace template
             if (!isset($this->templates[$this->pagename])) {
                 $this->templates[$this->pagename] = pageTemplate(array($this->pagename));
-                return array($tpl, $USERINFO, $data);
             }
-            return array($tpl, $USERINFO, $data);
         } elseif ($tpl !== '!') {
             $tpl = $this->replaceDefault($tpl);
             // Namespace link
             if ($runas) {
                 // Hack user credentials.
-                global $USERINFO;
                 $backup = array($_SERVER['REMOTE_USER'], $USERINFO['grps']);
                 $_SERVER['REMOTE_USER'] = $runas;
                 $USERINFO['grps'] = array();
             }
             $t_pages = array();
             search($t_pages, $conf['datadir'], 'search_universal',
-                array('depth' => 0, 'listfiles' => true),
+                array('depth' => 0, 'listfiles' => true, 'showhidden' => true),
                 str_replace(':', '/', getNS($tpl)));
             foreach ($t_pages as $t_page) {
                 $t_name = cleanID($t_page['id']);
@@ -241,13 +202,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
             if ($runas) {
                 /* Restore user credentials. */
-                global $USERINFO;
                 list($_SERVER['REMOTE_USER'], $USERINFO['grps']) = $backup;
-                return array($tpl, $USERINFO, $data);
             }
-            return array($tpl, $USERINFO, $data);
         }
-        return array($tpl);
+        return $tpl;
     }
 
     /**
@@ -290,8 +248,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * @param $thanks
-     * @return array
+     * Build thanks message, trigger indexing and rendering of new pages.
+     *
+     * @param string $thanks
+     * @return string html of thanks message or when redirect the first page id of created pages
      */
     function buildThankYouPage($thanks) {
         global $ID;
@@ -307,16 +267,17 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $lvl = substr_count($ID, ':');
             for ($n = 0; $n < $lvl; ++$n) {
                 if (!isset($last_folder[$n]) || strpos($ID, $last_folder[$n]['id']) !== 0) {
-                    $last_folder[$n] = array('id' => substr($ID, 0, strpos($ID, ':', ($n > 0 ? strlen($last_folder[$n - 1]['id']) : 0) + 1) + 1),
+                    $last_folder[$n] = array(
+                        'id' => substr($ID, 0, strpos($ID, ':', ($n > 0 ? strlen($last_folder[$n - 1]['id']) : 0) + 1) + 1),
                         'level' => $n + 1,
-                        'open' => 1);
+                        'open' => 1
+                    );
                     $data[] = $last_folder[$n];
                 }
             }
             $data[] = array('id' => $ID, 'level' => 1 + substr_count($ID, ':'), 'type' => 'f');
         }
-        $ret .= html_buildlist($data, 'idx', array($this, 'html_list_index'),
-            'html_li_index');
+        $ret .= html_buildlist($data, 'idx', array($this, 'html_list_index'), 'html_li_index');
 
         // Add indexer bugs for every just-created page
         $ret .= '<div class="no">';

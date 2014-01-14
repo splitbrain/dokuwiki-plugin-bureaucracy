@@ -11,24 +11,24 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
     /**
      * Build a nice email from the submitted data and send it
      */
-    function run($data, $thanks, $argv) {
+    function run($fields, $thanks, $argv) {
         global $ID;
         global $conf;
 
         $mail = new Mailer();
-        // get recipient address(es)
-        $to = join(',',$argv);
+        $replyto = array();
+        
+        $this->prepareLanguagePlaceholder();
 
-        $sub = sprintf($this->getLang('mailsubject'),$ID);
+        $subject = sprintf($this->getLang('mailsubject'),$ID);
 
         $this->_mail_text .=  sprintf($this->getLang('mailintro')."\n\n", dformat());
         $this->_mail_html .=  sprintf($this->getLang('mailintro')."<br><br>", dformat());
 
-        $mail->to($to);
-        $mail->subject($sub);
-
         $this->_mail_html .= '<table>';
-        foreach($data as $opt){
+
+        foreach($fields as $opt){
+            /** @var syntax_plugin_bureaucracy_field $opt */
             $value = $opt->getParam('value');
             $label = $opt->getParam('label');
             
@@ -46,16 +46,37 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
                         $mail->attachFile($value['tmp_name'],$value['type'],$value['name']);
                     }
                     break;
+                case 'subject':
+                    $subject = $label;
+                    break;
+                case 'email':
+                    if(!is_null($opt->getParam('replyto'))) {
+                        $replyto[] = $value;
+                    }
+                    /** fall through */
                 default:
                     if($value === null || $label === null) break;
                     $this->mail_addRow($label,$value);
             }
-            
+
+            $this->prepareFieldReplacements($label, $value);
         }
         $this->_mail_html .= '</table>';
+        
+        $subject = $this->replaceDefault($subject);
 
-        $mail->setBody($this->_mail_text,null,null,$this->_mail_html);
+        if(!empty($replyto)) {
+            $replyto = $mail->cleanAddress($replyto);
+            $mail->setHeader('Reply-To', $replyto, false);
+        }
+
+        
+        $to = $mail->cleanAddress($argv); // get recipient address(es) 
+        $mail->to($to);
         $mail->from($conf['mailfrom']);
+        $mail->subject($subject);
+        $mail->setBody($this->_mail_text,null,null,$this->_mail_html);
+        
 
         if(!$mail->send()) {
             throw new Exception($this->getLang('e_mail'));

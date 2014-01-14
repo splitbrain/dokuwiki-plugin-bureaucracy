@@ -11,36 +11,57 @@
 
 require_once DOKU_PLUGIN.'bureaucracy/syntax.php';
 
+/**
+ * Class syntax_plugin_bureaucracy_field
+ *
+ * base class for all the form fields
+ */
 class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
-    var $mandatory_args = 2;
-    var $opt = array();
-    var $checks = array();
-    var $checktypes = array('/' => 'match', '<' => 'max', '>' => 'min');
-    var $hidden = false;
-    var $error = false;
+
+    protected $mandatory_args = 2;
+    public $opt = array();
+    /** @var string|array */
+    protected $tpl;
+    protected $checks = array();
+    public $hidden = false;
+    protected $error = false;
+    protected $checktypes = array(
+        '/' => 'match',
+        '<' => 'max',
+        '>' => 'min'
+    );
 
     /**
      * Construct a syntax_plugin_bureaucracy_field object
      *
      * This constructor initializes a syntax_plugin_bureaucracy_field object
-     * based on a given definition. The first two items represent the type of
-     * the field and the label the field has been given. Additional arguments
-     * are type-specific mandatory extra arguments and optional arguments. The
-     * optional arguments may add constraints to the field value, provide a
+     * based on a given definition.
+     *
+     * The first two items represent:
+     *   * the type of the field
+     *   * and the label the field has been given.
+     * Additional arguments are type-specific mandatory extra arguments and optional arguments.
+     *
+     * The optional arguments may add constraints to the field value, provide a
      * default value, mark the field as optional or define that the field is
      * part of a pagename (when using the template action).
      *
      * Since the field objects are cached, this constructor may not reference
      * request data.
      *
-     * @param array                     $args          The tokenized definition
-     **/
-    function syntax_plugin_bureaucracy_field($args) {
+     * @param array $args The tokenized definition, only split at spaces
+     */
+    public function __construct($args) {
         $this->init($args);
         $this->standardArgs($args);
     }
 
-    function init(&$args) {
+    /**
+     * Checks number of arguments and store 'cmd', 'label' and 'display' values
+     *
+     * @param array $args array with the definition
+     */
+    protected function init(&$args) {
         if(count($args) < $this->mandatory_args){
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
                         hsc($args[1])), -1);
@@ -56,7 +77,12 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
         $this->opt['display'] = $this->opt['label']; // allow to modify display value independently
     }
 
-    function standardArgs($args) {
+    /**
+     * Check for additional arguments and store their values
+     *
+     * @param array $args array with remaining definition arguments
+     */
+    protected function standardArgs($args) {
         // parse additional arguments
         foreach($args as $arg){
             if ($arg[0] == '=') {
@@ -65,6 +91,8 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 $this->opt['optional'] = true;
             } elseif($arg == '@') {
                 $this->opt['pagename'] = true;
+            } elseif($arg == '@@') {
+                $this->opt['replyto'] = true;
             } elseif(preg_match('/x\d/', $arg)) {
                 $this->opt['rows'] = substr($arg,1);
             } elseif($arg[0] == '.'){
@@ -100,8 +128,8 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
-     **/
-    function renderfield($params, Doku_Form $form) {
+     */
+    public function renderfield($params, Doku_Form $form) {
         $this->_handlePreload();
         if(!$form->_infieldset){
             $form->startFieldset('');
@@ -118,7 +146,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
     /**
      * Check for preload value in the request url
      */
-    function _handlePreload() {
+    protected function _handlePreload() {
         $preload_name = '@' . strtr($this->getParam('label'),' .','__') . '@';
         if (isset($_GET[$preload_name])) {
             $this->setVal($_GET[$preload_name]);
@@ -136,18 +164,26 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @return bool|array Whether the passed value is valid; Fieldsets return
      *                    an array specifying their dependency state.
      */
-    function handle_post(&$value) {
+    public function handle_post(&$value) {
         return $this->hidden || $this->setVal($value);
     }
 
     /**
      * Get the field type
+     *
+     * @return string
      **/
-    function getFieldType() {
+    public function getFieldType() {
         return $this->opt['cmd'];
     }
 
-    function setVal($value) {
+    /**
+     * Validate value and stores it
+     *
+     * @param mixed $value value entered into field
+     * @return bool whether the passed value is valid
+     */
+    protected function setVal($value) {
         if ($value === '') {
             $value = null;
         }
@@ -164,11 +200,18 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
 
     /**
      * Whether the field is true (used for depending fieldsets)
+     *
+     * @return bool whether field is set
      */
     public function isSet_() {
         return !is_null($this->getParam('value'));
     }
 
+    /**
+     * Validate value of field and throws exceptions for bad values.
+     *
+     * @throws Exception when field didn't validate.
+     */
     protected function _validate() {
         $value = $this->getParam('value');
         if (is_null($value)) {
@@ -189,15 +232,16 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
 
     /**
      * Get an arbitrary parameter
-     **/
-    function getParam($name) {
-        if (!isset($this->opt[$name]) ||
-            $name === 'value' && $this->hidden) {
+     *
+     * @param string $name
+     * @return mixed|null
+     */
+    public function getParam($name) {
+        if (!isset($this->opt[$name]) || $name === 'value' && $this->hidden) {
             return null;
         }
         if ($name === 'pagename') {
-            // If $this->opt['pagename'] is set, return the escaped value of
-            // the field.
+            // If $this->opt['pagename'] is set, return the escaped value of the field.
             $value = $this->getParam('value');
             if (is_null($value)) {
                 return null;
@@ -219,8 +263,8 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @param array        $params A hash mapping parameters to values
      *
      * @return string|array The parsed template
-     **/
-    function _parse_tpl($tpl, $params) {
+     */
+    protected function _parse_tpl($tpl, $params) {
         // addElement supports a special array format as well. In this case
         // not all elements should be escaped.
         $is_simple = !is_array($tpl);
@@ -261,18 +305,43 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
         return $is_simple ? $tpl[0] : $tpl;
     }
 
-    function validate_match($d, $value) {
+    /**
+     * Executed after performing the action hooks
+     */
+    public function after_action() {
+    }
+
+    /**
+     * Constraint function: value of field should match this regexp
+     *
+     * @param string $d regexp
+     * @param mixed $value
+     * @return int|bool
+     */
+    protected function validate_match($d, $value) {
         return @preg_match('/' . $d . '/i', $value);
     }
 
-    function validate_min($d, $value) {
+    /**
+     * Constraint function: value of field should be bigger
+     *
+     * @param int|number $d lower bound
+     * @param mixed $value of field
+     * @return bool
+     */
+    protected function validate_min($d, $value) {
         return $value > $d;
     }
 
-    function validate_max($d, $value) {
+    /**
+     * Constraint function: value of field should be smaller
+     *
+     * @param int|number $d upper bound
+     * @param mixed $value of field
+     * @return bool
+     */
+    protected function validate_max($d, $value) {
         return $value < $d;
     }
 
-    function after_action() {
-    }
 }
