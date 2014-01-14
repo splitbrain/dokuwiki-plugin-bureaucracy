@@ -71,7 +71,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
         }
 
         
-        $to = $mail->cleanAddress($argv); // get recipient address(es) 
+        $to = $mail->cleanAddress(implode(',',$argv)); // get recipient address(es) 
         $mail->to($to);
         $mail->from($conf['mailfrom']);
         $mail->subject($subject);
