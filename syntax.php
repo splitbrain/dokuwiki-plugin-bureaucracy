@@ -56,7 +56,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Handle the match
      */
-    public function handle($match, $state, $pos, Doku_Handler &$handler){
+    public function handle($match, $state, $pos, Doku_Handler $handler){
         $match = substr($match,6,-7); // remove form wrap
         $lines = explode("\n",$match);
         $actions = array();
@@ -125,7 +125,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Create output
      */
-    public function render($format, Doku_Renderer &$R, $data) {
+    public function render($format, Doku_Renderer $R, $data) {
         if ($format != 'xhtml') return false;
         $R->info['cache'] = false; // don't cache
 
