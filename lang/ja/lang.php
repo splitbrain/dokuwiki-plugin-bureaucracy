@@ -1,4 +1,3 @@
-<code php lib/plugins/bureaucracy/lang/ja/lang.php>
 <?php
  
 /**
