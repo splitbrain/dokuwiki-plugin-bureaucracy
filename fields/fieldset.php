@@ -66,6 +66,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
      */
     public function handle_post(&$params) {
         $my_id = $params[1];
+        /** @var syntax_plugin_bureaucracy_field[] $fields  */
         $fields = &$params[2];
 
         if(!isset($this->depends_on)) {
@@ -74,7 +75,6 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
         $hidden = false;
         for ($n = 0 ; $n < $my_id; ++$n) {
             $field = $fields[$n];
-            /** @var syntax_plugin_bureaucracy_field $field  */
             if ($field->getParam('label') != $this->depends_on[0]) {
                 continue;
             }

@@ -18,32 +18,35 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
     }
 
     /**
+     * Handle a post to the field
+     *
+     * Accepts and validates a posted value.
+     *
+     * @param array $value The passed value or array or null if none given
+     * @return bool|array Whether the passed filename is valid
+     */
+    public function handle_post(&$value) {
+        $this->opt['file'] = $value;
+
+        return parent::handle_post($value['name']);
+    }
+
+    /**
      * @throws Exception max size, required or upload error
      */
     protected function _validate() {
         global $lang;
         parent::_validate();
         
-        $value = $this->getParam('value');
-        if($value['error'] == 1 || $value['error'] == 2) {   
+        $file = $this->getParam('file');
+        if($file['error'] == 1 || $file['error'] == 2) {
             throw new Exception(sprintf($lang['uploadsize'],filesize_h(php_to_byte(ini_get('upload_max_filesize')))));
-        } else if($value['error'] == 4) {
+        } else if($file['error'] == 4) {
             if(!isset($this->opt['optional'])) {
                 throw new Exception(sprintf($this->getLang('e_required'),hsc($this->opt['label'])));
             }
-        } else if( $value['error'] || !is_uploaded_file($value['tmp_name'])) {
-            throw new Exception(hsc($this->opt['label']) .' '. $lang['uploadfail'] . ' (' .$value['error'] . ')' );
+        } else if( $file['error'] || !is_uploaded_file($file['tmp_name'])) {
+            throw new Exception(hsc($this->opt['label']) .' '. $lang['uploadfail'] . ' (' .$file['error'] . ')' );
         }
-    }
-
-    /**
-     * validate against filename
-     *
-     * @param string $d
-     * @param array $value
-     * @return bool|int
-     */
-    function validate_match($d, $value) {
-        return @preg_match('/' . $d . '/i', $value['name']);
     }
 }

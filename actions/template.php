@@ -9,14 +9,13 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
     var $templates;
     var $pagename;
-    var $uploadfields;
 
     /**
      * Performs template action
      *
-     * @param array  $fields  array with form fields
+     * @param syntax_plugin_bureaucracy_field[] $fields  array with form fields
      * @param string $thanks  thanks message
-     * @param array  $argv    array with arguments: template, pagename, separator
+     * @param array  $argv    array with entries: template, pagename, separator
      * @return array|mixed
      *
      * @throws Exception
@@ -27,26 +26,24 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         list($tpl, $this->pagename, $sep) = $argv;
         if(is_null($sep)) $sep = $conf['sepchar'];
 
-        $runas = $this->getConf('runas');
         $this->patterns = array();
         $this->values   = array();
         $this->templates = array();
-        $this->uploadfields = array();
 
         $this->prepareLanguagePlaceholder();
         $this->prepareNoincludeReplacement();
-        $this->processFields($fields, $sep, $runas);
+        $this->processFields($fields, $sep);
         $this->buildTargetPageName();
         $this->resolveTemplates();
-        list($tpl,,) = $this->getTemplates($fields, $tpl, $runas);
+        $tpl = $this->getTemplates($tpl);
 
         if(empty($this->templates)) {
             throw new Exception(sprintf($this->getLang('e_template'), $tpl));
         }
 
-        $this->checkTargetPageNames($runas);
+        $this->checkTargetPageNames();
         
-        $this->processUploads($runas);
+        $this->processUploads($fields);
         
         $this->replaceAndSavePages();
 
@@ -55,64 +52,35 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         return $ret;
     }
 
-    static function _sort($a, $b) {
-        $ns_diff = substr_count($a, ':') - substr_count($b, ':');
-        return ($ns_diff === 0) ? strcmp($a, $b) : ($ns_diff > 0 ? -1 : 1);
-    }
-
-    static function html_list_index($item){
-        $ret = '';
-        $base = ':'.$item['id'];
-        $base = substr($base,strrpos($base,':')+1);
-        if($item['type']=='f'){
-            $ret .= html_wikilink(':'.$item['id']);
-        } else {
-            $ret .= '<strong>' . trim(substr($item['id'], strrpos($item['id'], ':', -2)), ':') . '</strong>';
-        }
-        return $ret;
-    }
-
-
-
     /**
      * - Generate field replacements
      * - Handle page names (additional pages via addpage)
      *
-     * @param array  $data  List of field objects
-     * @param string $sep   Separator between fields for page id
-     * @param string $runas User to run the command as - empty for current user
+     * @param syntax_plugin_bureaucracy_field[]  $fields  List of field objects
+     * @param string                             $sep     Separator between fields for page id
      * @return array
      */
-    function processFields($data, $sep, $runas) {
-        global $USERINFO;
-        foreach ($data as $opt) {
+    function processFields($fields, $sep) {
+        foreach ($fields as $field) {
+            $label = $field->getParam('label');
+            $value = $field->getParam('value');
 
-            /** @var $opt syntax_plugin_bureaucracy_field */
-            $label = $opt->getParam('label');
-            $value = $opt->getParam('value');
-            
-            if($opt->getFieldType() == 'file') {
-                if(!$value['size']) {
-                    $value = '';
-                } else {
-                    $this->uploadfields[] = $opt;
-                    $value = $value['name'];
-                }
-            }
-            
+            //field replacements
             $this->prepareFieldReplacements($label, $value);
 
             // handle pagenames
-            $pname = $opt->getParam('pagename');
+            $pname = $field->getParam('pagename');
             if (!is_null($pname)) {
                 $this->pagename .= $sep . $pname;
             }
 
-            if (!is_null($opt->getParam('page_tpl')) && !is_null($opt->getParam('page_tgt')) ) {
-                $page_tpl = $this->replaceDefault($opt->getParam('page_tpl'));
-                $user = $runas ? $runas : $_SERVER['REMOTE_USER'];
-                if (auth_aclcheck($page_tpl, $user, $USERINFO['grps']) >= AUTH_READ ) {
-                    $this->templates[$opt->getParam('page_tgt')] = $this->replace(array(), array(), rawWiki($page_tpl));
+
+            if (!is_null($field->getParam('page_tpl')) && !is_null($field->getParam('page_tgt')) ) {
+                $page_tpl = $this->replaceDefault($field->getParam('page_tpl'));
+
+                $auth = $this->aclcheck($page_tpl);
+                if ($auth >= AUTH_READ ) {
+                    $this->templates[$field->getParam('page_tgt')] = $this->replace(array(), array(), rawWiki($page_tpl));
                 }
             }
         }
@@ -123,11 +91,13 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
      *
      * @throws Exception missing pagename
      */
-    function buildTargetPageName() {
+    protected function buildTargetPageName() {
         global $ID;
+
         $this->pagename = $this->replaceDefault($this->pagename);
         $myns = getNS($ID);
         resolve_pageid($myns, $this->pagename, $junk); // resolve relatives
+
         if ($this->pagename === '') {
             throw new Exception($this->getLang('e_pagename'));
         }
@@ -136,8 +106,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     /**
      * Resolve pageids of target pages
      */
-    function resolveTemplates() {
+    protected function resolveTemplates() {
         global $ID;
+
         $_templates = array();
         $ns = getNS($ID);
         foreach ($this->templates as $k => $v) {
@@ -148,14 +119,15 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * @param $fields
-     * @param $tpl
-     * @param $runas
+     * Load template(s) given via action field
+     *
+     * @param string $tpl    template name as given in form
      * @return string template
      */
-    function getTemplates($fields, $tpl, $runas) {
+    protected function getTemplates($tpl) {
         global $USERINFO;
         global $conf;
+        $runas = $this->getConf('runas');
 
         if ($tpl == '_') {
             // use namespace template
@@ -164,36 +136,42 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             }
         } elseif ($tpl !== '!') {
             $tpl = $this->replaceDefault($tpl);
+
             // Namespace link
+            $backup = array();
             if ($runas) {
                 // Hack user credentials.
                 $backup = array($_SERVER['REMOTE_USER'], $USERINFO['grps']);
                 $_SERVER['REMOTE_USER'] = $runas;
                 $USERINFO['grps'] = array();
             }
-            $t_pages = array();
-            search($t_pages, $conf['datadir'], 'search_universal',
-                array('depth' => 0, 'listfiles' => true, 'showhidden' => true),
-                str_replace(':', '/', getNS($tpl)));
-            foreach ($t_pages as $t_page) {
-                $t_name = cleanID($t_page['id']);
-                $p_name = preg_replace('/^' . preg_quote_cb(cleanID($tpl)) . '($|:)/', $this->pagename . '$1', $t_name);
-                if ($p_name === $t_name) {
+            $template_pages = array();
+            $opts = array(
+                'depth' => 0,
+                'listfiles' => true,
+                'showhidden' => true
+            );
+            search($template_pages, $conf['datadir'], 'search_universal', $opts, str_replace(':', '/', getNS($tpl)));
+
+            foreach ($template_pages as $template_page) {
+                $templatepageid = cleanID($template_page['id']);
+                $newpageid = preg_replace('/^' . preg_quote_cb(cleanID($tpl)) . '($|:)/', $this->pagename . '$1', $templatepageid);
+                if ($newpageid === $templatepageid) {
                     // When using a single-page template, ignore other pages
                     // in the same namespace.
                     continue;
                 }
 
-                if (!isset($this->templates[$p_name])) {
+                if (!isset($this->templates[$newpageid])) {
                     // load page data and do default pattern replacements like
                     // namespace templates do
                     $data = array(
-                        'id' => $p_name,
-                        'tpl' => rawWiki($t_name),
+                        'id' => $newpageid,
+                        'tpl' => rawWiki($templatepageid),
                         'doreplace' => true,
                     );
                     parsePageTemplate($data);
-                    $this->templates[$p_name] = $this->replace(
+                    $this->templates[$newpageid] = $this->replace(
                         array('__lang__' => $this->patterns['__lang__'], '__trans__' => $this->patterns['__trans__']),
                         array('__lang__' => $this->values['__lang__'], '__trans__' => $this->values['__trans__']),
                         $data['tpl'], false);
@@ -209,31 +187,29 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * @param $runas
+     * Checks for existance and access of target pages
+     *
      * @return mixed
      * @throws Exception
      */
-    function checkTargetPageNames($runas) {
+    protected function checkTargetPageNames() {
         foreach (array_keys($this->templates) as $pname) {
             // prevent overriding already existing pages
             if (page_exists($pname)) {
                 throw new Exception(sprintf($this->getLang('e_pageexists'), html_wikilink($pname)));
             }
 
-            // check auth
-            if ($runas) {
-                $auth = auth_aclcheck($pname, $runas, array());
-            } else {
-                $auth = auth_quickaclcheck($pname);
-            }
+            $auth = $this->aclcheck($pname);
             if ($auth < AUTH_CREATE) {
                 throw new Exception($this->getLang('e_denied'));
             }
         }
-        return $pname;
     }
 
-    function replaceAndSavePages() {
+    /**
+     * Perform replacements on the collected templates, and save the pages.
+     */
+    protected function replaceAndSavePages() {
         global $ID;
         foreach ($this->templates as $pageName => $template) {
             // set NSBASE var to make certain dataplugin constructs easier
@@ -241,10 +217,45 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $this->values['__nsbase__'] = noNS(getNS($pageName));
 
             // save page
-            saveWikiText($pageName,
+            saveWikiText(
+                $pageName,
                 cleanText($this->replaceDefault($template, false)),
-                sprintf($this->getLang('summary'), $ID));
+                sprintf($this->getLang('summary'), $ID)
+            );
         }
+    }
+
+    /**
+     * (Callback) Sorts first by namespace depth, next by page ids
+     *
+     * @param string $a
+     * @param string $b
+     * @return int positive if $b is in deeper namespace than $a, negative higher.
+     *             further sorted by pageids
+     *
+     *  return an integer less than, equal to, or
+     * greater than zero if the first argument is considered to be
+     * respectively less than, equal to, or greater than the second.
+     */
+    public function _sort($a, $b) {
+        $ns_diff = substr_count($a, ':') - substr_count($b, ':');
+        return ($ns_diff === 0) ? strcmp($a, $b) : ($ns_diff > 0 ? -1 : 1);
+    }
+
+    /**
+     * (Callback) Build content of item
+     *
+     * @param array $item
+     * @return string
+     */
+    public function html_list_index($item){
+        $ret = '';
+        if($item['type']=='f'){
+            $ret .= html_wikilink(':'.$item['id']);
+        } else {
+            $ret .= '<strong>' . trim(substr($item['id'], strrpos($item['id'], ':', -2)), ':') . '</strong>';
+        }
+        return $ret;
     }
 
     /**
@@ -253,7 +264,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
      * @param string $thanks
      * @return string html of thanks message or when redirect the first page id of created pages
      */
-    function buildThankYouPage($thanks) {
+    protected function buildThankYouPage($thanks) {
         global $ID;
         $ret = "<p>$thanks</p>";
         // Build result tree
@@ -302,35 +313,60 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     /**
      * move the files to <pagename>:FILENAME 
      *
+     *
+     * @param syntax_plugin_bureaucracy_field[] $fields
+     * @throws Exception
      */
-    function processUploads($runas) {
+    protected function processUploads($fields) {
         $ns = $this->pagename;
-        foreach($this->uploadfields as $uploadfield) {
-            /** @var syntax_plugin_bureaucracy_field $uploadfield */
-            $value = $uploadfield->getParam('value');
-            $label = $uploadfield->getParam('label');
+        foreach($fields as $field) {
 
-            $id = $ns.':'.$value['name'];
-            $id = cleanID($id);
+            if($field->getFieldType() !== 'file') continue;
 
-            // check auth
-            if ($runas) {
-                $auth = auth_aclcheck($id, $runas, array());
-            } else {
-                $auth = auth_quickaclcheck($id);
+            $label = $field->getParam('label');
+            $file  = $field->getParam('file');
+
+            //skip empty files
+            if(!$file['size']) {
+                $this->values[$label] = '';
+                continue;
             }
 
+            $id = $ns.':'.$file['name'];
+            $id = cleanID($id);
+
+            $auth = $this->aclcheck($id);
+
             $res = media_save(
-                        array('name' => $value['tmp_name']),
-                        $id,
-                        false,
-                        $auth,
-                        'copy_uploaded_file');
+                array('name' => $file['tmp_name']),
+                $id,
+                false,
+                $auth,
+                'copy_uploaded_file');
 
             if(is_array($res)) throw new Exception($res[0]);
 
             $this->values[$label] = $res;
+
         }
+    }
+
+    /**
+     * Returns ACL access level of the user or the (virtual) 'runas' user
+     *
+     * @param string $id
+     * @return int
+     */
+    protected function aclcheck($id) {
+        $runas = $this->getConf('runas');
+
+        if($runas) {
+            $auth = auth_aclcheck($id, $runas, array());
+        } else {
+            $auth = auth_quickaclcheck($id);
+        }
+        return $auth;
+
     }
 
 }
