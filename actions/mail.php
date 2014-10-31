@@ -41,13 +41,14 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
             $replyto = $mail->cleanAddress($this->replyto);
             $mail->setHeader('Reply-To', $replyto, false);
         }
-        
-        $to = $mail->cleanAddress(implode(',',$argv)); // get recipient address(es) 
+
+        $to = $this->replaceDefault(implode(',',$argv)); // get recipient address(es)
+        $to = $mail->cleanAddress($to);
         $mail->to($to);
         $mail->from($conf['mailfrom']);
         $mail->subject($this->subject);
         $mail->setBody($this->_mail_text,null,null,$this->_mail_html);
-        
+
 
         if(!$mail->send()) {
             throw new Exception($this->getLang('e_mail'));
