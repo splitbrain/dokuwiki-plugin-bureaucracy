@@ -9,7 +9,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
     var $templates;
     var $pagename;
-    var $uploads;
+    var $uploadfields;
 
     /**
      * Performs template action
@@ -31,7 +31,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         $this->patterns = array();
         $this->values   = array();
         $this->templates = array();
-        $this->uploads = array();
+        $this->uploadfields = array();
 
         $this->prepareLanguagePlaceholder();
         $this->prepareNoincludeReplacement();
@@ -95,7 +95,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 if(!$value['size']) {
                     $value = '';
                 } else {
-                    $this->uploads[] = $opt;
+                    $this->uploadfields[] = $opt;
                     $value = $value['name'];
                 }
             }
@@ -305,19 +305,30 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
      */
     function processUploads($runas) {
         $ns = $this->pagename;
-        foreach($this->uploads as $upload) {
-            $value = $upload->getParam('value');
-            $label = $upload->getParam('label');
+        foreach($this->uploadfields as $uploadfield) {
+            /** @var syntax_plugin_bureaucracy_field $uploadfield */
+            $value = $uploadfield->getParam('value');
+            $label = $uploadfield->getParam('label');
+
             $id = $ns.':'.$value['name'];
+            $id = cleanID($id);
+
+            // check auth
+            if ($runas) {
+                $auth = auth_aclcheck($id, $runas, array());
+            } else {
+                $auth = auth_quickaclcheck($id);
+            }
+
             $res = media_save(
-                        array('name' => $value['tmp_name']), 
+                        array('name' => $value['tmp_name']),
                         $id,
-                        0, 
-                        auth_aclcheck($id, $runas ? $runas : $_SERVER['REMOTE_USER'],array()), 
+                        false,
+                        $auth,
                         'copy_uploaded_file');
-            
+
             if(is_array($res)) throw new Exception($res[0]);
-            
+
             $this->values[$label] = $res;
         }
     }
