@@ -1,10 +1,25 @@
 <?php
+
+/**
+ * File upload field
+ */
 class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_field {
+
+    /**
+     * Arguments:
+     *  - cmd
+     *  - label
+     *
+     * @param array $args The tokenized definition, only split at spaces
+     */
     function __construct($args) {
         parent::__construct($args);
         $this->tpl = form_makeFileField('@@NAME@@', '@@DISPLAY@@', '', '@@CLASS@@');
     }
 
+    /**
+     * @throws Exception max size, required or upload error
+     */
     protected function _validate() {
         global $lang;
         parent::_validate();
@@ -20,8 +35,14 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
             throw new Exception(hsc($this->opt['label']) .' '. $lang['uploadfail'] . ' (' .$value['error'] . ')' );
         }
     }
-    
-    //validate against filename
+
+    /**
+     * validate against filename
+     *
+     * @param string $d
+     * @param array $value
+     * @return bool|int
+     */
     function validate_match($d, $value) {
         return @preg_match('/' . $d . '/i', $value['name']);
     }
