@@ -30,4 +30,7 @@ $lang['template_thanks'] = 'The page has been created, follow the link to open i
 
 $lang['summary']         = 'Created from the form at %s';
 
+$lang['attachmentMailEmpty']   = '(file not submitted)';
+$lang['attachmentMailToLarge'] = '(file too large for mail attachment)';
+
 $lang['submit']         = 'Submit';

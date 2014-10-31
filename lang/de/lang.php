@@ -27,6 +27,9 @@ $lang['mailintro']       = 'Die folgenden Daten wurden am %s abgeschickt.';
 $lang['mail_thanks']     = 'Ihre Daten wurden erfolgreich versandt. Vielen Dank.';
 $lang['template_thanks'] = 'Die Seite wurde angelegt, folgen Sie dem Link um die neue Seite aufzurufen.';
 
-$lang['summary']         = 'Created from the formular at %s';
+$lang['summary']         = 'Erstellt mit dem Formular %s';
+
+$lang['attachmentMailEmpty']   = '(Datei nicht angegeben)';
+$lang['attachmentMailToLarge'] = '(Datei zu groß für Mail-Anhang)';
 
 $lang['submit']          = 'Absenden';

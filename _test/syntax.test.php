@@ -39,6 +39,9 @@ class syntax_plugin_bureaucracy_test extends DokuWikiTest {
         // text area
         $this->checkField($doc, 'Tell me about your self', 'textarea.edit', true);
 
+        // file field
+        $this->checkField($doc, 'File1', 'input[type=file].edit', true);
+        
         // submit button
         $this->assertEquals(1, pq('input[type=submit][value=Submit Query]')->length);
 
