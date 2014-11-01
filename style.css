@@ -7,6 +7,7 @@ div.dokuwiki div.bureaucracy__plugin {
 div.dokuwiki form.bureaucracy__plugin {
     width: 100%;
     text-align: center;
+    margin: 0 1em;
 }
 
 div.dokuwiki form.bureaucracy__plugin p,
@@ -68,4 +69,9 @@ div.dokuwiki form.bureaucracy__plugin input.button {
 
 div.dokuwiki form.bureaucracy__plugin label.bureaucracy_error span {
     color: #F00;
+}
+
+.dokuwiki form.bureaucracy__plugin #plugin__captcha_wrapper {
+    float: left;
+    margin: 3px;
 }
