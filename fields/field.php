@@ -275,7 +275,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
             if (is_array($val)) continue;
 
             // find all variables and their defaults or param values
-            preg_match_all('/@@([A-Z]+)(?:\|((?:[^@]|@$|@[^@])+))?@@/', $val, $pregs);
+            preg_match_all('/@@([A-Z]+)(?:\|((?:[^@]|@$|@[^@])*))?@@/', $val, $pregs);
             for ($i = 0 ; $i < count($pregs[2]) ; ++$i) {
                 if (isset($params[strtolower($pregs[1][$i])])) {
                     $pregs[2][$i] = $params[strtolower($pregs[1][$i])];

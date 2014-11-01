@@ -44,9 +44,16 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
         }
         $params = array_merge($this->opt, $params);
         $form->addElement(call_user_func_array('form_makeListboxField',
-                                               $this->_parse_tpl(array('@@NAME@@',
-                                                $params['args'], '@@VALUE|' . $params['args'][0] . '@@',
-                                                '@@DISPLAY@@', '', '@@CLASS@@'),
-                                                $params)));
+                                                $this->_parse_tpl(
+                                                    array(
+                                                        '@@NAME@@',
+                                                        $params['args'],
+                                                        '@@VALUE|' . $params['args'][0] . '@@',
+                                                        '@@DISPLAY@@',
+                                                        '',
+                                                        '@@CLASS@@'
+                                                    ),
+                                                    $params
+                                                )));
     }
 }
