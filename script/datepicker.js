@@ -3,7 +3,7 @@
  */
 
 jQuery(function(){
-    jQuery('.datepicker').datepicker({
+    jQuery('.bureaucracy__plugin .datepicker').datepicker({
         dateFormat: "yy-mm-dd",
         changeMonth: true,
         changeYear: true
