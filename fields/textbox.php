@@ -16,7 +16,13 @@ class syntax_plugin_bureaucracy_field_textbox extends syntax_plugin_bureaucracy_
      */
     function __construct($args) {
         parent::__construct($args);
-        $this->tpl = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@DISPLAY@@', '', '@@CLASS@@');
+
+        $attr = array();
+        if(!isset($this->opt['optional'])) {
+            $attr['required'] = 'required';
+        }
+
+        $this->tpl = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@DISPLAY@@', '', '@@CLASS@@', $attr);
         if(isset($this->opt['class'])){
             $this->tpl['class'] .= ' '.$this->opt['class'];
         }

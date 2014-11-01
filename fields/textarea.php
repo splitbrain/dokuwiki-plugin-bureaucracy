@@ -12,5 +12,5 @@ class syntax_plugin_bureaucracy_field_textarea extends syntax_plugin_bureaucracy
      *  - x123 (optional) as number of lines
      */
 
-    protected $tpl = '<label class="@@CLASS@@"><span>@@DISPLAY@@</span><textarea name="@@NAME@@" rows="@@ROWS|10@@" cols="10" class="edit">@@VALUE@@</textarea></label>';
+    protected $tpl = '<label class="@@CLASS@@"><span>@@DISPLAY@@</span><textarea name="@@NAME@@" rows="@@ROWS|10@@" cols="10" class="edit" @@OPTIONAL|required="required"@@>@@VALUE@@</textarea></label>';
 }

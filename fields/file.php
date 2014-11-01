@@ -14,7 +14,13 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
      */
     function __construct($args) {
         parent::__construct($args);
-        $this->tpl = form_makeFileField('@@NAME@@', '@@DISPLAY@@', '', '@@CLASS@@');
+
+        $attr = array();
+        if(!isset($this->opt['optional'])) {
+            $attr['required'] = 'required';
+        }
+
+        $this->tpl = form_makeFileField('@@NAME@@', '@@DISPLAY@@', '', '@@CLASS@@', $attr);
     }
 
     /**
