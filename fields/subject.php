@@ -16,8 +16,9 @@ class syntax_plugin_bureaucracy_field_subject extends syntax_plugin_bureaucracy_
      *
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
+     * @params int       $formid unique identifier of the form which contains this field
      */
-    public function renderfield($params, Doku_Form $form) {
+    public function renderfield($params, Doku_Form $form, $formid) {
         $this->_handlePreload();
     }
 
@@ -25,9 +26,10 @@ class syntax_plugin_bureaucracy_field_subject extends syntax_plugin_bureaucracy_
      * Handle a post to the field
      *
      * @param string $value null
+     * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
      */
-    function handle_post(&$value) {
+    function handle_post(&$value, $formid) {
         return true;
     }
 }

@@ -33,8 +33,9 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
      *
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
+     * @params int       $formid unique identifier of the form which contains this field
      */
-    public function renderfield($params, Doku_Form $form) {
+    public function renderfield($params, Doku_Form $form, $formid) {
         $this->_handlePreload();
         if(!$form->_infieldset){
             $form->startFieldset('');

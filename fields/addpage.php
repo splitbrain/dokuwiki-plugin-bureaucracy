@@ -30,17 +30,19 @@ class syntax_plugin_bureaucracy_field_addpage extends syntax_plugin_bureaucracy_
      *
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
+     * @params int       $formid unique identifier of the form which contains this field
      */
-    function renderfield($params, Doku_Form $form) {
+    function renderfield($params, Doku_Form $form, $formid) {
     }
 
     /**
      * Handle a post to the field
      *
      * @param string $value null
+     * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
      */
-    function handle_post(&$value) {
+    function handle_post(&$value, $formid) {
         return true;
     }
 

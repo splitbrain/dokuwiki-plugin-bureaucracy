@@ -27,7 +27,7 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
      *
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
-     * @params int       $formid
+     * @params int       $formid unique identifier of the form which contains this field
      */
     public function renderfield($params, Doku_Form $form, $formid) {
         if(!isset(syntax_plugin_bureaucracy_field_submit::$captcha_displayed[$formid])) {
@@ -40,7 +40,7 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
             }
         }
         $this->tpl = form_makeButton('submit','', '@@DISPLAY|' . $this->getLang('submit') . '@@');
-        parent::renderfield($params, $form);
+        parent::renderfield($params, $form, $formid);
     }
 
     /**
@@ -49,7 +49,7 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
      * Accepts and validates a posted captcha value.
      *
      * @param string $value The passed value
-     * @param int    $formid
+     * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the posted form has a valid captcha
      */
     public function handle_post(&$value, $formid) {
