@@ -64,6 +64,9 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
         return $this->replace($this->patterns, $this->values, $input, $strftime);
     }
 
+    /**
+     * Adds some language related replacement patterns
+     */
     function prepareLanguagePlaceholder() {
         global $ID;
         global $conf;
@@ -83,8 +86,10 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
     }
 
     /**
-     * @param $label
-     * @param $value
+     * Adds replacement pattern for fieldlabels (e.g @@Label@@)
+     *
+     * @param string $label field label
+     * @param string $value field value
      */
     function prepareFieldReplacements($label, $value) {
         if(!is_null($label)) {
@@ -95,6 +100,9 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
         }
     }
 
+    /**
+     * Adds <noinclude></noinclude> to replacement patterns
+     */
     function prepareNoincludeReplacement() {
         $this->patterns['__noinclude__'] = '/<noinclude>(.*?)<\/noinclude>/is';
         $this->values['__noinclude__'] = '';

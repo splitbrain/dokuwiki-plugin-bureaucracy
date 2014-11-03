@@ -2,7 +2,7 @@
 /**
  * Class syntax_plugin_bureaucracy_field_subject
  *
- * Defines own subject for mail action
+ * Defines own subject for mail action from this form
  */
 class syntax_plugin_bureaucracy_field_subject extends syntax_plugin_bureaucracy_field {
     /**

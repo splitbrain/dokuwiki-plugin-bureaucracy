@@ -21,7 +21,13 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
         foreach ($args as $arg) {
             switch ($arg[0]) {
             case '=':
-                $this->opt['true_value'] = substr($arg, 1);
+                if($arg == '==1') {
+                    $this->opt['value'] = '1';
+                }elseif($arg == '==0') {
+                    $this->opt['value'] = '0';
+                }else{
+                    $this->opt['true_value'] = substr($arg, 1);
+                }
                 break;
             case '!':
                 $this->opt['false_value'] = substr($arg, 1);
@@ -72,12 +78,16 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
      */
     public function renderfield($params, Doku_Form $form) {
         $id = 'bureaucracy__'.md5(rand());
-        $params = array_merge(array('value' => false), $this->opt, $params);
+        $params = array_merge(
+            array('value' => false),
+            $this->opt,
+            $params
+        );
         $check = $params['value'] ? 'checked="checked"' : '';
         $this->tpl = '<label class="@@CLASS@@" for="'.$id.'"><span>@@DISPLAY@@</span>'.
                      '<input type="hidden" name="@@NAME@@" value="0" />' .
-                     '<input type="checkbox" name="@@NAME@@" value="1" id="'.$id.'" ' .
-                     $check . ' /></label>';
+                     '<input type="checkbox" name="@@NAME@@" value="1" id="'.$id.'" ' . $check . ' />' .
+                     '</label>';
         parent::renderfield($params, $form);
     }
 }

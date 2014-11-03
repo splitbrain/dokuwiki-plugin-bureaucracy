@@ -7,6 +7,7 @@ div.dokuwiki div.bureaucracy__plugin {
 div.dokuwiki form.bureaucracy__plugin {
     width: 100%;
     text-align: center;
+    margin: 0 1em;
 }
 
 div.dokuwiki form.bureaucracy__plugin p,
@@ -26,10 +27,12 @@ div.dokuwiki form.bureaucracy__plugin fieldset {
 
 div.dokuwiki form.bureaucracy__plugin label {
     display: block;
-    margin: 5px;
+    margin: 3px;
     /* AutoCompletion anchor */
     position: relative;
 /*    overflow: visible;*/
+    float: left;
+    width: 100%;
 }
 
 div.dokuwiki form.bureaucracy__plugin label span {
@@ -41,6 +44,9 @@ div.dokuwiki form.bureaucracy__plugin label span {
 
 div.dokuwiki form.bureaucracy__plugin label .edit {
     width: 48%;
+}
+div.dokuwiki form.bureaucracy__plugin label textarea.edit {
+    min-width: 96%;
 }
 
 div.dokuwiki form.bureaucracy__plugin label input.datepicker {
@@ -55,6 +61,17 @@ div.dokuwiki form.bureaucracy__plugin label select {
     margin-left: 5px;
 }
 
+div.dokuwiki form.bureaucracy__plugin input.button {
+    display: block;
+    margin: 3px 0 3px 49.5%;
+    float: left;
+}
+
 div.dokuwiki form.bureaucracy__plugin label.bureaucracy_error span {
     color: #F00;
+}
+
+.dokuwiki form.bureaucracy__plugin #plugin__captcha_wrapper {
+    float: left;
+    margin: 3px;
 }

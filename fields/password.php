@@ -14,6 +14,11 @@ class syntax_plugin_bureaucracy_field_password extends syntax_plugin_bureaucracy
      */
     function __construct($args) {
         parent::__construct($args);
-        $this->tpl = form_makePasswordField('@@NAME@@', '@@DISPLAY@@', '', '@@CLASS@@');
+
+        $attr = array();
+        if(!isset($this->opt['optional'])) {
+            $attr['required'] = 'required';
+        }
+        $this->tpl = form_makePasswordField('@@NAME@@', '@@DISPLAY@@', '', '@@CLASS@@', $attr);
     }
 }
