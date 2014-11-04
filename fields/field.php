@@ -95,8 +95,10 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 $this->opt['replyto'] = true;
             } elseif(preg_match('/x\d/', $arg)) {
                 $this->opt['rows'] = substr($arg,1);
-            } elseif($arg[0] == '.'){
-                $this->opt['class'] = substr($arg,1);
+            } elseif($arg[0] == '.') {
+                $this->opt['class'] = substr($arg, 1);
+            } elseif(preg_match('/0{2,}/', $arg)) {
+                $this->opt['leadingzeros'] = strlen($arg);
             } else {
                 $t = $arg[0];
                 $d = substr($arg,1);
@@ -163,8 +165,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @param string $value The passed value or array or null if none given
      * @param int    $formid unique identifier of the form which contains this field
-     * @return bool|array Whether the passed value is valid; Fieldsets return
-     *                    an array specifying their dependency state.
+     * @return bool Whether the passed value is valid
      */
     public function handle_post(&$value, $formid) {
         return $this->hidden || $this->setVal($value);

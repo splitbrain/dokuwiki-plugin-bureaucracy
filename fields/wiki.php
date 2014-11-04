@@ -26,7 +26,7 @@ class syntax_plugin_bureaucracy_field_wiki extends syntax_plugin_bureaucracy_fie
      *
      * @param null $value empty
      * @param int    $formid unique identifier of the form which contains this field
-     * @return bool|array Whether the passed value is valid
+     * @return bool Whether the passed value is valid
      */
     public function handle_post(&$value, $formid) {
         return true;

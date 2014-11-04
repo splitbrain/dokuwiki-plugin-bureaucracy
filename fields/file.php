@@ -30,7 +30,7 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
      *
      * @param array $value The passed value or array or null if none given
      * @param int    $formid unique identifier of the form which contains this field
-     * @return bool|array Whether the passed filename is valid
+     * @return bool Whether the passed filename is valid
      */
     public function handle_post(&$value, $formid) {
         $this->opt['file'] = $value;

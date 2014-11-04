@@ -64,7 +64,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
      *    [1] int   $my_id index number of field
      *    [2] array $fields the form fields
      * @param int    $formid unique identifier of the form which contains this field
-     * @return bool true
+     * @return bool Whether the passed value is valid
      */
     public function handle_post(&$params, $formid) {
         $my_id = $params[1];

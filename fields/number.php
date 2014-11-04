@@ -39,6 +39,7 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
                 $this->opt['value'] = $c_val;
             }
         }
+        $this->opt['value'] = $this->addLeadingzeros($this->opt['value']);
     }
 
     /**
@@ -53,6 +54,21 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
         }
 
         parent::_validate();
+    }
+
+    /**
+     * Handle a post to the field
+     *
+     * Accepts and validates a posted value.
+     *
+     * @param string $value The passed value or array or null if none given
+     * @param int    $formid unique identifier of the form which contains this field
+     * @return bool Whether the passed value is valid
+     */
+    public function handle_post(&$value, $formid) {
+        $value = $this->addLeadingzeros($value);
+
+        return parent::handle_post($value, $formid);
     }
 
     /**
@@ -79,5 +95,22 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
                 unlink($cache_fn);
             }
         }
+    }
+
+    /**
+     * Add leading zeros, depending on the corresponding field option
+     *
+     * @param int|string $value number
+     * @return string
+     */
+    protected function addLeadingzeros(&$value) {
+        if($this->opt['leadingzeros']) {
+            $length = strlen($value);
+            for($i = $length; $i < $this->opt['leadingzeros']; $i++) {
+                $value = '0' . $value;
+            }
+            return $value;
+        }
+        return $value;
     }
 }
