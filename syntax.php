@@ -22,7 +22,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     var $patterns = array();
     var $values = array();
 
-    public function __constructor() {
+    public function __construct() {
         $this->prepareDateTimereplacements();
         $this->prepareNamespacetemplateReplacements();
     }
@@ -108,9 +108,9 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         foreach($actions as $action) {
             // check if action is available
             $action['type'] = $this->_sanitizeClassName($action['type']);
-            if (!$action['type'] ||
-                !@file_exists(DOKU_PLUGIN.'bureaucracy/actions/' .
-                              $action['type'] . '.php')) {
+            if(!$action['type'] ||
+                !@file_exists(DOKU_PLUGIN . 'bureaucracy/actions/' . $action['type'] . '.php')
+            ) {
                 msg(sprintf($this->getLang('e_noaction'), $action), -1);
             }
         }
@@ -135,12 +135,11 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         /**
          * replace some time and name placeholders in the default values
-         * @var $opt syntax_plugin_bureaucracy_field */
-        foreach ($data['fields'] as &$opt) {
-            if(isset($opt->opt['value'])) {
-                $opt->opt['value'] = $this->replace($opt->opt['value']);
+         * @var $field syntax_plugin_bureaucracy_field */
+        foreach ($data['fields'] as &$field) {
+            if(isset($field->opt['value'])) {
+                $field->opt['value'] = $this->replace($field->opt['value']);
             }
-
         }
 
         if($data['labels']) $this->loadlabels($data);
@@ -433,9 +432,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->patterns['__month__'] = '/@MONTH@/';
         $this->patterns['__day__'] = '/@DAY@/';
         $this->patterns['__time__'] = '/@TIME@/';
+        $this->patterns['__timesec__'] = '/@TIMESEC@/';
         $this->values['__year__'] = date('Y');
-        $this->values['__month__'] = date('Y');
-        $this->values['__day__'] = date('Y');
-        $this->values['__time__'] = date('Y');
+        $this->values['__month__'] = date('m');
+        $this->values['__day__'] = date('d');
+        $this->values['__time__'] = date('H:i');
+        $this->values['__timesec__'] = date('H:i:s');
+
     }
 }
