@@ -12,16 +12,20 @@
 // must be run within Dokuwiki
 if (!defined('DOKU_INC')) die();
 
-if (!defined('DOKU_PLUGIN')) define('DOKU_PLUGIN',DOKU_INC.'lib/plugins/');
-require_once(DOKU_PLUGIN.'syntax.php');
-
 /**
  * All DokuWiki plugins to extend the parser/rendering mechanism
  * need to inherit from this class
  */
 class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
-    // allowed types and the number of arguments
+
     private $form_id = 0;
+    var $patterns = array();
+    var $values = array();
+
+    public function __constructor() {
+        $this->prepareDateTimereplacements();
+        $this->prepareNamespacetemplateReplacements();
+    }
 
     /**
      * What kind of syntax are we?
@@ -134,7 +138,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
          * @var $opt syntax_plugin_bureaucracy_field */
         foreach ($data['fields'] as &$opt) {
             if(isset($opt->opt['value'])) {
-                $opt->opt['value'] = $this->replaceNSTemplatePlaceholders($opt->opt['value']);
+                $opt->opt['value'] = $this->replace($opt->opt['value']);
             }
 
         }
@@ -144,7 +148,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->form_id++;
         if (isset($_POST['bureaucracy']) && checkSecurityToken() &&
             $_POST['bureaucracy']['$$id'] == $this->form_id) {
-            $success = $this->_handlepost($data, $this->form_id);
+            $success = $this->_handlepost($data);
             if ($success !== false) {
                 $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">'
                         .  $success . '</div>';
@@ -234,20 +238,22 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      */
     private function _handlepost($data) {
         $success = true;
-        foreach ($data['fields'] as $id => $opt) {
-            /** @var $opt syntax_plugin_bureaucracy_field */
+        foreach ($data['fields'] as $id => $field) {
+            /** @var $field syntax_plugin_bureaucracy_field */
             $_ret = true;
-            if ($opt->getFieldType() === 'fieldset') {
+            if ($field->getFieldType() === 'fieldset') {
                 $params = array($_POST['bureaucracy'][$id], $id, &$data['fields']);
-                $_ret = $opt->handle_post($params);
-            } elseif ($opt->getFieldType() === 'file') {
+                $_ret = $field->handle_post($params, $this->form_id);
+
+            } elseif ($field->getFieldType() === 'file') {
                 $file = array();
                 foreach($_FILES['bureaucracy'] as $key=>$value) {
                     $file[$key] = $value[$id];
                 }
-                $_ret = $opt->handle_post($file);
-            } elseif(!$opt->hidden) {
-                $_ret = $opt->handle_post($_POST['bureaucracy'][$id]);
+                $_ret = $field->handle_post($file, $this->form_id);
+
+            } elseif(!$field->hidden) {
+                $_ret = $field->handle_post($_POST['bureaucracy'][$id], $this->form_id);
             }
             if (!$_ret) {
                 // Do not return instantly to allow validation of all fields.
@@ -275,7 +281,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         // Perform after_action hooks
         foreach($data['fields'] as $field) {
-            /** @var $field syntax_plugin_bureaucracy_field */
             $field->after_action();
         }
         return $thanks;
@@ -362,35 +367,75 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     }
 
     /**
-     * Replace some placeholders (default available for namespace templates) for userinfo and time
-     *   - more replacements are done in syntax_plugin_bureaucracy_action_template
-     * @param $input
-     * @return mixed
+     * Apply replacement patterns and values as prepared earlier
+     * (disable $strftime to prevent double replacements with default strftime() replacements in nstemplate)
+     *
+     * @param string $input    The text to work on
+     * @param bool   $strftime Apply strftime() replacements
+     * @return string processed text
      */
-    protected function replaceNSTemplatePlaceholders($input) {
+    function replace($input, $strftime = true) {
+        $input = preg_replace($this->patterns, $this->values, $input);
+
+        if($strftime) {
+            $input = preg_replace_callback(
+                '/%./',
+                create_function('$m', 'return strftime($m[0]);'),
+                $input
+            );
+        }
+        // user syntax: %%.(.*?)
+        // strftime() is already applied once, so syntax is at this point: %.(.*?)
+        $input = preg_replace_callback(
+            '/(%.)\((.*?)\)/',
+            array($this, 'replacedate'),
+            $input
+        );
+        return $input;
+    }
+
+    /**
+     * (callback) Replace date by request datestring
+     * e.g. '%m(30-11-1975)' is replaced by '11'
+     *
+     * @param $match
+     * @return string
+     */
+    function replacedate($match) {
+        return strftime($match[1], strtotime($match[2]));
+    }
+
+    /**
+     * Same replacements as applied at template namespaces
+     *
+     * @see parsePageTemplate()
+     */
+    function prepareNamespacetemplateReplacements() {
+        /* @var Input $INPUT */
+        global $INPUT;
         global $USERINFO;
         global $conf;
+        $this->patterns['__user__'] = '/@USER@/';
+        $this->patterns['__name__'] = '/@NAME@/';
+        $this->patterns['__mail__'] = '/@MAIL@/';
+        $this->patterns['__date__'] = '/@DATE@/';
+        $this->values['__user__'] =  $INPUT->server->str('REMOTE_USER');
+        $this->values['__name__'] = $USERINFO['name'];
+        $this->values['__mail__'] = $USERINFO['mail'];
+        $this->values['__date__'] = strftime($conf['dformat']);
+    }
 
-        // replace placeholders
-        return str_replace(array(
-                                '@USER@',
-                                '@NAME@',
-                                '@MAIL@',
-                                '@DATE@',
-                                '@YEAR@',
-                                '@MONTH@',
-                                '@DAY@',
-                                '@TIME@'
-                           ),
-                           array(
-                                $_SERVER['REMOTE_USER'],
-                                $USERINFO['name'],
-                                $USERINFO['mail'],
-                                strftime($conf['dformat']),
-                                date('Y'),
-                                date('m'),
-                                date('d'),
-                                date('H:i')
-                           ), $input);
+    /**
+     * Date time replacements
+     */
+    function prepareDateTimereplacements() {
+        $this->patterns['__year__'] = '/@YEAR@/';
+        $this->patterns['__month__'] = '/@MONTH@/';
+        $this->patterns['__day__'] = '/@DAY@/';
+        $this->patterns['__time__'] = '/@TIME@/';
+        $this->values['__year__'] = date('Y');
+        $this->values['__month__'] = date('Y');
+        $this->values['__day__'] = date('Y');
+        $this->values['__time__'] = date('Y');
     }
 }

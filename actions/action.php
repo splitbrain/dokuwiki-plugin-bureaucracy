@@ -11,9 +11,6 @@
  */
 class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
 
-    var $patterns;
-    var $values;
-
     /**
      * Handle the user input [required]
      *
@@ -31,37 +28,6 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
     public function run($fields, $thanks, $argv){
         msg('ERROR: called action %s did not implement a run() function');
         return false;
-    }
-
-    /**
-     * Apply given replacement patterns and values
-     *
-     * @param string $patterns The patterns to replace
-     * @param string $values   The values to use as replacement
-     * @param string $input    The text to work on
-     * @param bool   $strftime Apply strftime() replacements
-     * @return string processed text
-     */
-    function replace($patterns, $values, $input, $strftime=true) {
-        $input = preg_replace($patterns, $values, $input);
-        $input = parent::replaceNSTemplatePlaceholders($input);
-        if($strftime){
-            $input = preg_replace_callback('/%./',
-                                           create_function('$m','return strftime($m[0]);'),
-                                           $input);
-        }
-        return $input;
-    }
-
-    /**
-     * Apply the collected replacement patterns and values
-     *
-     * @param string $input    The text to work on
-     * @param bool   $strftime Apply strftime() replacements
-     * @return string processed text
-     */
-    function replaceDefault($input, $strftime=true) {
-        return $this->replace($this->patterns, $this->values, $input, $strftime);
     }
 
     /**
@@ -91,7 +57,7 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      * @param string $label field label
      * @param string $value field value
      */
-    function prepareFieldReplacements($label, $value) {
+    function prepareFieldReplacement($label, $value) {
         if(!is_null($label)) {
             $this->patterns[$label] = '/(@@|##)' . preg_quote($label, '/') .
                 '(?:\|(.*?))' . (is_null($value) ? '' : '?') .
@@ -106,6 +72,22 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
     function prepareNoincludeReplacement() {
         $this->patterns['__noinclude__'] = '/<noinclude>(.*?)<\/noinclude>/is';
         $this->values['__noinclude__'] = '';
+    }
+
+    /**
+     * Generate field replacements
+     *
+     * @param syntax_plugin_bureaucracy_field[]  $fields  List of field objects
+     * @return array
+     */
+    function prepareFieldReplacements($fields) {
+        foreach ($fields as $field) {
+            $label = $field->getParam('label');
+            $value = $field->getParam('value');
+
+            //field replacements
+            $this->prepareFieldReplacement($label, $value);
+        }
     }
 
 }

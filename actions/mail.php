@@ -25,7 +25,11 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
 
         $mail = new Mailer();
 
+        $this->prepareNamespacetemplateReplacements();
+        $this->prepareDateTimereplacements();
         $this->prepareLanguagePlaceholder();
+        $this->prepareNoincludeReplacement();
+        $this->prepareFieldReplacements($fields);
 
         //set default subject
         $this->subject = sprintf($this->getLang('mailsubject'),$ID);
@@ -33,16 +37,17 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
         $this->_mail_text .=  sprintf($this->getLang('mailintro')."\n\n", dformat());
         $this->_mail_html .=  sprintf($this->getLang('mailintro')."<br><br>", dformat());
 
+        //build html&text table, collect replyto and subject
         $this->buildTables($fields, $mail);
 
-        $this->subject = $this->replaceDefault($this->subject);
+        $this->subject = $this->replace($this->subject);
 
         if(!empty($this->replyto)) {
             $replyto = $mail->cleanAddress($this->replyto);
             $mail->setHeader('Reply-To', $replyto, false);
         }
 
-        $to = $this->replaceDefault(implode(',',$argv)); // get recipient address(es)
+        $to = $this->replace(implode(',',$argv)); // get recipient address(es)
         $to = $mail->cleanAddress($to);
         $mail->to($to);
         $mail->from($conf['mailfrom']);
@@ -58,6 +63,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
 
     /**
      * Create html and plain table of the field
+     * and collect values for subject and replyto
      *
      * @param syntax_plugin_bureaucracy_field[] $fields
      * @param Mailer $mail
@@ -87,6 +93,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
                 case 'subject':
                     $this->subject = $label;
                     break;
+
                 /** @noinspection PhpMissingBreakStatementInspection */
                 case 'email':
                     if(!is_null($field->getParam('replyto'))) {
@@ -97,8 +104,6 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
                     if($value === null || $label === null) break;
                     $this->mail_addRow($label, $value);
             }
-
-            $this->prepareFieldReplacements($label, $value);
         }
         $this->_mail_html .= '</table>';
     }
