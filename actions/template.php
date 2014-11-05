@@ -202,6 +202,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
     /**
      * Perform replacements on the collected templates, and save the pages.
+     *
+     * Note: wrt runas, for changelog are used:
+     *  - $INFO['userinfo']['name']
+     *  - $INPUT->server->str('REMOTE_USER')
      */
     protected function replaceAndSavePages() {
         global $ID;
