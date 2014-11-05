@@ -75,4 +75,64 @@ class syntax_plugin_bureaucracy_test extends DokuWikiTest {
         return $input;
     }
 
+    public function test_parseline() {
+        $match = 'textbox label0 "Test with spaces"
+textbox LabelWithoutSpaces
+textbox Label Without Spaces
+textbox "Label with spaces" "Text with a quote""in text"
+textbox Label2 " "
+textbox Label3 """"
+textbox Label4 " """ " """   " """
+textbox Label5 """ "
+textbox Label6 "" " "
+textbox Label7 " "" "
+textbox Label7 " ""
+ "" ss"
+textbox Label8';
+
+        $expected = array(
+            array('textbox', 'label0', 'Test with spaces'),
+            array('textbox', 'LabelWithoutSpaces'),
+            array('textbox', 'Label', 'Without', 'Spaces'),
+            array('textbox', 'Label with spaces', 'Text with a quote"in text'),
+            array('textbox', 'Label2', ' '),
+            array('textbox', 'Label3', '"'),
+            array('textbox', 'Label4', ' "', ' "', ' "'),
+            array('textbox', 'Label5', '" '),
+            array('textbox', 'Label6', '', ' '),
+            array('textbox', 'Label7', ' " '),
+            array('textbox', 'Label7', ' "
+ " ss'),
+            array('textbox', 'Label8')
+        );
+
+        $lines = explode("\n", $match);
+        $i = 0;
+        while(count($lines) > 0) {
+            $line = trim(array_shift($lines));
+
+            $syntaxcomponent = new syntax_plugin_bureaucracy();
+            $actual = $this->callNonaccessibleMethod($syntaxcomponent, '_parse_line', array($line, &$lines));
+
+            $this->assertEquals($expected[$i], $actual);
+            $i++;
+        }
+
+    }
+
+    /**
+     * Test not accessible methods..
+     *
+     * @param string|object $obj
+     * @param string $name
+     * @param array $args
+     * @return mixed
+     */
+    protected function callNonaccessibleMethod($obj, $name, array $args) {
+        $class = new ReflectionClass($obj);
+        $method = $class->getMethod($name);
+        $method->setAccessible(true);
+        return $method->invokeArgs($obj, $args);
+    }
+
 }

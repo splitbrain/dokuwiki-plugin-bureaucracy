@@ -321,12 +321,22 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     private function _parse_line($line, &$lines) {
         $args = array();
         $inQuote = false;
+        $escapedQuote = false;
         $arg = '';
         do {
             $len = strlen($line);
             for ( $i = 0 ; $i < $len; $i++ ) {
                 if ( $line{$i} == '"' ) {
                     if ($inQuote) {
+                        if($escapedQuote) {
+                            $arg .= '"';
+                            $escapedQuote = false;
+                            continue;
+                        }
+                        if($line{$i + 1} == '"') {
+                            $escapedQuote = true;
+                            continue;
+                        }
                         array_push($args, $arg);
                         $inQuote = false;
                         $arg = '';
