@@ -22,6 +22,9 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     var $patterns = array();
     var $values = array();
 
+    /**
+     * Prepare some replacements
+     */
     public function __construct() {
         $this->prepareDateTimereplacements();
         $this->prepareNamespacetemplateReplacements();

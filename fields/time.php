@@ -18,7 +18,7 @@ class syntax_plugin_bureaucracy_field_time extends syntax_plugin_bureaucracy_fie
     public function __construct($args) {
         parent::__construct($args);
         $attr = array(
-            'class' => 'edit',
+            'class' => 'timefield edit',
             'maxlength'=>'8'
         );
         if(!isset($this->opt['optional'])) {
