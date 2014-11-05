@@ -389,7 +389,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         // user syntax: %%.(.*?)
         // strftime() is already applied once, so syntax is at this point: %.(.*?)
         $input = preg_replace_callback(
-            '/(%.)\((.*?)\)/',
+            '/BP-DATE\((.*?),\s*(.*?)\)/',
             array($this, 'replacedate'),
             $input
         );
@@ -400,11 +400,18 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * (callback) Replace date by request datestring
      * e.g. '%m(30-11-1975)' is replaced by '11'
      *
-     * @param $match
+     * @param array $match with [0]=>whole match, [1]=> first subpattern, [2] => second subpattern
      * @return string
      */
     function replacedate($match) {
-        return strftime($match[1], strtotime($match[2]));
+        global $conf;
+
+        //shortcut for default date format
+        if($match[2] == 'dformat') {
+            $match[2] = $conf['dformat'];
+        }
+
+        return strftime($match[2], strtotime($match[1]));
     }
 
     /**
