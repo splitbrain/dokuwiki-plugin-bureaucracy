@@ -64,13 +64,15 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
      * Accepts and validates a posted value.
      *
      * @param string $value The passed value or array or null if none given
+     * @param array  $fields (reference) form fields (POST handled upto $this field)
+     * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
      */
-    public function handle_post(&$value, $formid) {
+    public function handle_post($value, &$fields, $index, $formid) {
         $value = $this->addLeadingzeros($value);
 
-        return parent::handle_post($value, $formid);
+        return parent::handle_post($value, $fields, $index, $formid);
     }
 
     /**

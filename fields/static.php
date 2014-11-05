@@ -24,10 +24,12 @@ class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_f
      * Handle a post to the field
      *
      * @param string $value The passed value
+     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
      */
-    public function handle_post(&$value, $formid) {
+    public function handle_post($value, &$fields, $index, $formid) {
         return true;
     }
 

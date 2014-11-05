@@ -54,10 +54,12 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
      * Accepts and validates a posted captcha value.
      *
      * @param string $value The passed value
+     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the posted form has a valid captcha
      */
-    public function handle_post(&$value, $formid) {
+    public function handle_post($value, &$fields, $index, $formid) {
         if ($this->hidden) {
             return true;
         }

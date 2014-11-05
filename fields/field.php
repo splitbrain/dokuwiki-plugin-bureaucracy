@@ -183,11 +183,13 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * (Overridden by fieldset, which has as argument an array with the form array by reference)
      *
-     * @param string $value The passed value or array or null if none given
+     * @param string $value  The passed value or array or null if none given
+     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
      */
-    public function handle_post(&$value, $formid) {
+    public function handle_post($value, &$fields, $index, $formid) {
         return $this->hidden || $this->setVal($value);
     }
 

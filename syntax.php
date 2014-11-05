@@ -240,29 +240,27 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      */
     private function _handlepost($data) {
         $success = true;
-        foreach ($data['fields'] as $id => $field) {
+        foreach($data['fields'] as $index => $field) {
             /** @var $field syntax_plugin_bureaucracy_field */
-            $_ret = true;
-            if ($field->getFieldType() === 'fieldset') {
-                $params = array($_POST['bureaucracy'][$id], $id, &$data['fields']);
-                $_ret = $field->handle_post($params, $this->form_id);
 
-            } elseif ($field->getFieldType() === 'file') {
+            $isValid = true;
+            if($field->getFieldType() === 'file') {
                 $file = array();
-                foreach($_FILES['bureaucracy'] as $key=>$value) {
-                    $file[$key] = $value[$id];
+                foreach($_FILES['bureaucracy'] as $key => $value) {
+                    $file[$key] = $value[$index];
                 }
-                $_ret = $field->handle_post($file, $this->form_id);
+                $isValid = $field->handle_post($file, $data['fields'], $index, $this->form_id);
 
-            } elseif(!$field->hidden) {
-                $_ret = $field->handle_post($_POST['bureaucracy'][$id], $this->form_id);
+            } elseif($field->getFieldType() === 'fieldset' || !$field->hidden) {
+                $isValid = $field->handle_post($_POST['bureaucracy'][$index], $data['fields'], $index, $this->form_id);
             }
-            if (!$_ret) {
+
+            if(!$isValid) {
                 // Do not return instantly to allow validation of all fields.
                 $success = false;
             }
         }
-        if (!$success) {
+        if(!$success) {
             return false;
         }
 

@@ -38,10 +38,12 @@ class syntax_plugin_bureaucracy_field_usemailtemplate extends syntax_plugin_bure
      * Handle a post to the field
      *
      * @param string $value null
+     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
      */
-    function handle_post(&$value, $formid) {
+    function handle_post($value, &$fields, $index, $formid) {
         return true;
     }
 
