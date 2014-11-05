@@ -11,6 +11,7 @@ class syntax_plugin_bureaucracy_field_textbox extends syntax_plugin_bureaucracy_
      *  - cmd
      *  - label
      *  - =default (optional)
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */
@@ -22,7 +23,7 @@ class syntax_plugin_bureaucracy_field_textbox extends syntax_plugin_bureaucracy_
             $attr['required'] = 'required';
         }
 
-        $this->tpl = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@DISPLAY@@', '', '@@CLASS@@', $attr);
+        $this->tpl = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@DISPLAY@@', '@@ID@@', '@@CLASS@@', $attr);
         if(isset($this->opt['class'])){
             $this->tpl['class'] .= ' '.$this->opt['class'];
         }

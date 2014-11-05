@@ -8,6 +8,14 @@ require_once DOKU_PLUGIN . 'bureaucracy/fields/textbox.php';
 class syntax_plugin_bureaucracy_field_email extends syntax_plugin_bureaucracy_field_textbox {
 
     /**
+     * Arguments:
+     *  - cmd
+     *  - label
+     *  - @@ (optional)
+     *  - ^ (optional)
+     */
+
+    /**
      * Validate field value
      *
      * @throws Exception when empty or not valid email address

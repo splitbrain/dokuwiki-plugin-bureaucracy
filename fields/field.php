@@ -89,6 +89,11 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 $this->setVal(substr($arg,1));
             } elseif ($arg == '!') {
                 $this->opt['optional'] = true;
+            } elseif ($arg == '^') {
+                //only one field has focus
+                if (syntax_plugin_bureaucracy_field::hasFocus()) {
+                    $this->opt['id'] = 'focus__this';
+                }
             } elseif($arg == '@') {
                 $this->opt['pagename'] = true;
             } elseif($arg == '@@') {
@@ -143,6 +148,21 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
 
         $params = array_merge($this->opt, $params);
         $form->addElement($this->_parse_tpl($this->tpl, $params));
+    }
+
+    /**
+     * Only the first use get the focus, next calls not
+     *
+     * @return bool
+     */
+    protected static function hasFocus(){
+        static $focus = true;
+        if($focus) {
+            $focus = false;
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

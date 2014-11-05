@@ -12,6 +12,7 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
      *  - label
      *  - =yesvalue
      *  - !falsevalue
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */
@@ -79,6 +80,9 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
      */
     public function renderfield($params, Doku_Form $form, $formid) {
         $id = 'bureaucracy__'.md5(rand());
+        if(isset($this->opt['id'])) {
+            $id = $this->opt['id'];
+        }
         $params = array_merge(
             array('value' => false),
             $this->opt,

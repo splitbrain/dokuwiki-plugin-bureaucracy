@@ -13,6 +13,7 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
      *  - cmd
      *  - label
      *  - option1|option2|etc
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */
@@ -51,7 +52,7 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
                                                         $params['args'],
                                                         '@@VALUE|' . $params['args'][0] . '@@',
                                                         '@@DISPLAY@@',
-                                                        '',
+                                                        '@@ID@@',
                                                         '@@CLASS@@'
                                                     ),
                                                     $params

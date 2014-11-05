@@ -10,7 +10,8 @@ class syntax_plugin_bureaucracy_field_textarea extends syntax_plugin_bureaucracy
      *  - cmd
      *  - label
      *  - x123 (optional) as number of lines
+     *  - ^ (optional)
      */
 
-    protected $tpl = '<label class="@@CLASS@@"><span>@@DISPLAY@@</span><textarea name="@@NAME@@" rows="@@ROWS|10@@" cols="10" class="edit" @@OPTIONAL|required="required"@@>@@VALUE@@</textarea></label>';
+    protected $tpl = '<label class="@@CLASS@@"><span>@@DISPLAY@@</span><textarea name="@@NAME@@" id="@@ID@@" rows="@@ROWS|10@@" cols="10" class="edit" @@OPTIONAL|required="required"@@>@@VALUE@@</textarea></label>';
 }

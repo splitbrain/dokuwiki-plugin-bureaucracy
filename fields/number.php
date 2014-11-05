@@ -14,6 +14,8 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
      *  - cmd
      *  - label
      *  - ++ (optional)
+     *  - 0000 (optional)
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */

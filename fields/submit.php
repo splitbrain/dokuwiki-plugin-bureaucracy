@@ -13,6 +13,7 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
      * Arguments:
      *  - cmd
      *  - label (optional)
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */
@@ -39,7 +40,11 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
                 $form->addElement($helper->getHTML());
             }
         }
-        $this->tpl = form_makeButton('submit','', '@@DISPLAY|' . $this->getLang('submit') . '@@');
+        $attr = array();
+        if(isset($this->opt['id'])) {
+            $attr['id'] = $this->opt['id'];
+        }
+        $this->tpl = form_makeButton('submit','', '@@DISPLAY|' . $this->getLang('submit') . '@@', $attr);
         parent::renderfield($params, $form, $formid);
     }
 

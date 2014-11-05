@@ -11,6 +11,7 @@ class syntax_plugin_bureaucracy_field_date extends syntax_plugin_bureaucracy_fie
      * Arguments:
      *  - cmd
      *  - label
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */
@@ -23,7 +24,7 @@ class syntax_plugin_bureaucracy_field_date extends syntax_plugin_bureaucracy_fie
         if(!isset($this->opt['optional'])) {
             $attr['required'] = 'required';
         }
-        $this->tpl = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@DISPLAY@@', '', '@@CLASS@@', $attr);
+        $this->tpl = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@DISPLAY@@', '@@ID@@', '@@CLASS@@', $attr);
     }
 
     /**

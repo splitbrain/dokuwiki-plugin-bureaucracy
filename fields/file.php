@@ -9,6 +9,7 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
      * Arguments:
      *  - cmd
      *  - label
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */
@@ -20,7 +21,7 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
             $attr['required'] = 'required';
         }
 
-        $this->tpl = form_makeFileField('@@NAME@@', '@@DISPLAY@@', '', '@@CLASS@@', $attr);
+        $this->tpl = form_makeFileField('@@NAME@@', '@@DISPLAY@@', '@@ID@@', '@@CLASS@@', $attr);
     }
 
     /**
