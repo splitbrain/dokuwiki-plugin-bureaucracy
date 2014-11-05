@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_textarea
+ * Class helper_plugin_bureaucracy_fieldtextarea
  *
  * Creates a multi-line input field
  */
-class syntax_plugin_bureaucracy_field_textarea extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldtextarea extends helper_plugin_bureaucracy_field {
     /**
      * Arguments:
      *  - cmd
@@ -12,10 +12,15 @@ class syntax_plugin_bureaucracy_field_textarea extends syntax_plugin_bureaucracy
      *  - x123 (optional) as number of lines
      *  - ^ (optional)
      */
-    public function __construct($args) {
-        parent::__construct($args);
+    public function initialize($args) {
+        parent::initialize($args);
         $this->opt['class'] .= ' textareafield';
     }
 
-    protected $tpl = '<label class="@@CLASS@@"><span>@@DISPLAY@@</span><textarea name="@@NAME@@" id="@@ID@@" rows="@@ROWS|10@@" cols="10" class="edit" @@OPTIONAL|required="required"@@>@@VALUE@@</textarea></label>';
+    protected $tpl =
+'<label class="@@CLASS@@">
+    <span>@@DISPLAY@@</span>
+    <textarea name="@@NAME@@" id="@@ID@@" rows="@@ROWS|10@@" cols="10" class="edit" @@OPTIONAL|required="required"@@>@@VALUE@@</textarea>
+</label>';
+
 }

@@ -1,11 +1,10 @@
 <?php
-require_once DOKU_PLUGIN . 'bureaucracy/fields/yesno.php';
 /**
- * Class syntax_plugin_bureaucracy_field_onoff
+ * Class helper_plugin_bureaucracy_fieldonoff
  *
  * Creates a checkbox
  */
-class syntax_plugin_bureaucracy_field_onoff extends syntax_plugin_bureaucracy_field_yesno {
+class helper_plugin_bureaucracy_fieldonoff extends helper_plugin_bureaucracy_fieldyesno {
     /**
      * Arguments:
      *  - cmd

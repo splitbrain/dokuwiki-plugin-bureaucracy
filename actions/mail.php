@@ -14,7 +14,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
     /**
      * Build a nice email from the submitted data and send it
      *
-     * @param syntax_plugin_bureaucracy_field[] $fields
+     * @param helper_plugin_bureaucracy_field[] $fields
      * @param string                            $thanks
      * @param array                             $argv
      * @return string thanks message
@@ -86,7 +86,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
      * Create html and plain table of the field
      * and collect values for subject and replyto
      *
-     * @param syntax_plugin_bureaucracy_field[] $fields
+     * @param helper_plugin_bureaucracy_field[] $fields
      * @param Mailer $mail
      * @return array of html and text table
      */

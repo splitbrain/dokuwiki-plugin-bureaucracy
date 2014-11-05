@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_submit
+ * Class helper_plugin_bureaucracy_fieldsubmit
  *
  * Creates a submit button
  */
-class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_field {
     protected $mandatory_args = 1;
     static $captcha_displayed = array();
     static $captcha_checked = array();
@@ -17,8 +17,8 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function __construct($args) {
-        parent::__construct($args);
+    public function initialize($args) {
+        parent::initialize($args);
         // make always optional to prevent being marked as required
         $this->opt['optional'] = true;
     }
@@ -31,8 +31,8 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
      * @params int       $formid unique identifier of the form which contains this field
      */
     public function renderfield($params, Doku_Form $form, $formid) {
-        if(!isset(syntax_plugin_bureaucracy_field_submit::$captcha_displayed[$formid])) {
-            syntax_plugin_bureaucracy_field_submit::$captcha_displayed[$formid] = true;
+        if(!isset(helper_plugin_bureaucracy_fieldsubmit::$captcha_displayed[$formid])) {
+            helper_plugin_bureaucracy_fieldsubmit::$captcha_displayed[$formid] = true;
             /** @var helper_plugin_captcha $helper */
             $helper = null;
             if(@is_dir(DOKU_PLUGIN.'captcha')) $helper = plugin_load('helper','captcha');
@@ -54,7 +54,7 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
      * Accepts and validates a posted captcha value.
      *
      * @param string $value The passed value
-     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the posted form has a valid captcha
@@ -63,8 +63,8 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
         if ($this->hidden) {
             return true;
         }
-        if(!isset(syntax_plugin_bureaucracy_field_submit::$captcha_checked[$formid])) {
-            syntax_plugin_bureaucracy_field_submit::$captcha_checked[$formid] = true;
+        if(!isset(helper_plugin_bureaucracy_fieldsubmit::$captcha_checked[$formid])) {
+            helper_plugin_bureaucracy_fieldsubmit::$captcha_checked[$formid] = true;
             // check CAPTCHA
             /** @var helper_plugin_captcha $helper */
             $helper = null;

@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_usemailtemplate
+ * Class helper_plugin_bureaucracy_fieldusemailtemplate
  *
  * Adds a template only for use with the mail action
  */
-class syntax_plugin_bureaucracy_field_usemailtemplate extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldusemailtemplate extends helper_plugin_bureaucracy_field {
 
     /**
      * Arguments:
@@ -13,7 +13,7 @@ class syntax_plugin_bureaucracy_field_usemailtemplate extends syntax_plugin_bure
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    function __construct($args) {
+    function initialize($args) {
         if(count($args) < 2){
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
                         hsc($args[1])), -1);
@@ -38,7 +38,7 @@ class syntax_plugin_bureaucracy_field_usemailtemplate extends syntax_plugin_bure
      * Handle a post to the field
      *
      * @param string $value null
-     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid

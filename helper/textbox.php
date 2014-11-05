@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_textbox
+ * Class helper_plugin_bureaucracy_fieldtextbox
  *
  * Creates a single line input field
  */
-class syntax_plugin_bureaucracy_field_textbox extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldtextbox extends helper_plugin_bureaucracy_field {
 
     /**
      * Arguments:
@@ -15,8 +15,8 @@ class syntax_plugin_bureaucracy_field_textbox extends syntax_plugin_bureaucracy_
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    function __construct($args) {
-        parent::__construct($args);
+    function initialize($args) {
+        parent::initialize($args);
 
         $attr = array();
         if(!isset($this->opt['optional'])) {

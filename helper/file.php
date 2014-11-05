@@ -3,7 +3,7 @@
 /**
  * File upload field
  */
-class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldfile extends helper_plugin_bureaucracy_field {
 
     /**
      * Arguments:
@@ -13,8 +13,8 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    function __construct($args) {
-        parent::__construct($args);
+    function initialize($args) {
+        parent::initialize($args);
 
         $attr = array();
         if(!isset($this->opt['optional'])) {
@@ -30,7 +30,7 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
      * Accepts and validates a posted value.
      *
      * @param array $value The passed value or array or null if none given
-     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed filename is valid

@@ -101,9 +101,15 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                     continue;
                 }
             }
+            $name = 'bureaucracy_field' . $args[0];
+            $field = $this->loadHelper($name, false);
+            if($field) {
+                $field->initialize($args);
+                $cmds[] = $field;
+            } else {
+                print_r($field);
+            }
 
-            $class = 'syntax_plugin_bureaucracy_field_' . $args[0];
-            $cmds[] = new $class($args);
         }
 
         foreach($actions as $action) {
@@ -136,7 +142,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         /**
          * replace some time and name placeholders in the default values
-         * @var $field syntax_plugin_bureaucracy_field
+         * @var $field helper_plugin_bureaucracy_field
          */
         foreach($data['fields'] as &$field) {
             if(isset($field->opt['value'])) {
@@ -238,7 +244,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     private function _handlepost($data) {
         $success = true;
         foreach($data['fields'] as $index => $field) {
-            /** @var $field syntax_plugin_bureaucracy_field */
+            /** @var $field helper_plugin_bureaucracy_field */
 
             $isValid = true;
             if($field->getFieldType() === 'file') {
@@ -289,7 +295,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Create the form
      *
-     * @param syntax_plugin_bureaucracy_field[] $fields array with form fields
+     * @param helper_plugin_bureaucracy_field[] $fields array with form fields
      * @return string html of the form
      */
     private function _htmlform($fields) {

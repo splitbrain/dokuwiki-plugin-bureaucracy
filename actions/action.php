@@ -77,7 +77,7 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
     /**
      * Generate field replacements
      *
-     * @param syntax_plugin_bureaucracy_field[]  $fields  List of field objects
+     * @param helper_plugin_bureaucracy_field[]  $fields  List of field objects
      * @return array
      */
     function prepareFieldReplacements($fields) {

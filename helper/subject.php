@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_subject
+ * Class helper_plugin_bureaucracy_fieldsubject
  *
  * Defines own subject for mail action from this form
  */
-class syntax_plugin_bureaucracy_field_subject extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldsubject extends helper_plugin_bureaucracy_field {
     /**
      * Arguments:
      *  - cmd
@@ -26,7 +26,7 @@ class syntax_plugin_bureaucracy_field_subject extends syntax_plugin_bureaucracy_
      * Handle a post to the field
      *
      * @param string $value null
-     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid

@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_addpage
+ * Class helper_plugin_bureaucracy_fieldaddpage
  *
  * Adds another page page_tgt based on a template page page_tpl only for use with the template action
  */
-class syntax_plugin_bureaucracy_field_addpage extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldaddpage extends helper_plugin_bureaucracy_field {
 
     /**
      * Arguments:
@@ -14,7 +14,7 @@ class syntax_plugin_bureaucracy_field_addpage extends syntax_plugin_bureaucracy_
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    function __construct($args) {
+    function initialize($args) {
         if(count($args) < 3){
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
                         hsc($args[1])), -1);
@@ -39,7 +39,7 @@ class syntax_plugin_bureaucracy_field_addpage extends syntax_plugin_bureaucracy_
      * Handle a post to the field
      *
      * @param string $value null
-     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid

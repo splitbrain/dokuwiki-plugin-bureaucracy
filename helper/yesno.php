@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_yesno
+ * Class helper_plugin_bureaucracy_fieldyesno
  *
  * Creates a checkbox
  */
-class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldyesno extends helper_plugin_bureaucracy_field {
 
     /**
      * Arguments:
@@ -16,7 +16,7 @@ class syntax_plugin_bureaucracy_field_yesno extends syntax_plugin_bureaucracy_fi
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function __construct($args) {
+    public function initialize($args) {
         $this->init($args);
         $newargs = array();
         foreach ($args as $arg) {

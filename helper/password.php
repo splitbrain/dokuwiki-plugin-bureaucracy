@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_password
+ * Class helper_plugin_bureaucracy_fieldpassword
  *
  * Creates a single line password input field
  */
-class syntax_plugin_bureaucracy_field_password extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldpassword extends helper_plugin_bureaucracy_field {
     /**
      * Arguments:
      *  - cmd
@@ -13,8 +13,8 @@ class syntax_plugin_bureaucracy_field_password extends syntax_plugin_bureaucracy
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    function __construct($args) {
-        parent::__construct($args);
+    function initialize($args) {
+        parent::initialize($args);
 
         $attr = array();
         if(!isset($this->opt['optional'])) {

@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_static
+ * Class helper_plugin_bureaucracy_fieldstatic
  *
  * Adds some static text to the form
  */
-class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldstatic extends helper_plugin_bureaucracy_field {
     protected $tpl = '<p>@@DISPLAY@@</p>';
 
     /**
@@ -14,8 +14,8 @@ class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_f
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function __construct($args) {
-        parent::__construct($args);
+    public function initialize($args) {
+        parent::initialize($args);
         // make always optional to prevent being marked as required
         $this->opt['optional'] = true;
     }
@@ -24,7 +24,7 @@ class syntax_plugin_bureaucracy_field_static extends syntax_plugin_bureaucracy_f
      * Handle a post to the field
      *
      * @param string $value The passed value
-     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid

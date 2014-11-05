@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_select
+ * Class helper_plugin_bureaucracy_fieldselect
  *
  * Creates a dropdown list
  */
-class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldselect extends helper_plugin_bureaucracy_field {
 
     protected $mandatory_args = 3;
 
@@ -17,7 +17,7 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function __construct($args) {
+    public function initialize($args) {
         $this->init($args);
         $this->opt['args'] = array_map('trim', explode('|',array_shift($args)));
         $this->standardArgs($args);
