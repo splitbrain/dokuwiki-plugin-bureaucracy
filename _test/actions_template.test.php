@@ -58,7 +58,10 @@ class syntax_plugin_bureaucracy_action_template_test extends DokuWikiTest {
 
     public function testProcessFields() {
         $data = array();
-        $data[] = new helper_plugin_bureaucracy_fieldstatic(array('text', 'text1'));
+        /** @var helper_plugin_bureaucracy_fieldstatic $staticfield */
+        $staticfield = plugin_load('helper', 'bureaucracy_fieldstatic');
+        $staticfield->initialize(array('text', 'text1'));
+        $data[] = $staticfield;
 
         $action = $this->getTemplateClass();
         $action->prepareFieldReplacements($data, '_', '');
