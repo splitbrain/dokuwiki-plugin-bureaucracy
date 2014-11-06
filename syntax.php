@@ -64,7 +64,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     public function handle($match, $state, $pos, Doku_Handler $handler) {
         $match = substr($match, 6, -7); // remove form wrap
         $lines = explode("\n", $match);
-        $actions = array();
+        $actions = $rawactions = array();
         $thanks = '';
         $labels = '';
 
@@ -85,7 +85,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 // is action element?
                 if($args[0] == 'action') {
                     array_shift($args);
-                    $actions[] = array('type' => array_shift($args), 'argv' => $args);
+                    $rawactions[] = array('type' => array_shift($args), 'argv' => $args);
                     continue;
                 }
 
@@ -108,34 +108,67 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 //name convention: plugin_componentname
                 $name = $args[0];
             }
+
+            /** @deprecated 6-11-2014 rename old field name*/
             if($name == 'bureaucracy_fielddataplugin') {
-                /** @deprecated 6-11-2014 */
                 msg("Please rename the field 'dataplugin' into 'data_aliastextbox'", -1);
                 $name = 'data_aliastextbox';
             }
+
             $field = $this->loadHelper($name, false);
             if($field) {
                 $field->initialize($args);
                 $cmds[] = $field;
             } else {
+                /** @deprecated 6-11-2014 old date plugin installed */
                 if($name == 'data_aliastextbox') {
-                    /** @deprecated 6-11-2014 */
                     msg("Please update the Data plugin for enabling the 'data_aliastextbox' field again (previous known as 'dataplugin' field)", -1);
                 }
+
                 msg(sprintf($this->getLang('e_unknowntype'), hsc($name)), -1);
             }
 
         }
 
-        foreach($actions as $action) {
-            // check if action is available
+        // check if action is available
+        foreach($rawactions as $action) {
             $action['type'] = $this->_sanitizeClassName($action['type']);
-            if(!$action['type'] ||
-                !@file_exists(DOKU_PLUGIN . 'bureaucracy/actions/' . $action['type'] . '.php')
-            ) {
-                msg(sprintf($this->getLang('e_noaction'), $action), -1);
+
+            if(strpos($action['type'], '_') === false) {
+                $action['actionname'] = 'bureaucracy_action' . $action['type'];
+            } else {
+                //name convention for other plugins: plugin_componentname
+                $action['actionname'] = $action['type'];
+            }
+
+            list($plugin, $component) = explode('_', $action['actionname']);
+            $alternativename = $action['type'] . '_'. $action['type'];
+
+            // bureaucracy_action<name> or <plugin>_<componentname>
+            if(!plugin_isdisabled($action['actionname']) || @file_exists(DOKU_PLUGIN . $plugin . '/helper/'  . $component . '.php')) {
+                $actions[] = $action;
+
+            // shortcut for other plugins with component name <name>_<name>
+            } elseif(plugin_isdisabled($alternativename) || !@file_exists(DOKU_PLUGIN . $action['type'] . '/helper/'  . $action['type'] . '.php')) {
+                $action['actionname'] = $alternativename;
+                $actions[] = $action;
+
+            // not found
+            } else {
+                msg(sprintf($this->getLang('e_unknownaction'), hsc($action['actionname'])), -1);
+
+                /** @deprecated 6-11-2014 old date plugin installed */
+                if($action['actionname'] == 'pagemod_pagemod') {
+                    msg("Please update the Pagemod plugin for enabling the 'pagemod_pagemod' field again (previous known as 'pagemod' field)", -1);
+                }
             }
         }
+
+        // action(s) found?
+        if(count($actions) < 1) {
+            msg($this->getLang('e_noaction'), -1);
+        }
+
         // set thank you message
         if(!$thanks) {
             $thanks = "";
@@ -284,9 +317,14 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         $thanks = '';
         foreach($data['actions'] as $actionData) {
-            /** @var syntax_plugin_bureaucracy_action $action */
-            $class = 'syntax_plugin_bureaucracy_action_' . $actionData['type'];
-            $action = new $class();
+            /** @var helper_plugin_bureaucracy_action $action */
+            $action = $this->loadHelper($actionData['actionname'], false);
+
+            // action helper found?
+            if(!$action) {
+                msg(sprintf($this->getLang('e_unknownaction'), hsc($actionData['actionname'])), -1);
+                return false;
+            }
 
             try {
                 $thanks .= $action->run(

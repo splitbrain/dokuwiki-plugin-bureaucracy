@@ -9,7 +9,16 @@
  *
  * @author Michael Klier <chi@chimeric.de>
  */
-class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
+class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
+
+    /**
+     * Return false to prevent DokuWiki reusing instances of the plugin
+     *
+     * @return bool
+     */
+    public function isSingleton() {
+        return false;
+    }
 
     /**
      * Handle the user input [required]
@@ -18,12 +27,12 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      * from the form. Data has to be grabbed from $_POST['bureaucracy'] using
      * the indicies in the 'idx' members of the $data items.
      *
-     * @param array  $fields    - the list of fields in the form
-     * @param string $thanks    - the thank you message as defined in the form
-     *                            or default one. Might be modified by the action
-     *                            before returned
-     * @param array  $argv      - additional arguments passed to the action
-     * @return mixed            - false on error, $thanks on success
+     * @param helper_plugin_bureaucracy_field[] $fields the list of fields in the form
+     * @param string                            $thanks the thank you message as defined in the form
+     *                                                  or default one. Might be modified by the action
+     *                                                  before returned
+     * @param array                             $argv   additional arguments passed to the action
+     * @return bool|string false on error, $thanks on success
      */
     public function run($fields, $thanks, $argv){
         msg('ERROR: called action %s did not implement a run() function');
@@ -88,6 +97,26 @@ class syntax_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
             //field replacements
             $this->prepareFieldReplacement($label, $value);
         }
+    }
+
+    /**
+     * Available methods
+     *
+     * @return array
+     */
+    public function getMethods() {
+        $result = array();
+        $result[] = array(
+            'name' => 'run',
+            'desc' => 'Handle the user input',
+            'params' => array(
+                'fields' => 'helper_plugin_bureaucracy_field[]',
+                'thanks' => 'string',
+                'argv'   => 'array'
+            ),
+            'return' => array('false on error, thanks message on success' => 'bool|string')
+        );
+        return $result;
     }
 
 }

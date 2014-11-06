@@ -72,7 +72,7 @@ class syntax_plugin_bureaucracy_action_template_test extends DokuWikiTest {
     }
 
     private function getTemplateClass() {
-        $class = new syntax_plugin_bureaucracy_action_template();
+        $class = new helper_plugin_bureaucracy_actiontemplate();
         $class->patterns = array();
         $class->values = array();
         $class->targetpages = array();
