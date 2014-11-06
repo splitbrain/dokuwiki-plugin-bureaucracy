@@ -71,13 +71,17 @@ class syntax_plugin_bureaucracy_action_template_test extends DokuWikiTest {
         $this->assertEmpty($action->targetpages);
     }
 
+    /**
+     * @return helper_plugin_bureaucracy_actiontemplate
+     */
     private function getTemplateClass() {
-        $class = new helper_plugin_bureaucracy_actiontemplate();
-        $class->patterns = array();
-        $class->values = array();
-        $class->targetpages = array();
-        $class->pagename = array();
-        return $class;
+        /** @var helper_plugin_bureaucracy_actiontemplate $templateaction */
+        $templateaction = plugin_load('helper', 'bureaucracy_actiontemplate');
+        $templateaction->patterns = array();
+        $templateaction->values = array();
+        $templateaction->targetpages = array();
+        $templateaction->pagename = array();
+        return $templateaction;
     }
 
 
