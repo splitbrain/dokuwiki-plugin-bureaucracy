@@ -101,13 +101,28 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                     continue;
                 }
             }
-            $name = 'bureaucracy_field' . $args[0];
+
+            if(strpos($args[0], '_') === false) {
+                $name = 'bureaucracy_field' . $args[0];
+            } else {
+                //name convention: plugin_componentname
+                $name = $args[0];
+            }
+            if($name == 'bureaucracy_fielddataplugin') {
+                /** @deprecated 6-11-2014 */
+                msg("Please rename the field 'dataplugin' into 'data_aliastextbox'", -1);
+                $name = 'data_aliastextbox';
+            }
             $field = $this->loadHelper($name, false);
             if($field) {
                 $field->initialize($args);
                 $cmds[] = $field;
             } else {
-                print_r($field);
+                if($name == 'data_aliastextbox') {
+                    /** @deprecated 6-11-2014 */
+                    msg("Please update the Data plugin for enabling the 'data_aliastextbox' field again (previous known as 'dataplugin' field)", -1);
+                }
+                msg(sprintf($this->getLang('e_unknowntype'), hsc($name)), -1);
             }
 
         }
