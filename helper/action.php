@@ -100,6 +100,24 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
     }
 
     /**
+     * Returns ACL access level of the user or the (virtual) 'runas' user
+     *
+     * @param string $id pageid
+     * @return int
+     */
+    protected function aclcheck($id) {
+        $runas = $this->getConf('runas');
+
+        if($runas) {
+            $auth = auth_aclcheck($id, $runas, array());
+        } else {
+            $auth = auth_quickaclcheck($id);
+        }
+        return $auth;
+
+    }
+
+    /**
      * Available methods
      *
      * @return array

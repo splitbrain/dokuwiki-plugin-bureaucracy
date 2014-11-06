@@ -353,24 +353,6 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
     }
 
     /**
-     * Returns ACL access level of the user or the (virtual) 'runas' user
-     *
-     * @param string $id pageid
-     * @return int
-     */
-    protected function aclcheck($id) {
-        $runas = $this->getConf('runas');
-
-        if($runas) {
-            $auth = auth_aclcheck($id, $runas, array());
-        } else {
-            $auth = auth_quickaclcheck($id);
-        }
-        return $auth;
-
-    }
-
-    /**
      * Load page data and do default pattern replacements like namespace templates do
      * and add it to list of targetpages
      *
