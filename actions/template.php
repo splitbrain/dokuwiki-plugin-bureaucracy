@@ -92,7 +92,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
      */
     function getAdditionalTargetpages($fields) {
         global $ID;
-        //$ns = getNS($ID);
+        $ns = getNS($ID);
 
         foreach ($fields as $field) {
             if (!is_null($field->getParam('page_tpl')) && !is_null($field->getParam('page_tgt')) ) {
@@ -102,7 +102,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
                 //target
                 $relativetargetpage = $field->getParam('page_tgt');
-                //resolve_pageid($ns, $relativeTargetPageid, $ignored);
+                resolve_pageid($ns, $relativeTargetPageid, $ignored);
                 $targetpage = "$this->pagename:$relativetargetpage";
 
                 $auth = $this->aclcheck($templatepage); // runas
