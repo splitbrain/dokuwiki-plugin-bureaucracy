@@ -35,8 +35,9 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
      *
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
+     * @params int       $formid unique identifier of the form which contains this field
      */
-    function renderfield($params, Doku_Form $form) {
+    function renderfield($params, Doku_Form $form, $formid) {
         $form->startFieldset(hsc($this->getParam('display')));
         if (isset($this->depends_on)) {
             $dependencies = array_map('hsc',(array) $this->depends_on);
@@ -57,23 +58,19 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
      *
      * When fieldset is closed, set containing fields to hidden
      *
-     * @param array $params
-     *  for a fieldset $params is an array of the entries:
-     *    [0] null  field value of fieldset always empty
-     *    [1] int   $my_id index number of field
-     *    [2] array $fields the form fields
-     * @return bool true
+     * @param null $value field value of fieldset always empty
+     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param int    $index  index number of field in form
+     * @param int    $formid unique identifier of the form which contains this field
+     * @return bool Whether the passed value is valid
      */
-    public function handle_post(&$params) {
-        $my_id = $params[1];
-        /** @var syntax_plugin_bureaucracy_field[] $fields  */
-        $fields = &$params[2];
-
+    public function handle_post($value, &$fields, $index, $formid) {
         if(!isset($this->depends_on)) {
             return true;
         }
+
         $hidden = false;
-        for ($n = 0 ; $n < $my_id; ++$n) {
+        for ($n = 0 ; $n < $index; ++$n) {
             $field = $fields[$n];
             if ($field->getParam('label') != $this->depends_on[0]) {
                 continue;
@@ -85,7 +82,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
         }
         if ($hidden) {
             $this->hidden = true;
-            for ($n = $my_id + 1 ; $n < count($fields) ; ++$n) {
+            for ($n = $index + 1 ; $n < count($fields) ; ++$n) {
                 $field = $fields[$n];
                 if ($field->getFieldType() === 'fieldset') {
                     break;

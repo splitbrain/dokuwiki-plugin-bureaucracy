@@ -12,5 +12,6 @@ class syntax_plugin_bureaucracy_field_onoff extends syntax_plugin_bureaucracy_fi
      *  - label
      *  - =yesvalue
      *  - !falsevalue
+     *  - ^ (optional)
      */
 }

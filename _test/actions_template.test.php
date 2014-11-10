@@ -61,18 +61,18 @@ class syntax_plugin_bureaucracy_action_template_test extends DokuWikiTest {
         $data[] = new syntax_plugin_bureaucracy_field_static(array('text', 'text1'));
 
         $action = $this->getTemplateClass();
-        $action->processFields($data, '_', '');
+        $action->prepareFieldReplacements($data, '_', '');
 
         $this->assertEquals('/(@@|##)text1(?:\|(.*?))\1/si', $action->patterns['text1']);
         $this->assertEquals('$2', $action->values['text1']);
-        $this->assertEmpty($action->templates);
+        $this->assertEmpty($action->targetpages);
     }
 
     private function getTemplateClass() {
         $class = new syntax_plugin_bureaucracy_action_template();
         $class->patterns = array();
         $class->values = array();
-        $class->templates = array();
+        $class->targetpages = array();
         $class->pagename = array();
         return $class;
     }

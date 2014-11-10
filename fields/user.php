@@ -11,6 +11,7 @@ class syntax_plugin_bureaucracy_field_user extends syntax_plugin_bureaucracy_fie
      * Arguments:
      *  - cmd
      *  - label
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */

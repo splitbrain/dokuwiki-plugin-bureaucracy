@@ -20,8 +20,9 @@ class syntax_plugin_bureaucracy_field_hidden extends syntax_plugin_bureaucracy_f
      *
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
+     * @params int       $formid unique identifier of the form which contains this field
      */
-    function renderfield($params, $form) {
+    function renderfield($params, $form, $formid) {
         $this->_handlePreload();
         $form->addHidden($params['name'], $this->getParam('value') . '');
     }

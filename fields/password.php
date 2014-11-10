@@ -9,6 +9,7 @@ class syntax_plugin_bureaucracy_field_password extends syntax_plugin_bureaucracy
      * Arguments:
      *  - cmd
      *  - label
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */
@@ -19,6 +20,6 @@ class syntax_plugin_bureaucracy_field_password extends syntax_plugin_bureaucracy
         if(!isset($this->opt['optional'])) {
             $attr['required'] = 'required';
         }
-        $this->tpl = form_makePasswordField('@@NAME@@', '@@DISPLAY@@', '', '@@CLASS@@', $attr);
+        $this->tpl = form_makePasswordField('@@NAME@@', '@@DISPLAY@@', '@@ID@@', '@@CLASS@@', $attr);
     }
 }

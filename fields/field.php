@@ -89,14 +89,21 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 $this->setVal(substr($arg,1));
             } elseif ($arg == '!') {
                 $this->opt['optional'] = true;
+            } elseif ($arg == '^') {
+                //only one field has focus
+                if (syntax_plugin_bureaucracy_field::hasFocus()) {
+                    $this->opt['id'] = 'focus__this';
+                }
             } elseif($arg == '@') {
                 $this->opt['pagename'] = true;
             } elseif($arg == '@@') {
                 $this->opt['replyto'] = true;
             } elseif(preg_match('/x\d/', $arg)) {
                 $this->opt['rows'] = substr($arg,1);
-            } elseif($arg[0] == '.'){
-                $this->opt['class'] = substr($arg,1);
+            } elseif($arg[0] == '.') {
+                $this->opt['class'] = substr($arg, 1);
+            } elseif(preg_match('/0{2,}/', $arg)) {
+                $this->opt['leadingzeros'] = strlen($arg);
             } else {
                 $t = $arg[0];
                 $d = substr($arg,1);
@@ -128,8 +135,9 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
+     * @params int       $formid unique identifier of the form which contains this field
      */
-    public function renderfield($params, Doku_Form $form) {
+    public function renderfield($params, Doku_Form $form, $formid) {
         $this->_handlePreload();
         if(!$form->_infieldset){
             $form->startFieldset('');
@@ -140,6 +148,21 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
 
         $params = array_merge($this->opt, $params);
         $form->addElement($this->_parse_tpl($this->tpl, $params));
+    }
+
+    /**
+     * Only the first use get the focus, next calls not
+     *
+     * @return bool
+     */
+    protected static function hasFocus(){
+        static $focus = true;
+        if($focus) {
+            $focus = false;
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
@@ -160,11 +183,13 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * (Overridden by fieldset, which has as argument an array with the form array by reference)
      *
-     * @param string $value The passed value or array or null if none given
-     * @return bool|array Whether the passed value is valid; Fieldsets return
-     *                    an array specifying their dependency state.
+     * @param string $value  The passed value or array or null if none given
+     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param int    $index  index number of field in form
+     * @param int    $formid unique identifier of the form which contains this field
+     * @return bool Whether the passed value is valid
      */
-    public function handle_post(&$value) {
+    public function handle_post($value, &$fields, $index, $formid) {
         return $this->hidden || $this->setVal($value);
     }
 

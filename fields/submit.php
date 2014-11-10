@@ -13,6 +13,7 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
      * Arguments:
      *  - cmd
      *  - label (optional)
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */
@@ -27,7 +28,7 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
      *
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
-     * @params int       $formid
+     * @params int       $formid unique identifier of the form which contains this field
      */
     public function renderfield($params, Doku_Form $form, $formid) {
         if(!isset(syntax_plugin_bureaucracy_field_submit::$captcha_displayed[$formid])) {
@@ -39,8 +40,12 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
                 $form->addElement($helper->getHTML());
             }
         }
-        $this->tpl = form_makeButton('submit','', '@@DISPLAY|' . $this->getLang('submit') . '@@');
-        parent::renderfield($params, $form);
+        $attr = array();
+        if(isset($this->opt['id'])) {
+            $attr['id'] = $this->opt['id'];
+        }
+        $this->tpl = form_makeButton('submit','', '@@DISPLAY|' . $this->getLang('submit') . '@@', $attr);
+        parent::renderfield($params, $form, $formid);
     }
 
     /**
@@ -49,10 +54,12 @@ class syntax_plugin_bureaucracy_field_submit extends syntax_plugin_bureaucracy_f
      * Accepts and validates a posted captcha value.
      *
      * @param string $value The passed value
-     * @param int    $formid
+     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param int    $index  index number of field in form
+     * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the posted form has a valid captcha
      */
-    public function handle_post(&$value, $formid) {
+    public function handle_post($value, &$fields, $index, $formid) {
         if ($this->hidden) {
             return true;
         }

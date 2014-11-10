@@ -4,7 +4,7 @@
  *
  * Creates a dropdown list
  */
-class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_field {
+class syntax_plugin_bureaucracy_field_radio extends syntax_plugin_bureaucracy_field {
 
     protected $mandatory_args = 3;
 
@@ -19,11 +19,8 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
      */
     public function __construct($args) {
         $this->init($args);
-        $this->opt['args'] = array_map('trim', explode('|',array_shift($args)));
+        $this->opt['args'] = array_filter(array_map('trim', explode('|',array_shift($args))));
         $this->standardArgs($args);
-        if (!isset($this->opt['value']) && isset($this->opt['optional'])) {
-            array_unshift($this->opt['args'],' ');
-        }
     }
 
     /**
@@ -45,17 +42,29 @@ class syntax_plugin_bureaucracy_field_select extends syntax_plugin_bureaucracy_f
             $params['class'] = 'bureaucracy_error';
         }
         $params = array_merge($this->opt, $params);
-        $form->addElement(call_user_func_array('form_makeListboxField',
-                                                $this->_parse_tpl(
-                                                    array(
-                                                        '@@NAME@@',
-                                                        $params['args'],
-                                                        '@@VALUE|' . $params['args'][0] . '@@',
-                                                        '@@DISPLAY@@',
-                                                        '@@ID@@',
-                                                        '@@CLASS@@'
-                                                    ),
-                                                    $params
-                                                )));
+
+        list($name, $entries, $value, $id, $class) = $this->_parse_tpl(
+            array(
+                '@@NAME@@',
+                $params['args'],
+                '@@VALUE|' . $params['args'][0] . '@@',
+                '@@ID@@',
+                '@@CLASS@@'
+            ),
+            $params
+        );
+
+         $value = (array_key_exists($value, $entries)) ? $value : key($entries);
+
+        foreach($entries as $val) {
+            if($value === $val) {
+                $attrs = array('checked' => 'checked');
+                $_id = $id;
+            } else {
+                $attrs = array();
+                $_id = '';
+            }
+            $form->addElement(form_makeRadioField($name, $val, $val, $_id, $class, $attrs));
+        }
     }
 }

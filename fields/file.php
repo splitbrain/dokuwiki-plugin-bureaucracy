@@ -9,6 +9,7 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
      * Arguments:
      *  - cmd
      *  - label
+     *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */
@@ -20,7 +21,7 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
             $attr['required'] = 'required';
         }
 
-        $this->tpl = form_makeFileField('@@NAME@@', '@@DISPLAY@@', '', '@@CLASS@@', $attr);
+        $this->tpl = form_makeFileField('@@NAME@@', '@@DISPLAY@@', '@@ID@@', '@@CLASS@@', $attr);
     }
 
     /**
@@ -29,12 +30,15 @@ class syntax_plugin_bureaucracy_field_file extends syntax_plugin_bureaucracy_fie
      * Accepts and validates a posted value.
      *
      * @param array $value The passed value or array or null if none given
-     * @return bool|array Whether the passed filename is valid
+     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param int    $index  index number of field in form
+     * @param int    $formid unique identifier of the form which contains this field
+     * @return bool Whether the passed filename is valid
      */
-    public function handle_post(&$value) {
+    public function handle_post($value, &$fields, $index, $formid) {
         $this->opt['file'] = $value;
 
-        return parent::handle_post($value['name']);
+        return parent::handle_post($value['name'], $fields, $index, $formid);
     }
 
     /**

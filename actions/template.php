@@ -7,7 +7,7 @@
 
 class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucracy_action {
 
-    var $templates;
+    var $targetpages;
     var $pagename;
 
     /**
@@ -28,23 +28,28 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
         $this->patterns = array();
         $this->values   = array();
-        $this->templates = array();
+        $this->targetpages = array();
 
+        $this->prepareNamespacetemplateReplacements();
+        $this->prepareDateTimereplacements();
         $this->prepareLanguagePlaceholder();
         $this->prepareNoincludeReplacement();
-        $this->processFields($fields, $sep);
-        $this->buildTargetPageName();
-        $this->resolveTemplates();
-        $tpl = $this->getTemplates($tpl);
+        $this->prepareFieldReplacements($fields);
 
-        if(empty($this->templates)) {
+        $this->buildTargetPagename($fields, $sep);
+
+        //target&template(s) from addpage fields
+        $this->getAdditionalTargetpages($fields);
+        //target&template(s) from action field
+        $tpl = $this->getActionTargetpages($tpl);
+
+        if(empty($this->targetpages)) {
             throw new Exception(sprintf($this->getLang('e_template'), $tpl));
         }
 
         $this->checkTargetPageNames();
-        
+
         $this->processUploads($fields);
-        
         $this->replaceAndSavePages();
 
         $ret = $this->buildThankYouPage($thanks);
@@ -53,50 +58,26 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * - Generate field replacements
-     * - Handle page names (additional pages via addpage)
+     * Prepare and resolve target page
      *
      * @param syntax_plugin_bureaucracy_field[]  $fields  List of field objects
      * @param string                             $sep     Separator between fields for page id
-     * @return array
+     * @throws Exception missing pagename
      */
-    function processFields($fields, $sep) {
+    protected function buildTargetPagename($fields, $sep) {
+        global $ID;
+
         foreach ($fields as $field) {
-            $label = $field->getParam('label');
-            $value = $field->getParam('value');
-
-            //field replacements
-            $this->prepareFieldReplacements($label, $value);
-
-            // handle pagenames
             $pname = $field->getParam('pagename');
             if (!is_null($pname)) {
                 $this->pagename .= $sep . $pname;
             }
-
-
-            if (!is_null($field->getParam('page_tpl')) && !is_null($field->getParam('page_tgt')) ) {
-                $page_tpl = $this->replaceDefault($field->getParam('page_tpl'));
-
-                $auth = $this->aclcheck($page_tpl);
-                if ($auth >= AUTH_READ ) {
-                    $this->templates[$field->getParam('page_tgt')] = $this->replace(array(), array(), rawWiki($page_tpl));
-                }
-            }
         }
-    }
 
-    /**
-     * Prepare and resolve target page
-     *
-     * @throws Exception missing pagename
-     */
-    protected function buildTargetPageName() {
-        global $ID;
+        $this->pagename = $this->replace($this->pagename);
 
-        $this->pagename = $this->replaceDefault($this->pagename);
         $myns = getNS($ID);
-        resolve_pageid($myns, $this->pagename, $junk); // resolve relatives
+        resolve_pageid($myns, $this->pagename, $ignored); // resolve relatives
 
         if ($this->pagename === '') {
             throw new Exception($this->getLang('e_pagename'));
@@ -104,40 +85,55 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     }
 
     /**
-     * Resolve pageids of target pages
+     * Handle templates from addpage field
+     *
+     * @param syntax_plugin_bureaucracy_field[]  $fields  List of field objects
+     * @return array
      */
-    protected function resolveTemplates() {
+    function getAdditionalTargetpages($fields) {
         global $ID;
-
-        $_templates = array();
         $ns = getNS($ID);
-        foreach ($this->templates as $k => $v) {
-            resolve_pageid($ns, $k, $ignored); // resolve template
-            $_templates[cleanID("$this->pagename:$k")] = $v; // $this->pagename is already resolved
+
+        foreach ($fields as $field) {
+            if (!is_null($field->getParam('page_tpl')) && !is_null($field->getParam('page_tgt')) ) {
+                //template
+                $templatepage = $this->replace($field->getParam('page_tpl'));
+                resolve_pageid(getNS($ID), $templatepage, $ignored);
+
+                //target
+                $relativetargetpage = $field->getParam('page_tgt');
+                resolve_pageid($ns, $relativeTargetPageid, $ignored);
+                $targetpage = "$this->pagename:$relativetargetpage";
+
+                $auth = $this->aclcheck($templatepage); // runas
+                if ($auth >= AUTH_READ ) {
+                    $this->addParsedTargetpage($targetpage, $templatepage);
+                }
+            }
         }
-        $this->templates = $_templates;
     }
 
     /**
-     * Load template(s) given via action field
+     * Load template(s) for targetpage as given via action field
      *
      * @param string $tpl    template name as given in form
-     * @return string template
+     * @return string parsed templatename
      */
-    protected function getTemplates($tpl) {
+    protected function getActionTargetpages($tpl) {
         global $USERINFO;
         global $conf;
+        global $ID;
         $runas = $this->getConf('runas');
 
         if ($tpl == '_') {
             // use namespace template
-            if (!isset($this->templates[$this->pagename])) {
-                $this->templates[$this->pagename] = pageTemplate(array($this->pagename));
+            if (!isset($this->targetpages[$this->pagename])) {
+                $this->targetpages[$this->pagename] = pageTemplate(array($this->pagename));
             }
         } elseif ($tpl !== '!') {
-            $tpl = $this->replaceDefault($tpl);
+            $tpl = $this->replace($tpl);
+            resolve_pageid(getNS($ID), $tpl, $ignored);
 
-            // Namespace link
             $backup = array();
             if ($runas) {
                 // Hack user credentials.
@@ -145,7 +141,9 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
                 $_SERVER['REMOTE_USER'] = $runas;
                 $USERINFO['grps'] = array();
             }
+
             $template_pages = array();
+            //search checks acl (as runas)
             $opts = array(
                 'depth' => 0,
                 'listfiles' => true,
@@ -155,26 +153,22 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
             foreach ($template_pages as $template_page) {
                 $templatepageid = cleanID($template_page['id']);
-                $newpageid = preg_replace('/^' . preg_quote_cb(cleanID($tpl)) . '($|:)/', $this->pagename . '$1', $templatepageid);
-                if ($newpageid === $templatepageid) {
-                    // When using a single-page template, ignore other pages
-                    // in the same namespace.
+                // try to replace $tpl path with $this->pagename path in the founded $templatepageid
+                // - a single-page template will only match on itself and will be replaced,
+                //   other newtargets are pages in same namespace, so aren't changed
+                // - a namespace as template will match at the namespaces-part of the path of pages in this namespace
+                //   so these newtargets are changed
+                // if there exist a single-page and a namespace with name $tpl, both are selected
+                $newTargetpageid = preg_replace('/^' . preg_quote_cb(cleanID($tpl)) . '($|:)/', $this->pagename . '$1', $templatepageid);
+
+                if ($newTargetpageid === $templatepageid) {
+                    // only a single-page template or page in the namespace template
+                    // which matches the $tpl path are changed
                     continue;
                 }
 
-                if (!isset($this->templates[$newpageid])) {
-                    // load page data and do default pattern replacements like
-                    // namespace templates do
-                    $data = array(
-                        'id' => $newpageid,
-                        'tpl' => rawWiki($templatepageid),
-                        'doreplace' => true,
-                    );
-                    parsePageTemplate($data);
-                    $this->templates[$newpageid] = $this->replace(
-                        array('__lang__' => $this->patterns['__lang__'], '__trans__' => $this->patterns['__trans__']),
-                        array('__lang__' => $this->values['__lang__'], '__trans__' => $this->values['__trans__']),
-                        $data['tpl'], false);
+                if (!isset($this->targetpages[$newTargetpageid])) {
+                    $this->addParsedTargetpage($newTargetpageid, $templatepageid);
                 }
             }
 
@@ -193,7 +187,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
      * @throws Exception
      */
     protected function checkTargetPageNames() {
-        foreach (array_keys($this->templates) as $pname) {
+        foreach (array_keys($this->targetpages) as $pname) {
             // prevent overriding already existing pages
             if (page_exists($pname)) {
                 throw new Exception(sprintf($this->getLang('e_pageexists'), html_wikilink($pname)));
@@ -208,10 +202,14 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
 
     /**
      * Perform replacements on the collected templates, and save the pages.
+     *
+     * Note: wrt runas, for changelog are used:
+     *  - $INFO['userinfo']['name']
+     *  - $INPUT->server->str('REMOTE_USER')
      */
     protected function replaceAndSavePages() {
         global $ID;
-        foreach ($this->templates as $pageName => $template) {
+        foreach ($this->targetpages as $pageName => $template) {
             // set NSBASE var to make certain dataplugin constructs easier
             $this->patterns['__nsbase__'] = '/@NSBASE@/';
             $this->values['__nsbase__'] = noNS(getNS($pageName));
@@ -219,7 +217,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             // save page
             saveWikiText(
                 $pageName,
-                cleanText($this->replaceDefault($template, false)),
+                cleanText($this->replace($template, false)),
                 sprintf($this->getLang('summary'), $ID)
             );
         }
@@ -237,7 +235,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
      * greater than zero if the first argument is considered to be
      * respectively less than, equal to, or greater than the second.
      */
-    public function _sort($a, $b) {
+    public function _sorttargetpages($a, $b) {
         $ns_diff = substr_count($a, ':') - substr_count($b, ':');
         return ($ns_diff === 0) ? strcmp($a, $b) : ($ns_diff > 0 ? -1 : 1);
     }
@@ -266,12 +264,14 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
      */
     protected function buildThankYouPage($thanks) {
         global $ID;
-        $ret = "<p>$thanks</p>";
-        // Build result tree
-        $pages = array_keys($this->templates);
-        usort($pages, array($this, '_sort'));
+        $backupID = $ID;
 
-        $oldid = $ID;
+        $html = "<p>$thanks</p>";
+
+        // Build result tree
+        $pages = array_keys($this->targetpages);
+        usort($pages, array($this, '_sorttargetpages'));
+
         $data = array();
         $last_folder = array();
         foreach ($pages as $ID) {
@@ -288,10 +288,10 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             }
             $data[] = array('id' => $ID, 'level' => 1 + substr_count($ID, ':'), 'type' => 'f');
         }
-        $ret .= html_buildlist($data, 'idx', array($this, 'html_list_index'), 'html_li_index');
+        $html .= html_buildlist($data, 'idx', array($this, 'html_list_index'), 'html_li_index');
 
         // Add indexer bugs for every just-created page
-        $ret .= '<div class="no">';
+        $html .= '<div class="no">';
         ob_start();
         foreach ($pages as $ID) {
             // indexerWebBug uses ID and INFO[exists], but the bureaucracy form
@@ -303,15 +303,16 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             // any used plugins are initialized (eg. the do plugin)
             echo '<iframe src="' . wl($ID, array('do' => 'export_html')) . '" width="1" height="1" style="visibility:hidden"></iframe>';
         }
-        $ret .= ob_get_contents();
+        $html .= ob_get_contents();
         ob_end_clean();
-        $ID = $oldid;
-        $ret .= '</div>';
-        return $ret;
+        $html .= '</div>';
+
+        $ID = $backupID;
+        return $html;
     }
     
     /**
-     * move the files to <pagename>:FILENAME 
+     * move the uploaded files to <pagename>:FILENAME
      *
      *
      * @param syntax_plugin_bureaucracy_field[] $fields
@@ -335,7 +336,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $id = $ns.':'.$file['name'];
             $id = cleanID($id);
 
-            $auth = $this->aclcheck($id);
+            $auth = $this->aclcheck($id); // runas
 
             $res = media_save(
                 array('name' => $file['tmp_name']),
@@ -354,7 +355,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     /**
      * Returns ACL access level of the user or the (virtual) 'runas' user
      *
-     * @param string $id
+     * @param string $id pageid
      * @return int
      */
     protected function aclcheck($id) {
@@ -367,6 +368,39 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
         }
         return $auth;
 
+    }
+
+    /**
+     * Load page data and do default pattern replacements like namespace templates do
+     * and add it to list of targetpages
+     *
+     * Note: for runas the values of the real user are used for the placeholders
+     *       @NAME@ => $USERINFO['name']
+     *       @MAIL@ => $USERINFO['mail']
+     *       and the replaced value:
+     *       @USER@ => $INPUT->server->str('REMOTE_USER')
+     *
+     * @param string $targetpageid   pageid of destination
+     * @param string $templatepageid pageid of template for this targetpage
+     */
+    protected function addParsedTargetpage($targetpageid, $templatepageid) {
+        $data = array(
+            'id' => $targetpageid,
+            'tpl' => rawWiki($templatepageid),
+            'doreplace' => true,
+        );
+        parsePageTemplate($data);
+
+        //collect and apply some other replacements
+        $patterns = array();
+        $values = array();
+        $keys = array('__lang__', '__trans__', '__year__', '__month__', '__day__', '__time__');
+        foreach($keys as $key) {
+            $patterns[$key] = $this->patterns[$key];
+            $values[$key] = $this->values[$key];
+        }
+
+        $this->targetpages[$targetpageid] = preg_replace($patterns, $values, $data['tpl']);
     }
 
 }

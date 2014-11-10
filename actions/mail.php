@@ -9,6 +9,7 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
     protected $_mail_text = '';
     protected $subject = '';
     protected $replyto = array();
+    protected $mailtemplate = '';
 
     /**
      * Build a nice email from the submitted data and send it
@@ -25,30 +26,55 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
 
         $mail = new Mailer();
 
+        $this->prepareNamespacetemplateReplacements();
+        $this->prepareDateTimereplacements();
         $this->prepareLanguagePlaceholder();
+        $this->prepareNoincludeReplacement();
+        $this->prepareFieldReplacements($fields);
 
         //set default subject
-        $this->subject = sprintf($this->getLang('mailsubject'),$ID);
+        $this->subject = sprintf($this->getLang('mailsubject'), $ID);
 
-        $this->_mail_text .=  sprintf($this->getLang('mailintro')."\n\n", dformat());
-        $this->_mail_html .=  sprintf($this->getLang('mailintro')."<br><br>", dformat());
+        //build html&text table, collect replyto and subject
+        list($table_html, $table_text) = $this->processFieldsBuildTable($fields, $mail);
 
-        $this->buildTables($fields, $mail);
+        //Body
+        if($this->mailtemplate) {
+            //show template
+            $this->patterns['__tablehtml__'] = '/@TABLEHTML@/';
+            $this->patterns['__tabletext__'] = '/@TABLETEXT@/';
+            $this->values['__tablehtml__'] = $table_html;
+            $this->values['__tabletext__'] = $table_text;
 
-        $this->subject = $this->replaceDefault($this->subject);
+            list($this->_mail_html, $this->_mail_text) = $this->getContent();
 
+        } else {
+            //show simpel listing
+            $this->_mail_html .= sprintf($this->getLang('mailintro')."<br><br>", dformat());
+            $this->_mail_html .= $table_html;
+
+            $this->_mail_text .= sprintf($this->getLang('mailintro')."\n\n", dformat());
+            $this->_mail_text .= $table_text;
+        }
+        $mail->setBody($this->_mail_text,null,null,$this->_mail_html);
+
+        // Reply-to
         if(!empty($this->replyto)) {
             $replyto = $mail->cleanAddress($this->replyto);
             $mail->setHeader('Reply-To', $replyto, false);
         }
 
-        $to = $this->replaceDefault(implode(',',$argv)); // get recipient address(es)
+        // To
+        $to = $this->replace(implode(',',$argv)); // get recipient address(es)
         $to = $mail->cleanAddress($to);
         $mail->to($to);
-        $mail->from($conf['mailfrom']);
-        $mail->subject($this->subject);
-        $mail->setBody($this->_mail_text,null,null,$this->_mail_html);
 
+        // From
+        $mail->from($conf['mailfrom']);
+
+        // Subject
+        $this->subject = $this->replace($this->subject);
+        $mail->subject($this->subject);
 
         if(!$mail->send()) {
             throw new Exception($this->getLang('e_mail'));
@@ -58,35 +84,49 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
 
     /**
      * Create html and plain table of the field
+     * and collect values for subject and replyto
      *
      * @param syntax_plugin_bureaucracy_field[] $fields
      * @param Mailer $mail
+     * @return array of html and text table
      */
-    protected function buildTables($fields, $mail) {
-        $this->_mail_html .= '<table>';
+    protected function processFieldsBuildTable($fields, $mail) {
+        global $ID;
+
+        $table_html = '<table>';
+        $table_text = '';
 
         foreach($fields as $field) {
+            $html = $text = '';
             $value = $field->getParam('value');
             $label = $field->getParam('label');
 
             switch($field->getFieldType()) {
                 case 'fieldset':
-                    $this->mail_addRow($label);
+                    list($html, $text) = $this->mail_buildRow($label);
                     break;
                 case 'file':
                     $file = $field->getParam('file');
                     if(!$file['size']) {
-                        $this->mail_addRow($label, $this->getLang('attachmentMailEmpty'));
+                        $message = $this->getLang('attachmentMailEmpty');
                     } else if($file['size'] > $this->getConf('maxEmailAttachmentSize')) {
-                        $this->mail_addRow($label, $file['name'] . ' ' . $this->getLang('attachmentMailToLarge'));
+                        $message = $file['name'] . ' ' . $this->getLang('attachmentMailToLarge');
                     } else {
-                        $this->mail_addRow($label, $file['name']);
+                        $message = $file['name'];
                         $mail->attachFile($file['tmp_name'], $file['type'], $file['name']);
                     }
+                    list($html, $text) = $this->mail_buildRow($label, $message);
                     break;
                 case 'subject':
                     $this->subject = $label;
                     break;
+                case 'usemailtemplate':
+                    if (!is_null($field->getParam('template')) ) {
+                        $this->mailtemplate = $this->replace($field->getParam('template'));
+                        resolve_pageid(getNS($ID), $this->mailtemplate, $ignored);
+                    }
+                    break;
+
                 /** @noinspection PhpMissingBreakStatementInspection */
                 case 'email':
                     if(!is_null($field->getParam('replyto'))) {
@@ -95,28 +135,59 @@ class syntax_plugin_bureaucracy_action_mail extends syntax_plugin_bureaucracy_ac
                 /** fall through */
                 default:
                     if($value === null || $label === null) break;
-                    $this->mail_addRow($label, $value);
+                    list($html, $text) = $this->mail_buildRow($label, $value);
             }
-
-            $this->prepareFieldReplacements($label, $value);
+            $table_html .= $html;
+            $table_text .= $text;
         }
-        $this->_mail_html .= '</table>';
+        $table_html .= '</table>';
+
+        return array($table_html, $table_text);
     }
 
     /**
-     * Add a row
+     * Build a row
      *
      * @param $column1
      * @param null $column2
+     * @return array of html and text row
      */
-    protected function mail_addRow($column1,$column2=null) {
+    protected function mail_buildRow($column1,$column2=null) {
         if($column2 === null) {
-            $this->_mail_html .= '<tr><td colspan="2"><u>'.hsc($column1).'<u></td></tr>';
-            $this->_mail_text .= "\n=====".$column1.'=====';
+            $html = '<tr><td colspan="2"><u>'.hsc($column1).'<u></td></tr>';
+            $text = "\n=====".$column1.'=====';
         } else {
-            $this->_mail_html .= '<tr><td><b>'.hsc($column1).'<b></td><td>'.hsc($column2).'</td></tr>';
-            $this->_mail_text .= "\n $column1 \t\t $column2";
+            $html = '<tr><td><b>'.hsc($column1).'<b></td><td>'.hsc($column2).'</td></tr>';
+            $text = "\n $column1 \t\t $column2";
         }
+        return array($html, $text);
+    }
+
+    /**
+     * Parse mail template in html and text, and perform replacements
+     *
+     * @return array html and text content
+     */
+    protected function getContent() {
+        $content = rawWiki($this->mailtemplate);
+        $html = '';
+        $text = '';
+
+        if(preg_match_all('#<code\b(.*?)>(.*?)</code>#is', $content, $matches)) {
+            foreach($matches[1] as $index => $codeoptions) {
+                list($syntax,) = explode(' ', trim($codeoptions), 2);
+                if($syntax == 'html') {
+                    $html = $matches[2][$index];
+                }
+                if($syntax == 'text' || $syntax == '') {
+                    $text = $matches[2][$index];
+                }
+            }
+        }
+        return array(
+            $this->replace($html),
+            $this->replace($text)
+        );
     }
 }
 // vim:ts=4:sw=4:et:enc=utf-8:

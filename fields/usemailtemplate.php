@@ -1,28 +1,27 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_addpage
+ * Class syntax_plugin_bureaucracy_field_usemailtemplate
  *
- * Adds another page page_tgt based on a template page page_tpl only for use with the template action
+ * Adds a template only for use with the mail action
  */
-class syntax_plugin_bureaucracy_field_addpage extends syntax_plugin_bureaucracy_field {
+class syntax_plugin_bureaucracy_field_usemailtemplate extends syntax_plugin_bureaucracy_field {
 
     /**
      * Arguments:
      *  - cmd
-     *  - page_tpl
-     *  - page_tgt
+     *  - template
      *
      * @param array $args The tokenized definition, only split at spaces
      */
     function __construct($args) {
-        if(count($args) < 3){
+        if(count($args) < 2){
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
                         hsc($args[1])), -1);
             return;
         }
 
         // get standard arguments
-        $this->opt = array_combine(array('cmd', 'page_tpl', 'page_tgt'), $args);
+        $this->opt = array_combine(array('cmd', 'template'), $args);
     }
 
     /**
@@ -56,8 +55,8 @@ class syntax_plugin_bureaucracy_field_addpage extends syntax_plugin_bureaucracy_
      */
     function getParam($name) {
         return ($name === 'value' ||
-                (in_array($name, array('page_tpl', 'page_tgt')) && $this->hidden)) ?
-               null :
-               parent::getParam($name);
+            (in_array($name, array('template')) && $this->hidden)) ?
+            null :
+            parent::getParam($name);
     }
 }
