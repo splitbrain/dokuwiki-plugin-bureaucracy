@@ -456,7 +456,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         // user syntax: %%.(.*?)
         // strftime() is already applied once, so syntax is at this point: %.(.*?)
         $input = preg_replace_callback(
-            '/BP-DATE\((.*?)(?:,\s*(.*?))?\)/',
+            '/@DATE\((.*?)(?:,\s*(.*?))?\)@/',
             array($this, 'replacedate'),
             $input
         );
