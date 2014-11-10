@@ -1,6 +1,7 @@
 <?php
 
 $lang['e_unknowntype']   = 'Unknown type "%s"';
+$lang['e_unknownaction'] = 'Unknown action "%s"';
 $lang['e_missingargs']   = 'Not enough arguments for %s %s';
 $lang['e_noaction']      = 'No action defined - where should the data be sent to?';
 $lang['e_mail']          = 'Something went wrong with sending that data';

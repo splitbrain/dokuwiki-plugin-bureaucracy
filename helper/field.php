@@ -9,14 +9,12 @@
  * @author Adrian Lang <lang@cosmocode.de>
  **/
 
-require_once DOKU_PLUGIN.'bureaucracy/syntax.php';
-
 /**
- * Class syntax_plugin_bureaucracy_field
+ * Class helper_plugin_bureaucracy_field
  *
  * base class for all the form fields
  */
-class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
+class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
 
     protected $mandatory_args = 2;
     public $opt = array();
@@ -32,9 +30,9 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
     );
 
     /**
-     * Construct a syntax_plugin_bureaucracy_field object
+     * Construct a helper_plugin_bureaucracy_field object
      *
-     * This constructor initializes a syntax_plugin_bureaucracy_field object
+     * This constructor initializes a helper_plugin_bureaucracy_field object
      * based on a given definition.
      *
      * The first two items represent:
@@ -51,9 +49,18 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function __construct($args) {
+    public function initialize($args) {
         $this->init($args);
         $this->standardArgs($args);
+    }
+
+    /**
+     * Return false to prevent DokuWiki reusing instances of the plugin
+     *
+     * @return bool
+     */
+    public function isSingleton() {
+        return false;
     }
 
     /**
@@ -91,7 +98,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 $this->opt['optional'] = true;
             } elseif ($arg == '^') {
                 //only one field has focus
-                if (syntax_plugin_bureaucracy_field::hasFocus()) {
+                if (helper_plugin_bureaucracy_field::hasFocus()) {
                     $this->opt['id'] = 'focus__this';
                 }
             } elseif($arg == '@') {
@@ -126,7 +133,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
     }
 
     /**
-     * Render the field as XHTML
+     * Add parsed element to Form which generates XHTML
      *
      * Outputs the represented field using the passed Doku_Form object.
      * Additional parameters (CSS class & HTML name) are passed in $params.
@@ -184,7 +191,7 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * (Overridden by fieldset, which has as argument an array with the form array by reference)
      *
      * @param string $value  The passed value or array or null if none given
-     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
@@ -367,6 +374,65 @@ class syntax_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      */
     protected function validate_max($d, $value) {
         return $value < $d;
+    }
+
+    /**
+     * Available methods
+     *
+     * @return array
+     */
+    public function getMethods() {
+        $result = array();
+        $result[] = array(
+            'name' => 'initialize',
+            'desc' => 'Initiate object, first parameters are at least cmd and label',
+            'params' => array(
+                'params' => 'array'
+            )
+        );
+        $result[] = array(
+            'name' => 'renderfield',
+            'desc' => 'Add parsed element to Form which generates XHTML',
+            'params' => array(
+                'params' => 'array',
+                'form' => 'Doku_Form',
+                'formid' => 'integer'
+            )
+        );
+        $result[] = array(
+            'name' => 'handle_post',
+            'desc' => 'Handle a post to the field',
+            'params' => array(
+                'value' => 'array',
+                'fields' => 'helper_plugin_bureaucracy_field[]',
+                'index' => 'Doku_Form',
+                'formid' => 'integer'
+            ),
+            'return' => array('isvalid' => 'bool')
+        );
+        $result[] = array(
+            'name' => 'getFieldType',
+            'desc' => 'Get the field type',
+            'return' => array('fieldtype' => 'string')
+        );
+        $result[] = array(
+            'name' => 'isSet_',
+            'desc' => 'Whether the field is true (used for depending fieldsets)  ',
+            'return' => array('isset' => 'bool')
+        );
+        $result[] = array(
+            'name' => 'getParam',
+            'desc' => 'Get an arbitrary parameter',
+            'params' => array(
+                'name' => 'string'
+            ),
+            'return' => array('Parameter value' => 'mixed|null')
+        );
+        $result[] = array(
+            'name' => 'after_action',
+            'desc' => 'Executed after performing the action hooks'
+        );
+        return $result;
     }
 
 }

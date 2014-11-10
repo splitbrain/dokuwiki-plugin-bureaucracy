@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_hiddenautoinc
+ * Class helper_plugin_bureaucracy_fieldhiddenautoinc
  *
  * Creates an invisible field with a number that increases by 1 on each form submit
  */
-class syntax_plugin_bureaucracy_field_hiddenautoinc extends syntax_plugin_bureaucracy_field_number {
+class helper_plugin_bureaucracy_fieldhiddenautoinc extends helper_plugin_bureaucracy_fieldnumber {
 
     /**
      * Arguments:
@@ -13,9 +13,9 @@ class syntax_plugin_bureaucracy_field_hiddenautoinc extends syntax_plugin_bureau
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    function __construct($args) {
+    function initialize($args) {
         $args[] = '++';
-        parent::__construct($args);
+        parent::initialize($args);
     }
 
     /**

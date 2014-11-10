@@ -1,12 +1,10 @@
 <?php
-require_once DOKU_PLUGIN . 'bureaucracy/fields/textbox.php';
-
 /**
- * Class syntax_plugin_bureaucracy_field_date
+ * Class helper_plugin_bureaucracy_fielddate
  *
  * A date in the format YYYY-MM-DD, provides a date picker
  */
-class syntax_plugin_bureaucracy_field_date extends syntax_plugin_bureaucracy_field_textbox {
+class helper_plugin_bureaucracy_fielddate extends helper_plugin_bureaucracy_fieldtextbox {
     /**
      * Arguments:
      *  - cmd
@@ -15,8 +13,8 @@ class syntax_plugin_bureaucracy_field_date extends syntax_plugin_bureaucracy_fie
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function __construct($args) {
-        parent::__construct($args);
+    public function initialize($args) {
+        parent::initialize($args);
         $attr = array(
             'class' => 'datepicker edit',
             'maxlength'=>'10'

@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_fieldset
+ * Class helper_plugin_bureaucracy_fieldfieldset
  *
  * Creates a new set of fields, which optional can be shown/hidden depending on the value of another field above it.
  */
-class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldfieldset extends helper_plugin_bureaucracy_field {
     protected $mandatory_args = 1;
 
     /**
@@ -16,7 +16,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function __construct($args) {
+    public function initialize($args) {
         // get standard arguments
         $this->opt = array('cmd' => array_shift($args));
 
@@ -59,7 +59,7 @@ class syntax_plugin_bureaucracy_field_fieldset extends syntax_plugin_bureaucracy
      * When fieldset is closed, set containing fields to hidden
      *
      * @param null $value field value of fieldset always empty
-     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid

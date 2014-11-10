@@ -1,10 +1,10 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_wiki
+ * Class helper_plugin_bureaucracy_fieldwiki
  *
  * Adds some static text to the form, but parses the input as Wiki syntax (computationally expensive)
  */
-class syntax_plugin_bureaucracy_field_wiki extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldwiki extends helper_plugin_bureaucracy_field {
 
     protected $tpl = '<p>@@LABEL@@</p>';
 
@@ -15,8 +15,8 @@ class syntax_plugin_bureaucracy_field_wiki extends syntax_plugin_bureaucracy_fie
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function __construct($args) {
-        parent::__construct($args);
+    public function initialize($args) {
+        parent::initialize($args);
         // make always optional to prevent being marked as required
         $this->opt['optional'] = true;
     }
@@ -25,7 +25,7 @@ class syntax_plugin_bureaucracy_field_wiki extends syntax_plugin_bureaucracy_fie
      * Handle a post to the field
      *
      * @param null $value empty
-     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid

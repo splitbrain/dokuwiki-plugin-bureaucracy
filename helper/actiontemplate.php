@@ -5,7 +5,7 @@
  * @author Michael Klier <chi@chimeric.de>
  */
 
-class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucracy_action {
+class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy_action {
 
     var $targetpages;
     var $pagename;
@@ -13,7 +13,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     /**
      * Performs template action
      *
-     * @param syntax_plugin_bureaucracy_field[] $fields  array with form fields
+     * @param helper_plugin_bureaucracy_field[] $fields  array with form fields
      * @param string $thanks  thanks message
      * @param array  $argv    array with entries: template, pagename, separator
      * @return array|mixed
@@ -60,7 +60,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     /**
      * Prepare and resolve target page
      *
-     * @param syntax_plugin_bureaucracy_field[]  $fields  List of field objects
+     * @param helper_plugin_bureaucracy_field[]  $fields  List of field objects
      * @param string                             $sep     Separator between fields for page id
      * @throws Exception missing pagename
      */
@@ -87,7 +87,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
     /**
      * Handle templates from addpage field
      *
-     * @param syntax_plugin_bureaucracy_field[]  $fields  List of field objects
+     * @param helper_plugin_bureaucracy_field[]  $fields  List of field objects
      * @return array
      */
     function getAdditionalTargetpages($fields) {
@@ -315,7 +315,7 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
      * move the uploaded files to <pagename>:FILENAME
      *
      *
-     * @param syntax_plugin_bureaucracy_field[] $fields
+     * @param helper_plugin_bureaucracy_field[] $fields
      * @throws Exception
      */
     protected function processUploads($fields) {
@@ -350,24 +350,6 @@ class syntax_plugin_bureaucracy_action_template extends syntax_plugin_bureaucrac
             $this->values[$label] = $res;
 
         }
-    }
-
-    /**
-     * Returns ACL access level of the user or the (virtual) 'runas' user
-     *
-     * @param string $id pageid
-     * @return int
-     */
-    protected function aclcheck($id) {
-        $runas = $this->getConf('runas');
-
-        if($runas) {
-            $auth = auth_aclcheck($id, $runas, array());
-        } else {
-            $auth = auth_quickaclcheck($id);
-        }
-        return $auth;
-
     }
 
     /**

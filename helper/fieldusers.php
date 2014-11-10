@@ -1,11 +1,10 @@
 <?php
-require_once DOKU_PLUGIN . 'bureaucracy/fields/textbox.php';
 /**
- * Class syntax_plugin_bureaucracy_field_users
+ * Class helper_plugin_bureaucracy_fieldusers
  *
  * Create multi-user input, with autocompletion
  */
-class syntax_plugin_bureaucracy_field_users extends syntax_plugin_bureaucracy_field_textbox {
+class helper_plugin_bureaucracy_fieldusers extends helper_plugin_bureaucracy_fieldtextbox {
 
     /**
      * Arguments:
@@ -15,8 +14,8 @@ class syntax_plugin_bureaucracy_field_users extends syntax_plugin_bureaucracy_fi
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function __construct($args) {
-        parent::__construct($args);
+    public function initialize($args) {
+        parent::initialize($args);
         $this->tpl['class'] .= ' userspicker';
     }
 

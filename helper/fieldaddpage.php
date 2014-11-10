@@ -1,27 +1,28 @@
 <?php
 /**
- * Class syntax_plugin_bureaucracy_field_usemailtemplate
+ * Class helper_plugin_bureaucracy_fieldaddpage
  *
- * Adds a template only for use with the mail action
+ * Adds another page page_tgt based on a template page page_tpl only for use with the template action
  */
-class syntax_plugin_bureaucracy_field_usemailtemplate extends syntax_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldaddpage extends helper_plugin_bureaucracy_field {
 
     /**
      * Arguments:
      *  - cmd
-     *  - template
+     *  - page_tpl
+     *  - page_tgt
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    function __construct($args) {
-        if(count($args) < 2){
+    function initialize($args) {
+        if(count($args) < 3){
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
                         hsc($args[1])), -1);
             return;
         }
 
         // get standard arguments
-        $this->opt = array_combine(array('cmd', 'template'), $args);
+        $this->opt = array_combine(array('cmd', 'page_tpl', 'page_tgt'), $args);
     }
 
     /**
@@ -38,7 +39,7 @@ class syntax_plugin_bureaucracy_field_usemailtemplate extends syntax_plugin_bure
      * Handle a post to the field
      *
      * @param string $value null
-     * @param syntax_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
+     * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
@@ -55,8 +56,8 @@ class syntax_plugin_bureaucracy_field_usemailtemplate extends syntax_plugin_bure
      */
     function getParam($name) {
         return ($name === 'value' ||
-            (in_array($name, array('template')) && $this->hidden)) ?
-            null :
-            parent::getParam($name);
+                (in_array($name, array('page_tpl', 'page_tgt')) && $this->hidden)) ?
+               null :
+               parent::getParam($name);
     }
 }

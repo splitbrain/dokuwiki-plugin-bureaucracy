@@ -1,11 +1,10 @@
 <?php
-require_once DOKU_PLUGIN . 'bureaucracy/fields/textbox.php';
 /**
- * Class syntax_plugin_bureaucracy_field_number
+ * Class helper_plugin_bureaucracy_fieldnumber
  *
  * Creates a single line input field, where input is validated to be numeric
  */
-class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_field_textbox {
+class helper_plugin_bureaucracy_fieldnumber extends helper_plugin_bureaucracy_fieldtextbox {
 
     private $autoinc = false;
 
@@ -19,14 +18,14 @@ class syntax_plugin_bureaucracy_field_number extends syntax_plugin_bureaucracy_f
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function __construct($args) {
+    public function initialize($args) {
         $pp = array_search('++', $args, true);
         if ($pp !== false) {
             unset($args[$pp]);
             $this->autoinc = true;
         }
 
-        parent::__construct($args);
+        parent::initialize($args);
 
         if ($this->autoinc) {
             global $ID;
