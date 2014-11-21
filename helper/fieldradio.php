@@ -43,11 +43,12 @@ class helper_plugin_bureaucracy_fieldradio extends helper_plugin_bureaucracy_fie
         }
         $params = array_merge($this->opt, $params);
 
-        list($name, $entries, $value, $id, $class) = $this->_parse_tpl(
+        list($name, $entries, $value, $label, $id, $class) = $this->_parse_tpl(
             array(
                 '@@NAME@@',
                 $params['args'],
                 '@@VALUE|' . $params['args'][0] . '@@',
+                '@@DISPLAY@@',
                 '@@ID@@',
                 '@@CLASS@@'
             ),
@@ -55,6 +56,15 @@ class helper_plugin_bureaucracy_fieldradio extends helper_plugin_bureaucracy_fie
         );
 
         $value = (in_array($value, $entries) ? $value : current($entries));
+
+        // label
+        $s = '<label';
+        $s .= ' class="radiolabel '.$class.'"';
+        $s .= '><span>' . $label . '</span> ';
+        $s .= '</label>';
+        $form->addElement($s);
+
+        // radio fields
         foreach($entries as $val) {
             if($value === $val) {
                 $attrs = array('checked' => 'checked');

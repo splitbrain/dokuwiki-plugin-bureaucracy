@@ -65,6 +65,10 @@ div.dokuwiki form.bureaucracy__plugin input.button {
     margin: 3px 0 3px 50%;
     display: block;
 }
+div.dokuwiki form.bureaucracy__plugin label.radiolabel span{
+    width: 100%;
+    text-align: left;
+}
 div.dokuwiki form.bureaucracy__plugin label input[type=radio]~span {
     width: 50%;
     display: inline-block;
