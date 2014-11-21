@@ -54,12 +54,11 @@ class helper_plugin_bureaucracy_fieldradio extends helper_plugin_bureaucracy_fie
             $params
         );
 
-         $value = (array_key_exists($value, $entries)) ? $value : key($entries);
-
+        $value = (in_array($value, $entries) ? $value : current($entries));
         foreach($entries as $val) {
             if($value === $val) {
                 $attrs = array('checked' => 'checked');
-                $_id = $id;
+                $_id = $id; //autofocus
             } else {
                 $attrs = array();
                 $_id = '';
