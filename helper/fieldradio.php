@@ -47,7 +47,7 @@ class helper_plugin_bureaucracy_fieldradio extends helper_plugin_bureaucracy_fie
             array(
                 '@@NAME@@',
                 $params['args'],
-                '@@VALUE|' . $params['args'][0] . '@@',
+                '@@VALUE@@',
                 '@@DISPLAY@@',
                 '@@ID@@',
                 '@@CLASS@@'
@@ -55,12 +55,12 @@ class helper_plugin_bureaucracy_fieldradio extends helper_plugin_bureaucracy_fie
             $params
         );
 
-        $value = (in_array($value, $entries) ? $value : current($entries));
-
+        $value = (in_array($value, $entries) ? $value : null);
+        $valueoffieldwithid = ($value !== null ? $value : current($entries));
         // label
         $s = '<label';
         $s .= ' class="radiolabel '.$class.'"';
-        $s .= '><span>' . $label . '</span> ';
+        $s .= '><span>' . $label . '</span>';
         $s .= '</label>';
         $form->addElement($s);
 
@@ -68,9 +68,12 @@ class helper_plugin_bureaucracy_fieldradio extends helper_plugin_bureaucracy_fie
         foreach($entries as $val) {
             if($value === $val) {
                 $attrs = array('checked' => 'checked');
-                $_id = $id; //autofocus
             } else {
                 $attrs = array();
+            }
+            if($valueoffieldwithid === $val) {
+                $_id = $id; //e.g. autofocus with 'focus__this' id
+            } else {
                 $_id = '';
             }
             $form->addElement(form_makeRadioField($name, $val, $val, $_id, $class, $attrs));
