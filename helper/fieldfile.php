@@ -22,6 +22,10 @@ class helper_plugin_bureaucracy_fieldfile extends helper_plugin_bureaucracy_fiel
         }
 
         $this->tpl = form_makeFileField('@@NAME@@', '@@DISPLAY@@', '@@ID@@', '@@CLASS@@', $attr);
+
+        if(!isset($this->opt['optional'])){
+            $this->tpl['class'] .= ' required';
+        }
     }
 
     /**

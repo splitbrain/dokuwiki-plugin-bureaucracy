@@ -21,5 +21,9 @@ class helper_plugin_bureaucracy_fieldpassword extends helper_plugin_bureaucracy_
             $attr['required'] = 'required';
         }
         $this->tpl = form_makePasswordField('@@NAME@@', '@@DISPLAY@@', '@@ID@@', '@@CLASS@@', $attr);
+
+        if(!isset($this->opt['optional'])){
+            $this->tpl['class'] .= ' required';
+        }
     }
 }

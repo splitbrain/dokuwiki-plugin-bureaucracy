@@ -27,5 +27,8 @@ class helper_plugin_bureaucracy_fieldtextbox extends helper_plugin_bureaucracy_f
         if(isset($this->opt['class'])){
             $this->tpl['class'] .= ' '.$this->opt['class'];
         }
+        if(!isset($this->opt['optional'])){
+            $this->tpl['class'] .= ' required';
+        }
     }
 }

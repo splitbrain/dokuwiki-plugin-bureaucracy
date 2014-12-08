@@ -21,6 +21,7 @@ class helper_plugin_bureaucracy_fieldtime extends helper_plugin_bureaucracy_fiel
         );
         if(!isset($this->opt['optional'])) {
             $attr['required'] = 'required';
+            $attr['class'] .= ' required';
         }
         $this->tpl = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@DISPLAY@@', '@@ID@@', '@@CLASS@@', $attr);
     }

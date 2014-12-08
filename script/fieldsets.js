@@ -21,17 +21,28 @@ jQuery(function () {
         //show/hide fieldset and trigger depending children
         function updateFieldset(input) {
             jQuery.each(jQuery(input).data('dparray'), function (i, dp) {
-                dp.fset.toggle(
+                var showOrHide =
                     input.parentNode.parentNode.style.display !== 'none' &&                     // input/checkbox is displayed AND
                     ((input.checked === dp.tval) ||                                             //  ( checkbox is checked
                      (input.type !== 'checkbox' && (dp.tval === true && input.value !== '')) || //  OR no checkbox, but input is set
-                     input.value === dp.tval)                                                   //  OR input === dp.tval )
-                );
+                     input.value === dp.tval);                                                  //  OR input === dp.tval )
+
+                dp.fset.toggle(showOrHide);
 
                 dp.fset.find('input,select')
                     .each(function () {
-                        if (jQuery(this).data('dparray')) {
-                            jQuery(this).change();
+                        //toggle required attribute
+                        var $inputelem = jQuery(this);
+                        if($inputelem.hasClass('required')) {
+                            if(showOrHide) {
+                                $inputelem.attr('required', 'required');
+                            } else {
+                                $inputelem.removeAttr('required')
+                            }
+                        }
+                        //update dependencies
+                        if ($inputelem.data('dparray')) {
+                            $inputelem.change();
                         }
                     });
             });
