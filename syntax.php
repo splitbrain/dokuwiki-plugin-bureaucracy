@@ -315,7 +315,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             return false;
         }
 
-        $thanks = '';
+        $thanks_array = array();
+		
         foreach($data['actions'] as $actionData) {
             /** @var helper_plugin_bureaucracy_action $action */
             $action = $this->loadHelper($actionData['actionname'], false);
@@ -327,7 +328,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             }
 
             try {
-                $thanks .= $action->run(
+                $thanks_array[] = $action->run(
                     $data['fields'],
                     $data['thanks'],
                     $actionData['argv']
@@ -342,6 +343,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         foreach($data['fields'] as $field) {
             $field->after_action();
         }
+	
+		// create thanks string
+		$thanks = '';
+		foreach(array_unique($thanks_array) as $thanks_string) {
+			$thanks .= '<p>' . $thanks_string . '</p>';
+		}
+	
         return $thanks;
     }
 
