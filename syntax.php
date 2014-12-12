@@ -515,11 +515,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     function prepareDateTimereplacements() {
         $this->patterns['__year__'] = '/@YEAR@/';
         $this->patterns['__month__'] = '/@MONTH@/';
+        $this->patterns['__monthname__'] = '/@MONTHNAME@/';
         $this->patterns['__day__'] = '/@DAY@/';
         $this->patterns['__time__'] = '/@TIME@/';
         $this->patterns['__timesec__'] = '/@TIMESEC@/';
         $this->values['__year__'] = date('Y');
         $this->values['__month__'] = date('m');
+        $this->values['__monthname__'] = date('B');
         $this->values['__day__'] = date('d');
         $this->values['__time__'] = date('H:i');
         $this->values['__timesec__'] = date('H:i:s');
