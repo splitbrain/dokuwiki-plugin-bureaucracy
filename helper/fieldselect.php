@@ -60,7 +60,7 @@ class helper_plugin_bureaucracy_fieldselect extends helper_plugin_bureaucracy_fi
                                                     array(
                                                         '@@NAME@@',
                                                         $this->opt['show_params'],
-                                                        '@@VALUE|' . $this->opt['show_params'][0] . '@@',
+                                                        '@@VALUE@@|' . $this->opt['show_params'][0],
                                                         '@@DISPLAY@@',
                                                         '@@ID@@',
                                                         '@@CLASS@@'
