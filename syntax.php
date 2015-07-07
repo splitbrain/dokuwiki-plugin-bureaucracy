@@ -204,11 +204,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         if(isset($_POST['bureaucracy']) && checkSecurityToken() && $_POST['bureaucracy']['$$id'] == $this->form_id) {
             $success = $this->_handlepost($data);
             if($success !== false) {
-                $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">' . $success . '</div>';
+                //$R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">' . $success . '</div>';
+                $split = strpos($success, "<div");
+                $R->doc = '<div class="bureaucracy__plugin" id="scroll__here">'.$R->render_text(substr($success,0,$split)).'</div>'.substr($success,$split);
                 return true;
             }
         }
-
         $R->doc .= $this->_htmlform($data['fields']);
 
         return true;
@@ -316,7 +317,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
         $thanks_array = array();
-		
+
         foreach($data['actions'] as $actionData) {
             /** @var helper_plugin_bureaucracy_action $action */
             $action = $this->loadHelper($actionData['actionname'], false);
@@ -343,13 +344,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         foreach($data['fields'] as $field) {
             $field->after_action();
         }
-	
+
 		// create thanks string
 		$thanks = '';
 		foreach(array_unique($thanks_array) as $thanks_string) {
-			$thanks .= '<p>' . $thanks_string . '</p>';
+			$thanks .= html_entity_decode($thanks_string);
 		}
-	
+
         return $thanks;
     }
 
