@@ -140,9 +140,9 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * HTML output is created by passing the template $this->tpl to the simple
      * template engine _parse_tpl.
      *
-     * @params array     $params Additional HTML specific parameters
-     * @params Doku_Form $form   The target Doku_Form object
-     * @params int       $formid unique identifier of the form which contains this field
+     * @param array     $params Additional HTML specific parameters
+     * @param Doku_Form $form   The target Doku_Form object
+     * @param int       $formid unique identifier of the form which contains this field
      */
     public function renderfield($params, Doku_Form $form, $formid) {
         $this->_handlePreload();
