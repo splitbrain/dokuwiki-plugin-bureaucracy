@@ -127,15 +127,13 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
                     }
                     break;
 
-                /** @noinspection PhpMissingBreakStatementInspection */
-                case 'email':
-                    if(!is_null($field->getParam('replyto'))) {
-                        $this->replyto[] = $value;
-                    }
-                /** fall through */
                 default:
                     if($value === null || $label === null) break;
                     list($html, $text) = $this->mail_buildRow($label, $value);
+
+                    if(!is_null($field->getParam('replyto'))) {
+                        $this->replyto[] = $value;
+                    }
             }
             $table_html .= $html;
             $table_text .= $text;
