@@ -53,13 +53,21 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
     /**
      * Connect pattern to lexer
+     *
+     * @param string $mode
      */
     public function connectTo($mode) {
         $this->Lexer->addSpecialPattern('<form>.*?</form>', $mode, 'plugin_bureaucracy');
     }
 
     /**
-     * Handle the match
+     * Handler to prepare matched data for the rendering process
+     *
+     * @param   string       $match   The text matched by the patterns
+     * @param   int          $state   The lexer state for the match
+     * @param   int          $pos     The character position of the matched text
+     * @param   Doku_Handler $handler The Doku_Handler object
+     * @return  bool|array Return an array with all data you want to use in render, false don't add an instruction
      */
     public function handle($match, $state, $pos, Doku_Handler $handler) {
         $match = substr($match, 6, -7); // remove form wrap
@@ -115,6 +123,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $name = 'data_aliastextbox';
             }
 
+            /** @var helper_plugin_bureaucracy_field $field */
             $field = $this->loadHelper($name, false);
             if($field) {
                 $field->initialize($args);
@@ -178,11 +187,21 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         } else {
             $thanks = hsc($thanks);
         }
-        return array('fields' => $cmds, 'actions' => $actions, 'thanks' => $thanks, 'labels' => $labels);
+        return array(
+            'fields'  => $cmds,
+            'actions' => $actions,
+            'thanks'  => $thanks,
+            'labels'  => $labels
+        );
     }
 
     /**
-     * Create output
+     * Handles the actual output creation.
+     *
+     * @param string          $format   output format being rendered
+     * @param Doku_Renderer   $R        the current renderer object
+     * @param array           $data     data created by handler()
+     * @return  boolean                 rendered correctly? (however, returned value is not used at the moment)
      */
     public function render($format, Doku_Renderer $R, $data) {
         if($format != 'xhtml') return false;
@@ -316,7 +335,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
         $thanks_array = array();
-		
+
         foreach($data['actions'] as $actionData) {
             /** @var helper_plugin_bureaucracy_action $action */
             $action = $this->loadHelper($actionData['actionname'], false);
@@ -343,13 +362,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         foreach($data['fields'] as $field) {
             $field->after_action();
         }
-	
+
 		// create thanks string
 		$thanks = '';
 		foreach(array_unique($thanks_array) as $thanks_string) {
 			$thanks .= '<p>' . $thanks_string . '</p>';
 		}
-	
+
         return $thanks;
     }
 
