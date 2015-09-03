@@ -41,9 +41,9 @@ class syntax_plugin_bureaucracy_test extends DokuWikiTest {
 
         // file field
         $this->checkField($doc, 'File1', 'input[type=file].edit', true);
-        
+
         // submit button
-        $this->assertEquals(1, pq('input[type=submit][value=Submit Query]')->length);
+        $this->assertEquals(1, pq('button[type=submit]:contains(Submit Query)')->length);
 
     }
 

@@ -6,8 +6,8 @@
  */
 class helper_plugin_bureaucracy_fieldfieldset extends helper_plugin_bureaucracy_field {
     protected $mandatory_args = 1;
-    /** @var null|array with one entry (fieldname) or two entries (fieldname and match value) */
-    public $depends_on = null;
+    /** @var array with zero, one entry (fieldname) or two entries (fieldname and match value) */
+    public $depends_on = array();
 
     /**
      * Arguments:
@@ -39,7 +39,7 @@ class helper_plugin_bureaucracy_fieldfieldset extends helper_plugin_bureaucracy_
      */
     function renderfield($params, Doku_Form $form, $formid) {
         $form->startFieldset(hsc($this->getParam('display')));
-        if (isset($this->depends_on)) {
+        if (!empty($this->depends_on)) {
             $dependencies = array_map('hsc',(array) $this->depends_on);
             if (count($this->depends_on) > 1) {
                 $msg = 'Only edit this fieldset if ' .
@@ -49,6 +49,7 @@ class helper_plugin_bureaucracy_fieldfieldset extends helper_plugin_bureaucracy_
                 $msg = 'Only edit this fieldset if ' .
                        '“<span class="bureaucracy_depends_fname">%s</span>” is set.';
             }
+
             $form->addElement('<p class="bureaucracy_depends">' . vsprintf($msg, $dependencies) . '</p>');
         }
     }
