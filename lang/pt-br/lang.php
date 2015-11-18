@@ -7,7 +7,8 @@ $lang['e_mail']          = 'Ocorreu algum erro com o envio dos dados.';
 $lang['e_unknownconstraint'] = 'Restrição %s de campo desconhecida.';
 
 $lang['e_required']      = '"%s" é requerido.';
-$lang['e_match']         = '"%s" não foi corretamente preenchido. (Comparado com /%s/i).';
+$lang['e_match']         = '"%s" não foi corretamente preenchido. %s';
+$lang['checkagainst']    = '(Comparado com /%s/i)';
 $lang['e_email']         = '"%s" tem de ser um endereço de email válido.';
 $lang['e_numeric']       = '"%s" tem de ser um número.';
 $lang['e_date']          = '"%s" tem de ser uma data válida no formato dd-mm-yyyy.';

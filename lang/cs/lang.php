@@ -6,7 +6,8 @@ $lang['e_noaction']      = 'Žádná akce nebyla nastavena';
 $lang['e_mail']          = 'Nastala chyba při odesílání';
 
 $lang['e_required']      = '"%s" je povinný';
-$lang['e_match']         = '"%s" nemá požadovaný formát. (regulární výraz: /%s/i)';
+$lang['e_match']         = '"%s" nemá požadovaný formát. %s)';
+$lang['checkagainst']    = '(regulární výraz: /%s/i)';
 $lang['e_email']         = '"%s" není platná emailová adresa.';
 $lang['e_numeric']       = '"%s" není číslo.';
 $lang['e_min']           = '"%s" musí být větší než %s.';

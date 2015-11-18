@@ -9,7 +9,8 @@ $lang['e_unknownconstraint'] = 'Unknown field constraint %s';
 $lang['e_labelpage']     = 'Labelpage %s not found';
 
 $lang['e_required']      = '"%s" is required';
-$lang['e_match']         = '"%s" wasn\'t filled in correctly. (Checked against /%s/i)';
+$lang['e_match']         = '"%s" wasn\'t filled in correctly. %s';
+$lang['checkagainst']    = '(Checked against /%s/i)';
 $lang['e_email']         = '"%s" needs to be a valid email address.';
 $lang['e_numeric']       = '"%s" needs to be a number.';
 $lang['e_date']          = '"%s" needs to be a valid date in the format yyyy-mm-dd.';

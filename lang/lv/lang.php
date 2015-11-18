@@ -6,7 +6,8 @@ $lang['e_noaction']      = 'Nav definēta darbība, kur dati jāsūta vai jāiev
 $lang['e_mail']          = 'Kļūme nosūtot datus';
 
 $lang['e_required']      = 'Jāaizpilda "%s" ';
-$lang['e_match']         = 'Nav pareizi aizpildīts "%s"  (neatbilst prasībai /%s/i)';
+$lang['e_match']         = 'Nav pareizi aizpildīts "%s"  %s';
+$lang['checkagainst']    = '(neatbilst prasībai /%s/i)';
 $lang['e_email']         = '"%s" jābūt derīgai epasta adresei.';
 $lang['e_numeric']       = '"%s" jābūt skaitlim.';
 $lang['e_min']           = '"%s" jābūt lielākam par %s.';

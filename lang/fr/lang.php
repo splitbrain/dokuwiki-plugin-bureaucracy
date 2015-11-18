@@ -7,7 +7,8 @@ $lang['e_mail']          = 'Erreur lors de l\'envoi des donn&eacute;es';
 $lang['e_unknownconstraint'] = 'Contrainte de champ inconue %s';
 
 $lang['e_required']      = '"%s" est requis';
-$lang['e_match']         = '"%s" n\'a pas &eacute;t&eacute; remplis correctement. (verifi&eacute; avec /%s/i)';
+$lang['e_match']         = '"%s" n\'a pas &eacute;t&eacute; remplis correctement. %s';
+$lang['checkagainst']    = '(verifi&eacute; avec /%s/i)';
 $lang['e_email']         = '"%s" doit &ecirc;tre une adresse e-mail valide.';
 $lang['e_numeric']       = '"%s" doit &ecirc;tre un nombre.';
 $lang['e_date']          = '"%s" doit &ecirc;tre une date valide au format yyyy-mm-dd.';

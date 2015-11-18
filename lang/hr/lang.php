@@ -8,7 +8,8 @@ $lang['e_unknownconstraint'] = 'Nepoznato ograničenje polja %s';
 $lang['e_labelpage']     = 'Stranica s labelama %s nije nađena';
 
 $lang['e_required']      = '"%s" je obvezan';
-$lang['e_match']         = '"%s" nije ispravno popunjen. (Provjereno prema /%s/i)';
+$lang['e_match']         = '"%s" nije ispravno popunjen. %s';
+$lang['checkagainst']    = '(Provjereno prema /%s/i)';
 $lang['e_email']         = '"%s" treba biti valjana adresa e-pošte.';
 $lang['e_numeric']       = '"%s" treba biti broj.';
 $lang['e_date']          = '"%s" treba biti valjani datum u obliku gggg-mm-dd.';

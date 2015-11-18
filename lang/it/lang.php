@@ -6,7 +6,8 @@ $lang['e_noaction']    = 'Nessuna azione definita - dove devono essere spediti i
 $lang['e_mail']        = 'Si sono verificati dei problemi sulla spedizione dei dati';
 
 $lang['e_required']    = '"%s" deve essere specificato';
-$lang['e_match']       = '"%s" non corretto. (Controlla /%s/i)';
+$lang['e_match']       = '"%s" non corretto. %s';
+$lang['checkagainst']  = '(Controlla /%s/i)';
 $lang['e_email']       = '"%s" deve essere un indirizzo email valido.';
 $lang['e_numeric']     = '"%s" deve essere un valore numerico.';
 $lang['e_min']         = '"%s" deve essere maggiore di %s.';

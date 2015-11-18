@@ -9,7 +9,8 @@ $lang['e_unknownconstraint'] = '未知的域范围 %s';
 $lang['e_labelpage']     = '标签页 %s 未找到';
 
 $lang['e_required']      = '需要"%s"';
-$lang['e_match']         = '"%s" 填写错误. (请检查 /%s/i)';
+$lang['e_match']         = '"%s" 填写错误. %s';
+$lang['checkagainst']    = '(请检查 /%s/i)';
 $lang['e_email']         = '"%s" 应为有效Email地址。';
 $lang['e_numeric']       = '"%s" 必须是数字';
 $lang['e_date']          = '"%s" 应为 yyyy-mm-dd 格式的日期';

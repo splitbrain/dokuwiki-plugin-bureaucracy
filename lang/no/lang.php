@@ -9,7 +9,8 @@ $lang['e_unknownconstraint'] = 'Ukjent feltverdi %s';
 $lang['e_labelpage']     = 'Finner ikke siden %s';
 
 $lang['e_required']      = '"%s" er påkrevet';
-$lang['e_match']         = '"%s" var ikke riktig utfylt. (Sjekk mot /%s/i)';
+$lang['e_match']         = '"%s" var ikke riktig utfylt. %s';
+$lang['checkagainst']    = '(Sjekk mot /%s/i)';
 $lang['e_email']         = '"%s" må være gyldig epostadresse.';
 $lang['e_numeric']       = '"%s" må være et nummer.';
 $lang['e_date']          = '"%s" må være gyldig dato på formatet åååå-mm-dd.';
