@@ -8,6 +8,7 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
     protected $_mail_html = '';
     protected $_mail_text = '';
     protected $subject = '';
+    protected $from = '';
     protected $replyto = array();
     protected $mailtemplate = '';
 
@@ -70,7 +71,11 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
         $mail->to($to);
 
         // From
-        $mail->from($conf['mailfrom']);
+        if(empty($this->from)) {
+            $this->from = $conf['mailfrom'];
+        }
+        $this->from = $this->replace($this->from);
+        $mail->from($this->from);
 
         // Subject
         $this->subject = $this->replace($this->subject);
@@ -119,6 +124,9 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
                     break;
                 case 'subject':
                     $this->subject = $label;
+                    break;
+                case 'from':
+                    $this->from = $label;
                     break;
                 case 'usemailtemplate':
                     if (!is_null($field->getParam('template')) ) {
