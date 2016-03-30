@@ -50,7 +50,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         $this->checkTargetPageNames();
 
         $this->processUploads($fields);
-        $this->replaceAndSavePages();
+        $this->replaceAndSavePages($fields);
 
         $ret = $this->buildThankYouPage($thanks);
 
@@ -207,19 +207,32 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      *  - $INFO['userinfo']['name']
      *  - $INPUT->server->str('REMOTE_USER')
      */
-    protected function replaceAndSavePages() {
+    protected function replaceAndSavePages($fields) {
         global $ID;
         foreach ($this->targetpages as $pageName => $template) {
             // set NSBASE var to make certain dataplugin constructs easier
             $this->patterns['__nsbase__'] = '/@NSBASE@/';
             $this->values['__nsbase__'] = noNS(getNS($pageName));
 
-            // save page
-            saveWikiText(
-                $pageName,
-                cleanText($this->replace($template, false)),
-                sprintf($this->getLang('summary'), $ID)
+            $evdata = array(
+                'patterns' => &$this->patterns,
+                'values' => &$this->values,
+                'id' => $pageName,
+                'template' => $template,
+                'form' => $ID,
+                'fields' => $fields
             );
+
+            $event = new Doku_Event('PLUGIN_BUREAUCRACY_TEMPLATE_SAVE', $evdata);
+            if($event->advise_before()) {
+                // save page
+                saveWikiText(
+                    $evdata['id'],
+                    cleanText($this->replace($evdata['template'], false)),
+                    sprintf($this->getLang('summary'), $ID)
+                );
+            }
+            $event->advise_after();
         }
     }
 
