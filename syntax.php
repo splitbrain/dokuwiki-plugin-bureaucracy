@@ -119,11 +119,15 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
             /** @var helper_plugin_bureaucracy_field $field */
             $field = $this->loadHelper($name, false);
-            if($field) {
+            if($field && is_a($field, 'helper_plugin_bureaucracy_field')) {
                 $field->initialize($args);
                 $cmds[] = $field;
             } else {
-                msg(sprintf($this->getLang('e_unknowntype'), hsc($name)), -1);
+                $evdata = array('fields' => &$cmds, 'args' => $args);
+                $event = new Doku_Event('PLUGIN_BUREAUCRACY_FIELD_UNKNOWN', $evdata);
+                if($event->advise_before()) {
+                    msg(sprintf($this->getLang('e_unknowntype'), hsc($name)), -1);
+                }
             }
 
         }
@@ -153,7 +157,11 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
             // not found
             } else {
-                msg(sprintf($this->getLang('e_unknownaction'), hsc($action['actionname'])), -1);
+                $evdata = array('actions' => &$actions, 'action' => $action);
+                $event = new Doku_Event('PLUGIN_BUREAUCRACY_ACTION_UNKNOWN', $evdata);
+                if($event->advise_before()) {
+                    msg(sprintf($this->getLang('e_unknownaction'), hsc($action['actionname'])), -1);
+                }
             }
         }
 
