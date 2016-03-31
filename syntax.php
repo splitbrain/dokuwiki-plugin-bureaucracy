@@ -117,23 +117,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $name = $args[0];
             }
 
-            /** @deprecated 6-11-2014 rename old field name*/
-            if($name == 'bureaucracy_fielddataplugin') {
-                msg("Please rename the field 'dataplugin' into 'data_aliastextbox'", -1);
-                $name = 'data_aliastextbox';
-            }
-
             /** @var helper_plugin_bureaucracy_field $field */
             $field = $this->loadHelper($name, false);
             if($field) {
                 $field->initialize($args);
                 $cmds[] = $field;
             } else {
-                /** @deprecated 6-11-2014 old date plugin installed */
-                if($name == 'data_aliastextbox') {
-                    msg("Please update the Data plugin for enabling the 'data_aliastextbox' field again (previous known as 'dataplugin' field)", -1);
-                }
-
                 msg(sprintf($this->getLang('e_unknowntype'), hsc($name)), -1);
             }
 
@@ -165,11 +154,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             // not found
             } else {
                 msg(sprintf($this->getLang('e_unknownaction'), hsc($action['actionname'])), -1);
-
-                /** @deprecated 6-11-2014 old date plugin installed */
-                if($action['actionname'] == 'pagemod_pagemod') {
-                    msg("Please update the Pagemod plugin for enabling the 'pagemod_pagemod' field again (previous known as 'pagemod' field)", -1);
-                }
             }
         }
 
