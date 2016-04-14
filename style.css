@@ -25,9 +25,14 @@
     margin-bottom: 0.5em;
 }
 
+.dokuwiki form.bureaucracy__plugin input, 
+.dokuwiki form.bureaucracy__plugin select {
+    margin-bottom: 5px;
+}
+
 .dokuwiki form.bureaucracy__plugin label {
     display: block;
-    text-align: right;
+    text-align: left;
     line-height: 2em;
 }
 
@@ -35,7 +40,9 @@
     display: inline-block;
     width: 47%;
     line-height: normal;
+    margin-bottom: 5px;
 }
+
 .dokuwiki form.bureaucracy__plugin label.textareafield {
     text-align: left;
 }
