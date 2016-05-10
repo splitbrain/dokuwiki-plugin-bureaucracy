@@ -103,9 +103,19 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
 
             switch($field->getFieldType()) {
                 case 'fieldset':
-                    list($html, $text) = $this->mail_buildRow($label);
+                    if(!empty($field->depends_on)) {
+                        //print fieldset only if depend condition is true
+                        foreach($fields as $field_tmp) {
+                            if($field_tmp->getParam('label') === $field->depends_on[0] && $field_tmp->getParam('value') === $field->depends_on[1] ) {
+                                list($html, $text) =  $this->mail_buildRow($label);
+                            }
+                        }
+                    } else {
+                        list($html, $text) =  $this->mail_buildRow($label);
+                    }
                     break;
                 case 'file':
+                    if($value === null || $label === null) break; //print attachment only if field was visible
                     $file = $field->getParam('file');
                     if(!$file['size']) {
                         $message = $this->getLang('attachmentMailEmpty');
