@@ -26,7 +26,7 @@ class helper_plugin_bureaucracy_fieldhiddenautoinc extends helper_plugin_bureauc
      * @params array     $params Additional HTML specific parameters
      * @params Doku_Form $form   The target Doku_Form object
      */
-    function renderfield($params, $form) {
+    function renderfield($params, Doku_Form $form) {
         $this->_handlePreload();
         $form->addHidden($params['name'], $this->getParam('value') . '');
     }
