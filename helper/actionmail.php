@@ -92,7 +92,7 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
      */
     protected function processFieldsBuildTable($fields, $mail) {
         global $ID;
-        
+
         $table_html = '<table>';
         $table_text = '';
 
