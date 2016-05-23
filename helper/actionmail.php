@@ -92,7 +92,7 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
      */
     protected function processFieldsBuildTable($fields, $mail) {
         global $ID;
-
+        
         $table_html = '<table>';
         $table_text = '';
 
@@ -121,6 +121,7 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
                         $message = $this->getLang('attachmentMailEmpty');
                     } else if($file['size'] > $this->getConf('maxEmailAttachmentSize')) {
                         $message = $file['name'] . ' ' . $this->getLang('attachmentMailToLarge');
+                        msg(sprintf($this->getLang('mail_uploadsize'), hsc($file['name']), filesize_h($this->getConf('maxEmailAttachmentSize'))), 2);
                     } else {
                         $message = $file['name'];
                         $mail->attachFile($file['tmp_name'], $file['type'], $file['name']);
