@@ -32,5 +32,7 @@ $lang['summary']         = 'Erstellt mit dem Formular %s';
 
 $lang['attachmentMailEmpty']   = '(Datei nicht angegeben)';
 $lang['attachmentMailToLarge'] = '(Datei zu groß für Mail-Anhang)';
+$lang['attachmentMailToLarge_userinfo'] = 'Die Datei "%s" ist zu groß als Mail-Anhang (>%s) (E-Mail ohne Datei gesendet)';
+
 
 $lang['submit']          = 'Absenden';
