@@ -35,5 +35,6 @@ $lang['summary']         = 'Created from the form at %s';
 
 $lang['attachmentMailEmpty']   = '(file not submitted)';
 $lang['attachmentMailToLarge'] = '(file too large for mail attachment)';
+$lang['attachmentMailToLarge_userinfo'] = 'file "%s" too large for mail attachment (>%s) (mail was sent nevertheless)';
 
 $lang['submit']         = 'Submit';
