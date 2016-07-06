@@ -66,7 +66,7 @@ class helper_plugin_bureaucracy_fieldfieldset extends helper_plugin_bureaucracy_
      * @return bool Whether the passed value is valid
      */
     public function handle_post($value, &$fields, $index, $formid) {
-        if(!isset($this->depends_on)) {
+        if(empty($this->depends_on)) {
             return true;
         }
 
