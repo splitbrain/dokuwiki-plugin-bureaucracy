@@ -102,6 +102,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
 
                 //target
                 $relativetargetpage = $field->getParam('page_tgt');
+                $relativetargetpage = $this->replace($relativetargetpage);
                 resolve_pageid($ns, $relativeTargetPageid, $ignored);
                 $targetpage = "$this->pagename:$relativetargetpage";
 
