@@ -504,20 +504,43 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * Same replacements as applied at template namespaces
      *
      * @see parsePageTemplate()
+     * @author Andreas Gohr <andi@splitbrain.org>
+     * @author Schplurtz le Déboulonné <Schplurtz@laposte.net>
      */
     function prepareNamespacetemplateReplacements() {
         /* @var Input $INPUT */
         global $INPUT;
         global $USERINFO;
         global $conf;
-        $this->patterns['__user__'] = '/@USER@/';
-        $this->patterns['__name__'] = '/@NAME@/';
-        $this->patterns['__mail__'] = '/@MAIL@/';
-        $this->patterns['__date__'] = '/@DATE@/';
-        $this->values['__user__'] = $INPUT->server->str('REMOTE_USER');
-        $this->values['__name__'] = $USERINFO['name'];
-        $this->values['__mail__'] = $USERINFO['mail'];
-        $this->values['__date__'] = strftime($conf['dformat']);
+	global $ID;
+        $file = noNS($ID);
+        $page = strtr($file, $conf['sepchar'], ' ');
+        $this->patterns['__user__']         = '/@USER@/';
+        $this->patterns['__name__']         = '/@NAME@/';
+        $this->patterns['__mail__']         = '/@MAIL@/';
+        $this->patterns['__date__']         = '/@DATE@/';
+        $this->patterns['__self__']         = '/@SELF@/';
+        $this->patterns['__self_ns__']      = '/@SELF_NS@/';
+        $this->patterns['__self_file__']    = '/@SELF_FILE@/';
+        $this->patterns['__!self_file__']   = '/@.SELF_FILE@/';
+        $this->patterns['__!self_file!__']  = '/@!SELF_FILE!@/';
+        $this->patterns['__self_page__']    = '/@SELF_PAGE@/';
+        $this->patterns['__!self_page__']   = '/@!SELF_PAGE@/';
+        $this->patterns['__!!self_page__']  = '/@!!SELF_PAGE@/';
+        $this->patterns['__!self_page!__']  = '/@!SELF_PAGE!@/';
+        $this->values['__user__']         = $INPUT->server->str('REMOTE_USER');
+        $this->values['__name__']         = $USERINFO['name'];
+        $this->values['__mail__']         = $USERINFO['mail'];
+        $this->values['__date__']         = strftime($conf['dformat']);
+        $this->values['__self__']         = $ID;
+        $this->values['__self_ns__']      = getNS($ID);
+        $this->values['__self_file__']    = $file;
+        $this->values['__!self_file__']   = utf8_ucfirst($file);
+        $this->values['__!self_file!__']  = utf8_strtoupper($file);
+        $this->values['__self_page__']    = $page;
+        $this->values['__!self_page__']   = utf8_ucfirst($page);
+        $this->values['__!!self_page__']  = utf8_ucwords($page);
+        $this->values['__!self_page!__']  = utf8_strtoupper($page);
     }
 
     /**
