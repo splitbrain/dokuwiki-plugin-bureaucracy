@@ -512,7 +512,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         global $INPUT;
         global $USERINFO;
         global $conf;
-	global $ID;
+        global $ID;
         $file = noNS($ID);
         $page = strtr($file, $conf['sepchar'], ' ');
         $this->patterns['__user__']         = '/@USER@/';
@@ -522,7 +522,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->patterns['__self__']         = '/@SELF@/';
         $this->patterns['__self_ns__']      = '/@SELF_NS@/';
         $this->patterns['__self_file__']    = '/@SELF_FILE@/';
-        $this->patterns['__!self_file__']   = '/@.SELF_FILE@/';
+        $this->patterns['__!self_file__']   = '/@!SELF_FILE@/';
         $this->patterns['__!self_file!__']  = '/@!SELF_FILE!@/';
         $this->patterns['__self_page__']    = '/@SELF_PAGE@/';
         $this->patterns['__!self_page__']   = '/@!SELF_PAGE@/';
