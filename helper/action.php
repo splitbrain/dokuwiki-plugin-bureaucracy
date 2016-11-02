@@ -111,11 +111,6 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
             }  
             
             if(!$use_fieldset) continue;
-
-            if($field->getParam('cmd') == 'textarea') {
-                $value = str_replace("\r", '', $value);
-                $value = str_replace("\n", ' \\\\\\\\ ', $value);
-            }
             
             //field replacements
             $this->prepareFieldReplacement($label, $value);
