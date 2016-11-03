@@ -90,28 +90,13 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      * @return array
      */
     function prepareFieldReplacements($fields) {
-        $use_fieldset = true;
-        
         foreach ($fields as $field) {
+            //do not use fields in hidden fieldsets
+            if($field->hidden) continue;
+            
             $label = $field->getParam('label');
             $value = $field->getParam('value');
 
-             if($field->getFieldType() === 'fieldset') {
-                if(!empty($field->depends_on)) {
-                    foreach($fields as $field_tmp) {
-                        if($field_tmp->getParam('label') === $field->depends_on[0] && $field_tmp->getParam('value') !== $field->depends_on[1]) {
-                            $use_fieldset = false;
-                        } else if ($field_tmp->getParam('label') === $field->depends_on[0] && $field_tmp->getParam('value') === $field->depends_on[1]) {
-                            $use_fieldset = true;
-                        }
-                    }
-                } else {
-                    $use_fieldset = true;
-                }
-            }  
-            
-            if(!$use_fieldset) continue;
-            
             //field replacements
             $this->prepareFieldReplacement($label, $value);
         }
