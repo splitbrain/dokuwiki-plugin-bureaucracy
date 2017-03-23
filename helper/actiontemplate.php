@@ -132,7 +132,16 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             }
         } elseif ($tpl !== '!') {
             $tpl = $this->replace($tpl);
-            resolve_pageid(getNS($ID), $tpl, $ignored);
+
+            // resolve templates, but keep references to whole namespaces intact (ending in a colon)
+            if(substr($tpl, -1) == ':') {
+                $tpl = $tpl.'xxx'; // append a fake page name
+                msg($tpl);
+                resolve_pageid(getNS($ID), $tpl, $ignored);
+                $tpl = substr($tpl, 0, -3); // cut off fake page name again
+            } else {
+                resolve_pageid(getNS($ID), $tpl, $ignored);
+            }
 
             $backup = array();
             if ($runas) {
@@ -323,7 +332,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         $ID = $backupID;
         return $html;
     }
-    
+
     /**
      * move the uploaded files to <pagename>:FILENAME
      *
