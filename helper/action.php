@@ -93,6 +93,14 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
         foreach ($fields as $field) {
             $label = $field->getParam('label');
             $value = $field->getParam('value');
+            
+            //do not use fields in hidden fieldsets
+            if($field->hidden) {
+                if(!isset($this->patterns[$label])) { //set to null so default value can be used on replacement
+                    $this->prepareFieldReplacement($label, null);
+                }
+                continue;
+            }
 
             //field replacements
             $this->prepareFieldReplacement($label, $value);
