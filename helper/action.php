@@ -67,7 +67,7 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      * @param string $value field value
      */
     function prepareFieldReplacement($label, $value) {
-        if(!is_null($label)) {
+        if(!is_null($label) && !is_null($value)) {
             $this->patterns[$label] = '/(@@|##)' . preg_quote($label, '/') .
                 '(?:\|(.*?))' . (is_null($value) ? '' : '?') .
                 '\1/si';
