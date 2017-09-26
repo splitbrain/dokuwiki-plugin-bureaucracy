@@ -14,7 +14,16 @@ class helper_plugin_bureaucracy_fieldfile extends helper_plugin_bureaucracy_fiel
      * @param array $args The tokenized definition, only split at spaces
      */
     function initialize($args) {
-        parent::initialize($args);
+        $this->init($args);
+
+        //default namespace for file upload (pagepath:file_name)
+        $this->opt['namespace'] = '.';
+
+        //check whenever the first argument is an upload namespace
+        if (isset($args[0]) && preg_match('/^[a-z.\-_:]+$/', $args[0])) {
+            $this->opt['namespace'] = array_shift($args);
+        }
+        $this->standardArgs($args);
 
         $attr = array();
         if(!isset($this->opt['optional'])) {
@@ -51,7 +60,7 @@ class helper_plugin_bureaucracy_fieldfile extends helper_plugin_bureaucracy_fiel
     protected function _validate() {
         global $lang;
         parent::_validate();
-        
+
         $file = $this->getParam('file');
         if($file['error'] == 1 || $file['error'] == 2) {
             throw new Exception(sprintf($lang['uploadsize'],filesize_h(php_to_byte(ini_get('upload_max_filesize')))));
