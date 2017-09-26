@@ -3,7 +3,7 @@
  * @group plugin_bureaucracy
  * @group plugins
  */
-class syntax_plugin_bureaucracy_filefield_test extends DokuWikiTest {
+class syntax_plugin_bureaucracy_fieldfile_test extends DokuWikiTest {
 
     protected $pluginsEnabled = array('bureaucracy');
 
