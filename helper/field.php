@@ -212,6 +212,30 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
     }
 
     /**
+     * Get the replacement pattern used by action
+     *
+     * @return string
+     */
+    public function getReplacementPattern() {
+        $label = $this->opt['label'];
+        $value = $this->opt['value'];
+        return '/(@@|##)' . preg_quote($label, '/') .
+            '(?:\|(.*?))' . (is_null($value) ? '' : '?') .
+            '\1/si';
+    }
+
+    /**
+     * Get the value used by action
+     * If value is a callback preg_replace_callback is called instead preg_replace
+     *
+     * @return mixed|string
+     */
+    public function getReplacementValue() {
+        $value = $this->opt['value'];
+        return is_null($value) || $value === false ? '$2' : $value;
+    }
+
+    /**
      * Validate value and stores it
      *
      * @param mixed $value value entered into field
