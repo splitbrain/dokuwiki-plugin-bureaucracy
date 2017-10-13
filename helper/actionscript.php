@@ -30,7 +30,7 @@ class helper_plugin_bureaucracy_actionscript extends helper_plugin_bureaucracy_a
         require $path;
 
         $classFragment = substr($scriptName, 0, strpos($scriptName, '.'));
-        $className = 'bureaucracy_handler_' . $classFragment;
+        $className = 'helper_plugin_bureaucracy_handler_' . $classFragment;
 
         /** @var dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface $handler */
         $handler = new $className;
