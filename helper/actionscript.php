@@ -2,7 +2,7 @@
 
 class helper_plugin_bureaucracy_actionscript extends helper_plugin_bureaucracy_action {
 
-    protected $scriptNamePattern = '/^[-_a-zA-Z0-9]+\.php$/';
+    protected $scriptNamePattern = '/^[_a-zA-Z0-9]+\.php$/';
 
     /**
      * @inheritDoc
