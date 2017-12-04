@@ -63,15 +63,14 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
     /**
      * Adds replacement pattern for fieldlabels (e.g @@Label@@)
      *
-     * @param string $label field label
-     * @param string $value field value
+     * @param helper_plugin_bureaucracy_field $field
      */
-    function prepareFieldReplacement($label, $value) {
+    function prepareFieldReplacement($field) {
+        $label = $field->getParam('label');
+
         if(!is_null($label)) {
-            $this->patterns[$label] = '/(@@|##)' . preg_quote($label, '/') .
-                '(?:\|(.*?))' . (is_null($value) ? '' : '?') .
-                '\1/si';
-            $this->values[$label] = is_null($value) || $value === false ? '$2' : $value;
+            $this->patterns[$label] = $field->getReplacementPattern();
+            $this->values[$label] = $field->getReplacementValue();
         }
     }
 
@@ -91,11 +90,8 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      */
     function prepareFieldReplacements($fields) {
         foreach ($fields as $field) {
-            $label = $field->getParam('label');
-            $value = $field->getParam('value');
-
             //field replacements
-            $this->prepareFieldReplacement($label, $value);
+            $this->prepareFieldReplacement($field);
         }
     }
 

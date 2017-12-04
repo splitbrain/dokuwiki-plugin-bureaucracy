@@ -463,7 +463,19 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @return string processed text
      */
     function replace($input, $strftime = true) {
-        $input = preg_replace($this->patterns, $this->values, $input);
+        foreach ($this->values as $label => $value) {
+            $pattern = $this->patterns[$label];
+            if (is_callable($value)) {
+                $input = preg_replace_callback(
+                    $pattern,
+                    $value,
+                    $input
+                );
+            } else {
+                $input = preg_replace($pattern, $value, $input);
+            }
+
+        }
 
         if($strftime) {
             $input = preg_replace_callback(
