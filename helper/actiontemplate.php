@@ -340,13 +340,13 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @throws Exception
      */
     protected function processUploads($fields) {
-        $ns = $this->pagename;
         foreach($fields as $field) {
 
             if($field->getFieldType() !== 'file') continue;
 
             $label = $field->getParam('label');
             $file  = $field->getParam('file');
+            $ns    = $field->getParam('namespace');
 
             //skip empty files
             if(!$file['size']) {
@@ -355,16 +355,20 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             }
 
             $id = $ns.':'.$file['name'];
-            $id = cleanID($id);
+            resolve_mediaid($this->pagename, $id, $ignored); // resolve relatives
 
             $auth = $this->aclcheck($id); // runas
-
+            $move = 'copy_uploaded_file';
+            //prevent from is_uploaded_file() check
+            if(defined('DOKU_UNITTEST')) {
+                $move = 'copy';
+            }
             $res = media_save(
                 array('name' => $file['tmp_name']),
                 $id,
                 false,
                 $auth,
-                'copy_uploaded_file');
+                $move);
 
             if(is_array($res)) throw new Exception($res[0]);
 
