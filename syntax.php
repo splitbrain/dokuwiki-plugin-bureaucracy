@@ -522,10 +522,36 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         global $INPUT;
         global $USERINFO;
         global $conf;
+        global $ID;
+
+        $this->patterns['__formpage_id__'] = '/@FORMPAGE_ID@/';
+        $this->patterns['__formpage_ns__'] = '/@FORMPAGE_NS@/';
+        $this->patterns['__formpage_curns__'] = '/@FORMPAGE_CURNS@/';
+        $this->patterns['__formpage_file__'] = '/@FORMPAGE_FILE@/';
+        $this->patterns['__formpage_!file__'] = '/@FORMPAGE_!FILE@/';
+        $this->patterns['__formpage_!file!__'] = '/@FORMPAGE_!FILE!@/';
+        $this->patterns['__formpage_page__'] = '/@FORMPAGE_PAGE@/';
+        $this->patterns['__formpage_!page__'] = '/@FORMPAGE_!PAGE@/';
+        $this->patterns['__formpage_!!page__'] = '/@FORMPAGE_!!PAGE@/';
+        $this->patterns['__formpage_!page!__'] = '/@FORMPAGE_!PAGE!@/';
         $this->patterns['__user__'] = '/@USER@/';
         $this->patterns['__name__'] = '/@NAME@/';
         $this->patterns['__mail__'] = '/@MAIL@/';
         $this->patterns['__date__'] = '/@DATE@/';
+
+        // replace placeholders
+        $file = noNS($ID);
+        $page = strtr($file, $conf['sepchar'], ' ');
+        $this->values['__formpage_id__'] = $ID;
+        $this->values['__formpage_ns__'] = curNS($ID);
+        $this->values['__formpage_curns__'] = getNS($ID);
+        $this->values['__formpage_file__'] = $file;
+        $this->values['__formpage_!file__'] = utf8_ucfirst($file);
+        $this->values['__formpage_!file!__'] = utf8_strtoupper($file);
+        $this->values['__formpage_page__'] = $page;
+        $this->values['__formpage_!page__'] = utf8_ucfirst($page);
+        $this->values['__formpage_!!page__'] = utf8_ucwords($page);
+        $this->values['__formpage_!page!__'] = utf8_strtoupper($page);
         $this->values['__user__'] = $INPUT->server->str('REMOTE_USER');
         $this->values['__name__'] = $USERINFO['name'];
         $this->values['__mail__'] = $USERINFO['mail'];
