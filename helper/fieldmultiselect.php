@@ -20,7 +20,7 @@ class helper_plugin_bureaucracy_fieldmultiselect extends helper_plugin_bureaucra
         $this->opt['args'] = array_map('trim', explode('|',array_shift($args)));
         $this->standardArgs($args);
         if (isset($this->opt['value'])) {
-            $this->opt['value'] = array_map('trim', explode('|', $this->opt['value']));
+            $this->opt['value'] = array_map('trim', explode(',', $this->opt['value']));
         } else {
             $this->opt['value'] = array();
         }
