@@ -4,8 +4,7 @@
  *
  * Creates a multiselect box
  */
-class helper_plugin_bureaucracy_fieldmultiselect extends helper_plugin_bureaucracy_field {
-    protected $mandatory_args = 3;
+class helper_plugin_bureaucracy_fieldmultiselect extends helper_plugin_bureaucracy_fieldselect {
 
     /**
      * Arguments:
@@ -20,9 +19,58 @@ class helper_plugin_bureaucracy_fieldmultiselect extends helper_plugin_bureaucra
         $this->init($args);
         $this->opt['args'] = array_map('trim', explode('|',array_shift($args)));
         $this->standardArgs($args);
-        if (!isset($this->opt['value']) && isset($this->opt['optional'])) {
-            array_unshift($this->opt['args'],' ');
+        if (isset($this->opt['value'])) {
+            $this->opt['value'] = array_map('trim', explode('|', $this->opt['value']));
+        } else {
+            $this->opt['value'] = array();
         }
+    }
+
+    /**
+     * Get the replacement pattern used by action
+     *
+     * @return string
+     */
+    public function getReplacementPattern() {
+        $label = $this->opt['label'];
+        $value = $this->opt['value'];
+
+        return '/(@@|##)' . preg_quote($label, '/') .
+            '(?:\((?P<delimiter>.*?)\))?' .//delimiter
+            '(?:\|(?P<default>.*?))' . (count($value) == 0 ? '' : '?') .
+            '\1/si';
+    }
+
+    /**
+     * Used as an callback for preg_replace_callback
+     *
+     * @param $matches
+     * @return string
+     */
+    public function replacementValueCallback($matches) {
+        $value = $this->opt['value'];
+
+        //default value
+        if (is_null($value) || $value === false) {
+            if (isset($matches['default']) && $matches['default'] != '') {
+                return $matches['default'];
+            }
+            return $matches[0];
+        }
+
+        //check if matched string containts a pair of brackets
+        $delimiter = preg_match('/\(.*\)/s', $matches[0]) ? $matches['delimiter'] : ', ';
+
+        return implode($delimiter, $value);
+    }
+
+    /**
+     * Return the callback for user replacement
+     *
+     * @return array
+     */
+    public function getReplacementValue() {
+        return array($this, 'replacementValueCallback');
     }
 
     /**
@@ -47,12 +95,13 @@ class helper_plugin_bureaucracy_fieldmultiselect extends helper_plugin_bureaucra
         $form->addElement(call_user_func_array('form_makeListboxField',
                                                $this->_parse_tpl(
                                                    array(
-                                                       '@@NAME@@',
+                                                       '@@NAME@@[]',
                                                        $params['args'],
-                                                       '@@VALUE|' . $params['args'][0] . '@@',
+                                                       $this->opt['value'],
                                                        '@@DISPLAY@@',
                                                        '@@ID@@',
-                                                       '@@CLASS@@'
+                                                       '@@CLASS@@',
+                                                       array('multiple' => 'multiple')
                                                    ),
                                                    $params
                                                )));
