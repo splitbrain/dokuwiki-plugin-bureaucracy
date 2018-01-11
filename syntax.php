@@ -21,6 +21,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     private $form_id = 0;
     var $patterns = array();
     var $values = array();
+    var $functions = array();
 
     /**
      * Prepare some replacements
@@ -28,6 +29,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     public function __construct() {
         $this->prepareDateTimereplacements();
         $this->prepareNamespacetemplateReplacements();
+        $this->prepareFunctions();
     }
 
     /**
@@ -491,6 +493,17 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             array($this, 'replacedate'),
             $input
         );
+
+        //run functions
+        foreach ($this->functions as $name => $callback) {
+            $pattern = '/@' . preg_quote($name) . '\((.*?)\)@/';
+            if (is_callable($callback)) {
+                $input = preg_replace_callback($pattern, function ($matches) use ($callback) {
+                    return call_user_func($callback, $matches[1]);
+                }, $input);
+            }
+        }
+
         return $input;
     }
 
@@ -543,8 +556,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $file = noNS($ID);
         $page = strtr($file, $conf['sepchar'], ' ');
         $this->values['__formpage_id__'] = $ID;
-        $this->values['__formpage_ns__'] = curNS($ID);
-        $this->values['__formpage_curns__'] = getNS($ID);
+        $this->values['__formpage_ns__'] = getNS($ID);
+        $this->values['__formpage_curns__'] = curNS($ID);
         $this->values['__formpage_file__'] = $file;
         $this->values['__formpage_!file__'] = utf8_ucfirst($file);
         $this->values['__formpage_!file!__'] = utf8_strtoupper($file);
@@ -575,5 +588,15 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->values['__time__'] = date('H:i');
         $this->values['__timesec__'] = date('H:i:s');
 
+    }
+
+    /**
+     * Functions that can be used after replacements
+     */
+    function prepareFunctions() {
+        $this->functions['curNS'] = 'curNS';
+        $this->functions['getNS'] = 'getNS';
+        $this->functions['noNS'] = 'noNS';
+        $this->functions['p_get_first_heading'] = 'p_get_first_heading';
     }
 }
