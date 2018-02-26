@@ -385,7 +385,7 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @return int|bool
      */
     protected function validate_match($d, $value) {
-        return @preg_match('/' . $d . '/i', $value);
+        return @preg_match('/' . $d . '/', $value);
     }
 
     /**
