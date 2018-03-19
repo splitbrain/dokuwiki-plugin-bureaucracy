@@ -34,7 +34,7 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      * @param array                             $argv   additional arguments passed to the action
      * @return bool|string false on error, $thanks on success
      */
-    public function run($fields, $thanks, $argv){
+    public function run(&$fields, &$thanks, $argv){
         msg('ERROR: called action %s did not implement a run() function');
         return false;
     }
