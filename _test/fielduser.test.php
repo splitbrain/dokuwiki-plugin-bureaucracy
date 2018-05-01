@@ -13,204 +13,157 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
     public function setUp() {
         parent::setUp();
 
-        /** @var DokuWiki_Auth_Plugin $auth */
+        /** @var \DokuWiki_Auth_Plugin $auth */
         global $auth;
 
-        $auth->createUser("user1", "54321", "a User", "you@example.com");
-        $auth->createUser("user2", "543210", "You", "he@example.com");
-        $auth->createUser("mwuser", "12345", "Wiki User", "me@example.com", array('group1', 'gropu2'));
+        $auth->createUser("user1", "54321", "user1Name", "user1@example.com");
+        $auth->createUser("user2", "543210", "user2Name", "user2@example.com");
+        $auth->createUser("mwuser", "12345", "Wiki User", "wikiuser@example.com", array('group1', 'group2'));
     }
+
+    public function dataProvider()
+    {
+        return [
+            [
+                'user:@@user@@',
+                'mwuser',
+                'user:mwuser',
+                [],
+                'default substitution',
+            ],
+            [
+                'user:@@user@@',
+                '',
+                'user:',
+                ['user'],
+                'error for empty substitution',
+            ],
+            [
+                'user:@@user.name@@',
+                'mwuser',
+                'user:Wiki User',
+                [],
+                'name substitution',
+            ],
+            [
+                'user:@@user.mail@@',
+                'mwuser',
+                'user:wikiuser@example.com',
+                [],
+                'mail substitution',
+            ],
+            [
+                'user:@@user.grps@@',
+                'mwuser',
+                'user:group1, group2',
+                [],
+                'groups substitution',
+            ],
+            [
+                'user:@@user.grps(;)@@',
+                'mwuser',
+                'user:group1;group2',
+                [],
+                'groups substitution custom delimiter',
+            ],
+            [
+                'user:@@user.grps())@@',
+                'mwuser',
+                'user:group1)group2',
+                [],
+                'groups substitution custom delimiter with brackets',
+            ],
+            [
+                'user:@@user.no_sutch_attribute@@',
+                'mwuser',
+                'user:@@user.no_sutch_attribute@@',
+                [],
+                'template unknown attribute substitution',
+            ],
+            [
+                'user:##user##',
+                'mwuser',
+                'user:mwuser',
+                [],
+                'hash substitution',
+            ],
+            [
+                'user:##user.mail##',
+                'mwuser',
+                'user:wikiuser@example.com',
+                [],
+                'hash substitution with attribute',
+            ],
+            [
+                'user:##user@@',
+                'mwuser',
+                'user:##user@@',
+                [],
+                'hash substitution sign mismatch',
+            ],
+            [
+                "user:@@user@@\n\nmail:@@user.mail@@\n\ngrps:@@user.grps(\n)@@",
+                'mwuser',
+                "user:mwuser\n\nmail:wikiuser@example.com\n\ngrps:group1\ngroup2",
+                [],
+                'multiple replacements',
+            ],
+            [
+                "grps1:@@user.grps(\n)@@\n\ngrps2:@@user.grps(())@@",
+                'mwuser',
+                "grps1:group1\ngroup2\n\ngrps2:group1()group2",
+                [],
+                'groups twice',
+            ],
+            [
+                'grps:@@user.grps(end))@@',
+                'mwuser',
+                'grps:group1end)group2',
+                [],
+                'groups special glue',
+            ],
+        ];
+    }
+
 
     /**
-     * Simulate a bureaucracy form send with the 'user' field
+     * @dataProvider dataProvider
      *
-     * @param string       $template_syntax     template to be used as form action
-     * @param string|array $users               value of 'users' field or array('label' => 'own label', 'value' => 'value')
-     * @param bool         $assertValid         should we assert the form validity
-     * @param array        &$validation_errors  labels of invalid form fields
+     * @param string       $templateSyntax
+     * @param string|array $users value of 'users' field or array('label' => 'own label', 'value' => 'value')
+     * @param string       $expectedWikiText
+     * @param string       $expectedValidationErrors
+     * @param string       $msg
      *
-     * @return string content of newly created page
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
-    protected function send_form($template_syntax, $user, $assertValid=true, &$validation_errors=array()) {
+    public function test_field_user(
+        $templateSyntax,
+        $users,
+        $expectedWikiText,
+        $expectedValidationErrors,
+        $msg
+    ) {
+        $actualValidationErrors = [];
+
         $label = 'user';
-        if (is_array($user)) {
-            if (!isset($user['value'])) {
-                throw new \Exception('$user should be string or array("label" => label, "value" => value');
+        if (is_array($users)) {
+            if (!isset($users['value'])) {
+                throw new \InvalidArgumentException('$users should be string or array("label" => label, "value" => value');
             }
-            if (isset($user['label'])) $label = $user['label'];
-            $user = $user['value'];
+            if (isset($users['label'])) {
+                $label = $users['label'];
+            }
+            $users = $users['value'];
         }
-        $result = parent::send_form_action_template('user "'.$label.'"', $template_syntax, $validation_errors, $user);
-        if ($assertValid) {
-            $this->assertEmpty($validation_errors, 'validation error: fields not valid: '.implode(', ', $validation_errors));
-        }
+        $actualWikiText = parent::send_form_action_template(
+            'user "' . $label . '"',
+            $templateSyntax,
+            $actualValidationErrors,
+            $users
+        );
 
-        return $result;
+        $this->assertEquals($expectedWikiText, $actualWikiText, $msg);
+        $this->assertEquals($expectedValidationErrors, $actualValidationErrors, $msg);
     }
-
-    public function test_regex_label() {
-        $label = '*]]'; //somthing to break a regex when not properly quoted
-        $user = array('label' => $label, 'value' => 'mwuser');
-        $result = $this->send_form("user:@@$label@@", $user);
-        $this->assertEquals("user:$user[value]", $result);
-    }
-
-    public function test_action_template_default_substitution() {
-        $user = 'mwuser';
-        $result = $this->send_form('user:@@user@@', $user);
-        $this->assertEquals("user:$user", $result);
-    }
-
-    public function test_action_template_empty_substitution() {
-        $template_syntax = 'user:@@user@@';
-        $validation_errors = array();
-        $result = $this->send_form($template_syntax, '', false, $validation_errors);
-        $this->assertEquals(array('user'), $validation_errors);
-    }
-
-    public function test_action_template_name_substitution() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $user = 'mwuser';
-        $name = $auth->getUserData($user)['name'];
-
-        $result = $this->send_form('user:@@user.name@@', $user);
-        $this->assertEquals("user:$name", $result);
-    }
-
-    public function test_action_template_email_substitution() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $user = 'mwuser';
-        $mail = $auth->getUserData($user)['mail'];
-
-        $result = $this->send_form('user:@@user.mail@@', $user);
-        $this->assertEquals("user:$mail", $result);
-    }
-
-    public function test_action_template_group_substitution_default_delimiter() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $user = 'mwuser';
-        $delimiter = ', ';
-        $grps = implode($delimiter, $auth->getUserData($user)['grps']);
-
-        $result = $this->send_form('user:@@user.grps@@', $user);
-        $this->assertEquals("user:$grps", $result);
-    }
-
-    //user.grps(, )
-    public function test_action_template_group_substitution_custom_delimiter() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $user = 'mwuser';
-        $delimiter = ';';
-        $grps = implode($delimiter, $auth->getUserData($user)['grps']);
-
-        $result = $this->send_form("user:@@user.grps($delimiter)@@", $user);
-        $this->assertEquals("user:$grps", $result);
-    }
-
-    //user.grps(, )
-    public function test_action_template_group_substitution_custom_delimiter_with_brackets() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $user = 'mwuser';
-        $delimiter = ')';
-        $grps = implode($delimiter, $auth->getUserData($user)['grps']);
-
-        $result = $this->send_form("user:@@user.grps($delimiter)@@", $user);
-        $this->assertEquals("user:$grps", $result);
-    }
-
-    public function test_action_template_unknown_user_substitution() {
-        $template_syntax = 'user:@@user@@';
-        $user = 'no_such_user';
-
-        $validation_errors = array();
-        $result = $this->send_form('user:@@user@@', $user, false, $validation_errors);
-        $this->assertEquals(array('user'), $validation_errors);
-    }
-
-    public function test_action_template_unknown_attribute_substitution() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $template_syntax = 'user:@@user.no_sutch_attribute@@';
-        $user = 'mwuser';
-
-        $result = $this->send_form($template_syntax, $user);
-        $this->assertEquals($template_syntax, $result);
-    }
-
-    public function test_action_template_hash_subsitution() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $template_syntax = 'user:##user##';
-        $user = 'mwuser';
-
-        $result = $this->send_form($template_syntax, $user);
-        $this->assertEquals('user:mwuser', $result);
-    }
-
-    public function test_action_template_hash_subsitution_with_attribute() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $user = 'mwuser';
-        $mail = $auth->getUserData($user)['mail'];
-
-        $result = $this->send_form('user:##user.mail##', $user);
-        $this->assertEquals("user:$mail", $result);
-    }
-
-
-    public function test_action_template_hash_at_sign_mismatch() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $template_syntax = 'user:##user@@';
-        $user = 'mwuser';
-
-        $result = $this->send_form($template_syntax, $user);
-        $this->assertEquals($template_syntax, $result);
-    }
-
-    public function test_action_template_multiple_replacements() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $user = 'mwuser';
-        $mail = $auth->getUserData($user)['mail'];
-
-        $delimiter = "\n";
-        $grps = implode($delimiter, $auth->getUserData($user)['grps']);
-
-        $result = $this->send_form("user:@@user@@\n\nmail:@@user.mail@@\n\ngrps:@@user.grps($delimiter)@@", $user);
-        $this->assertEquals("user:$user\n\nmail:$mail\n\ngrps:$grps", $result);
-    }
-
-    public function test_action_template_grps_twice() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $user = 'mwuser';
-
-        $delimiter1 = "\n";
-        $delimiter2 = "()";
-        $grps1 = implode($delimiter1, $auth->getUserData($user)['grps']);
-        $grps2 = implode($delimiter2, $auth->getUserData($user)['grps']);
-
-        $result = $this->send_form("grps1:@@user.grps($delimiter1)@@\n\ngrps2:@@user.grps($delimiter2)@@", $user);
-        $this->assertEquals("grps1:$grps1\n\ngrps2:$grps2", $result);
-    }
-
-    public function test_action_template_grps_special_glue() {
-        /** @var DokuWiki_Auth_Plugin $auth */
-        global $auth;
-        $user = 'mwuser';
-
-        $delimiter = "end)";
-        $grps = implode($delimiter, $auth->getUserData($user)['grps']);
-
-        $result = $this->send_form("grps:@@user.grps($delimiter)@@", $user);
-        $this->assertEquals("grps:$grps", $result);
-    }
-
 }
