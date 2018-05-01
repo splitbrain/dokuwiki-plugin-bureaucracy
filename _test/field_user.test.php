@@ -122,6 +122,27 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
                 [],
                 'groups special glue',
             ],
+            [
+                'grps:@@user.grps()@@',
+                'mwuser',
+                'grps:group1group2',
+                [],
+                'groups with empty delimiter',
+            ],
+            [
+                'user:@@user@@',
+                'non_existant_user',
+                'user:non_existant_user',
+                ['user'],
+                'error for non existant user',
+            ],
+            [
+                'user:@@user.name@@',
+                'non_existant_user',
+                'user:@@user.name@@',
+                ['user'],
+                'error for non existant user with attribute',
+            ],
         ];
     }
 

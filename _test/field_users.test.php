@@ -91,6 +91,20 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
                 'multiple replacements',
             ],
             [
+                'users:@@users@@',
+                'not_existing1, not_existing2',
+                'users:not_existing1, not_existing2',
+                ['users'],
+                'unknown users should cause errors',
+            ],
+            [
+                'users:@@users.unknown_attribute@@',
+                'user1, user2',
+                'users:@@users.unknown_attribute@@',
+                [],
+                'non existant attribute is not replaced',
+            ],
+            [
                 'users:@@*]]@@',  // the label must be something to break a regex when not properly quoted
                 ['label' => '*]]', 'value' => 'user1, user2'],
                 'users:user1, user2',
