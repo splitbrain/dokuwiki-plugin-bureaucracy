@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    bootstrap="../../../_test/bootstrap.php"
+    convertNoticesToExceptions="false"
+    colors="true"
+    stderr="true"
+    backupGlobals="true"
+    >
+
+    <testsuites>
+        <testsuite name="Plugin Tests">
+            <directory suffix=".test.php">./_test</directory>
+        </testsuite>
+    </testsuites>
+
+    <groups>
+        <exclude>
+            <group>flaky</group>
+        </exclude>
+    </groups>
+
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">.</directory>
+            <exclude>
+                <directory suffix=".php">./lang/</directory>
+                <directory suffix=".php">./_test/</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+</phpunit>
