@@ -43,14 +43,12 @@ class BureaucracyTest extends \DokuWikiTest
         //this is the only form
         $form_id = 0;
 
-        for ($i = 0; $i < count($data['fields']); ++$i) {
-            //set null for not existing values
+        /** @var \helper_plugin_bureaucracy_field $field */
+        foreach ($data['fields'] as $i => $field) {
             if (!isset($values[$i])) {
                 $values[$i] = null;
             }
 
-            /** @var \helper_plugin_bureaucracy_field $field */
-            $field = $data['fields'][$i];
             $isValid = $field->handle_post($values[$i], $data['fields'], $i, $form_id);
             if (!$isValid) {
                 $validation_errors[] = $field->getParam('label');
