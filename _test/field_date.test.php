@@ -30,6 +30,22 @@ class bureaucracy_field_date_test extends BureaucracyTest
                 ['dateLabel'],
                 'invalid date',
             ],
+            [
+                'Date: @DATE(@@dateLabel@@)@',
+                'date "dateLabel"',
+                '2018-02-15',
+                'Date: 2018/02/15 00:00',
+                [],
+                'formatted date with $conf[\'dformat\'] format',
+            ],
+            [
+                'Month: @DATE(@@dateLabel@@,%%m)@',
+                'date "dateLabel"',
+                '2018-02-15',
+                'Month: 02',
+                [],
+                'formatted date with custom format',
+            ],
         ];
     }
 
