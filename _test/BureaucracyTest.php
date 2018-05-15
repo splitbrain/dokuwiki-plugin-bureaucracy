@@ -5,6 +5,12 @@ namespace dokuwiki\plugin\bureaucracy\test;
 
 class BureaucracyTest extends \DokuWikiTest
 {
+
+    const FORM_PREFIX_HTML = '<form class="bureaucracy__plugin" id="bureaucracy__plugin1" enctype="multipart/form-data" method="post" action="" accept-charset="utf-8"><div class="no">
+<input type="hidden" name="sectok" value="" /><input type="hidden" name="bureaucracy[$$id]" value="1" /><fieldset ><legend></legend>';
+    const FORM_SUFFIX_HTML = '</fieldset>
+</div></form>';
+
     protected $pluginsEnabled = ['bureaucracy'];
 
     /**
