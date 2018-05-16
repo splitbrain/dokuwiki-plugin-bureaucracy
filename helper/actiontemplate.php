@@ -347,6 +347,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             $label = $field->getParam('label');
             $file  = $field->getParam('file');
             $ns    = $field->getParam('namespace');
+            $ow    = $field->getParam('overwrite');
 
             //skip empty files
             if(!$file['size']) {
@@ -366,7 +367,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             $res = media_save(
                 array('name' => $file['tmp_name']),
                 $id,
-                false,
+                $ow,
                 $auth,
                 $move);
 
