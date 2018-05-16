@@ -105,7 +105,7 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 $this->opt['pagename'] = true;
             } elseif($arg == '@@') {
                 $this->opt['replyto'] = true;
-            } elseif($arg == 'overwrite') {
+            } elseif($arg == '%overwrite') {
                 $this->opt['overwrite'] = true;
             } elseif(preg_match('/x\d/', $arg)) {
                 $this->opt['rows'] = substr($arg,1);
