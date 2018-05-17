@@ -53,7 +53,8 @@ class bureaucracy_field_date_test extends BureaucracyTest
      * @dataProvider dataProvider
      *
      * @param string $templateSyntax
-     * @param        $postedValue
+     * @param string $formSyntax
+     * @param string $postedValue
      * @param string $expectedWikiText
      * @param string $expectedValidationErrors
      * @param string $msg
