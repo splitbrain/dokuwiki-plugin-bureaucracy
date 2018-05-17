@@ -8,6 +8,4 @@ before_install: wget https://raw.github.com/splitbrain/dokuwiki-travis/master/tr
 install: sh travis.sh
 script:
   - cd _test
-  - phpunit --configuration=../lib/plugins/bureaucracy/phpunit.xml --group plugin_bureaucracy --coverage-clover=coverage.clover
-  - wget https://scrutinizer-ci.com/ocular.phar
-  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover --repository=g/$TRAVIS_REPO_SLUG --revision=$TRAVIS_COMMIT
+  - phpunit --group plugin_bureaucracy
