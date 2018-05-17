@@ -47,7 +47,7 @@ class helper_plugin_bureaucracy_fielduser extends helper_plugin_bureaucracy_fiel
         $value = $this->opt['value'];
         //attr doesn't exists
         if (!isset($matches[2])) {
-            return is_null($value) || $value === false ? $matches[0] : $value;
+            return is_null($value) || $value === false ? '' : $value;
         }
         $attr = $matches[2];
 
