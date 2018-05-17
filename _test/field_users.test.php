@@ -29,6 +29,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
         return [
             [
                 'users:@@users@@',
+                'users users',
                 'user1, user2',
                 'users:user1, user2',
                 [],
@@ -36,6 +37,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 'users:@@users@@',
+                'users users',
                 '',
                 'users:',
                 ['users'],
@@ -43,6 +45,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 'users:@@users(;)@@',
+                'users users',
                 'user1, user2',
                 'users:user1;user2',
                 [],
@@ -50,6 +53,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 "users:@@users(\n)@@",
+                'users users',
                 'user1, user2',
                 "users:user1\nuser2",
                 [],
@@ -57,6 +61,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 'users:@@users()@@',
+                'users users',
                 'user1, user2',
                 'users:user1user2',
                 [],
@@ -64,6 +69,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 'users:@@users.name@@',
+                'users users',
                 'user1, user2',
                 'users:user1Name, user2Name',
                 [],
@@ -71,6 +77,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 'users:@@users(;).name@@',
+                'users users',
                 'user1, user2',
                 'users:user1Name;user2Name',
                 [],
@@ -78,6 +85,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 'users:@@users.mail@@',
+                'users users',
                 'user1, user2',
                 'users:user1@example.com, user2@example.com',
                 [],
@@ -85,6 +93,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 "mails:@@users.mail@@\n\nnames:@@users(\n).name@@",
+                'users users',
                 'user1, user2',
                 "mails:user1@example.com, user2@example.com\n\nnames:user1Name\nuser2Name",
                 [],
@@ -92,6 +101,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 'users:@@users@@',
+                'users users',
                 'not_existing1, not_existing2',
                 'users:not_existing1, not_existing2',
                 ['users'],
@@ -99,6 +109,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 'users:@@users.unknown_attribute@@',
+                'users users',
                 'user1, user2',
                 'users:@@users.unknown_attribute@@',
                 [],
@@ -106,14 +117,16 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
             ],
             [
                 'users:@@*]]@@',  // the label must be something to break a regex when not properly quoted
-                ['label' => '*]]', 'value' => 'user1, user2'],
+                'users "*]]"',
+                'user1, user2',
                 'users:user1, user2',
                 [],
                 'ensure label desn\'t break regex',
             ],
             [
                 'users:@@tHis Is UsEr@@',
-                ['label' => 'tHis Is UsEr', 'value' => 'user1, user2'],
+                'users "tHis Is UsEr"',
+                'user1, user2',
                 'users:user1, user2',
                 [],
                 'label with spaces and mixed case',
@@ -124,38 +137,29 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
     /**
      * @dataProvider dataProvider
      *
-     * @param string       $templateSyntax
-     * @param string|array $users value of 'users' field or array('label' => 'own label', 'value' => 'value')
-     * @param string       $expectedWikiText
-     * @param string       $expectedValidationErrors
-     * @param string       $msg
+     * @param string $templateSyntax
+     * @param string $formSyntax
+     * @param string $postedValue value of 'users' field
+     * @param string $expectedWikiText
+     * @param string $expectedValidationErrors
+     * @param string $msg
      *
-     * @throws \InvalidArgumentException
      */
     public function test_field_users(
         $templateSyntax,
-        $users,
+        $formSyntax,
+        $postedValue,
         $expectedWikiText,
         $expectedValidationErrors,
         $msg
     ) {
         $actualValidationErrors = [];
 
-        $label = 'users';
-        if (is_array($users)) {
-            if (!isset($users['value'])) {
-                throw new \InvalidArgumentException('$users should be string or array("label" => label, "value" => value');
-            }
-            if (isset($users['label'])) {
-                $label = $users['label'];
-            }
-            $users = $users['value'];
-        }
         $actualWikiText = parent::send_form_action_template(
-            'users "' . $label . '"',
+            $formSyntax,
             $templateSyntax,
             $actualValidationErrors,
-            $users
+            $postedValue
         );
 
         $this->assertEquals($expectedWikiText, $actualWikiText, $msg);

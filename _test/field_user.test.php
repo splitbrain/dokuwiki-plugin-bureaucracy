@@ -26,6 +26,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
         return [
             [
                 'user:@@user@@',
+                'user user',
                 'mwuser',
                 'user:mwuser',
                 [],
@@ -33,6 +34,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:@@user@@',
+                'user user',
                 '',
                 'user:',
                 ['user'],
@@ -40,6 +42,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:@@user.name@@',
+                'user user',
                 'mwuser',
                 'user:Wiki User',
                 [],
@@ -47,6 +50,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:@@user.mail@@',
+                'user user',
                 'mwuser',
                 'user:wikiuser@example.com',
                 [],
@@ -54,6 +58,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:@@user.grps@@',
+                'user user',
                 'mwuser',
                 'user:group1, group2',
                 [],
@@ -61,6 +66,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:@@user.grps(;)@@',
+                'user user',
                 'mwuser',
                 'user:group1;group2',
                 [],
@@ -68,6 +74,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:@@user.grps())@@',
+                'user user',
                 'mwuser',
                 'user:group1)group2',
                 [],
@@ -75,6 +82,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:@@user.no_sutch_attribute@@',
+                'user user',
                 'mwuser',
                 'user:@@user.no_sutch_attribute@@',
                 [],
@@ -82,6 +90,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:##user##',
+                'user user',
                 'mwuser',
                 'user:mwuser',
                 [],
@@ -89,6 +98,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:##user.mail##',
+                'user user',
                 'mwuser',
                 'user:wikiuser@example.com',
                 [],
@@ -96,6 +106,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:##user@@',
+                'user user',
                 'mwuser',
                 'user:##user@@',
                 [],
@@ -103,6 +114,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 "user:@@user@@\n\nmail:@@user.mail@@\n\ngrps:@@user.grps(\n)@@",
+                'user user',
                 'mwuser',
                 "user:mwuser\n\nmail:wikiuser@example.com\n\ngrps:group1\ngroup2",
                 [],
@@ -110,6 +122,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 "grps1:@@user.grps(\n)@@\n\ngrps2:@@user.grps(())@@",
+                'user user',
                 'mwuser',
                 "grps1:group1\ngroup2\n\ngrps2:group1()group2",
                 [],
@@ -117,6 +130,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'grps:@@user.grps(end))@@',
+                'user user',
                 'mwuser',
                 'grps:group1end)group2',
                 [],
@@ -124,6 +138,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'grps:@@user.grps()@@',
+                'user user',
                 'mwuser',
                 'grps:group1group2',
                 [],
@@ -131,6 +146,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:@@user@@',
+                'user user',
                 'non_existant_user',
                 'user:non_existant_user',
                 ['user'],
@@ -138,6 +154,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
             ],
             [
                 'user:@@user.name@@',
+                'user user',
                 'non_existant_user',
                 'user:@@user.name@@',
                 ['user'],
@@ -150,41 +167,32 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
     /**
      * @dataProvider dataProvider
      *
-     * @param string       $templateSyntax
-     * @param string|array $users value of 'users' field or array('label' => 'own label', 'value' => 'value')
-     * @param string       $expectedWikiText
-     * @param string       $expectedValidationErrors
-     * @param string       $msg
+     * @param string $templateSyntax
+     * @param string $formSyntax
+     * @param string $postedValue value of 'user' field
+     * @param string $expectedWikiText
+     * @param string $expectedValidationErrors
+     * @param string $msg
      *
-     * @throws \InvalidArgumentException
      */
     public function test_field_user(
         $templateSyntax,
-        $users,
+        $formSyntax,
+        $postedValue,
         $expectedWikiText,
         $expectedValidationErrors,
         $msg
     ) {
         $actualValidationErrors = [];
 
-        $label = 'user';
-        if (is_array($users)) {
-            if (!isset($users['value'])) {
-                throw new \InvalidArgumentException('$users should be string or array("label" => label, "value" => value');
-            }
-            if (isset($users['label'])) {
-                $label = $users['label'];
-            }
-            $users = $users['value'];
-        }
         $actualWikiText = parent::send_form_action_template(
-            'user "' . $label . '"',
+            $formSyntax,
             $templateSyntax,
             $actualValidationErrors,
-            $users
+            $postedValue
         );
 
-        $this->assertEquals($expectedWikiText, $actualWikiText, $msg);
         $this->assertEquals($expectedValidationErrors, $actualValidationErrors, $msg);
+        $this->assertEquals($expectedWikiText, $actualWikiText, $msg);
     }
 }
