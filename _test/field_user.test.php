@@ -44,6 +44,14 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest
                 'error for empty substitution',
             ],
             [
+                'user:@@user@@',
+                'user user !',
+                '',
+                'user:',
+                [],
+                'ok for empty substitution in optional field',
+            ],
+            [
                 'user:@@user.name@@',
                 'user user',
                 'mwuser',
