@@ -217,8 +217,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @return string
      */
     public function getReplacementPattern() {
-        $label = $this->opt['label'];
-        $value = $this->opt['value'];
+        $label = $this->getParam('label');
+        $value = $this->getParam('value');
         return '/(@@|##)' . preg_quote($label, '/') .
             '(?:\|(.*?))' . (is_null($value) ? '' : '?') .
             '\1/si';
@@ -231,7 +231,7 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @return mixed|string
      */
     public function getReplacementValue() {
-        $value = $this->opt['value'];
+        $value = $this->getParam('value');
         return is_null($value) || $value === false ? '$2' : $value;
     }
 
