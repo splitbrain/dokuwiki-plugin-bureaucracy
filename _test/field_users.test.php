@@ -21,7 +21,7 @@ class syntax_plugin_bureaucracy_fieldusers_test extends BureaucracyTest
 
         $auth->createUser('user1', '54321', 'user1Name', 'user1@example.com');
         $auth->createUser('user2', '543210', 'user2Name', 'user2@example.com');
-        $auth->createUser('mwuser', '12345', 'Wiki User', 'me@example.com', array('group1', 'group2'));
+        $auth->createUser('mwuser', '12345', 'Wiki User', 'me@example.com', ['group1', 'group2']);
     }
 
     public function dataProvider()

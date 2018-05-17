@@ -1,16 +1,19 @@
 <?php
+
 namespace dokuwiki\plugin\bureaucracy\test;
 
 /**
  * @group plugin_bureaucracy
  * @group plugins
  */
-class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
+class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest
+{
 
     /**
      * Create some users
      */
-    public function setUp() {
+    public function setUp()
+    {
         parent::setUp();
 
         /** @var \DokuWiki_Auth_Plugin $auth */
@@ -18,7 +21,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest {
 
         $auth->createUser("user1", "54321", "user1Name", "user1@example.com");
         $auth->createUser("user2", "543210", "user2Name", "user2@example.com");
-        $auth->createUser("mwuser", "12345", "Wiki User", "wikiuser@example.com", array('group1', 'group2'));
+        $auth->createUser("mwuser", "12345", "Wiki User", "wikiuser@example.com", ['group1', 'group2']);
     }
 
     public function dataProvider()
