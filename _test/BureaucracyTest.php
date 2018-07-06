@@ -25,9 +25,6 @@ class BureaucracyTest extends \DokuWikiTest
      */
     protected function send_form_action_template($form_syntax, $template_syntax, &$validation_errors, ...$values)
     {
-        if (is_array($values[0])) {
-            $values = $values[0];
-        }
         $id = uniqid('page', true);
         $template_id = uniqid('template', true);
 
