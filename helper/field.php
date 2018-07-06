@@ -219,9 +219,40 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
     public function getReplacementPattern() {
         $label = $this->getParam('label');
         $value = $this->getParam('value');
+
+        if (is_array($value)) {
+            return '/(@@|##)' . preg_quote($label, '/') .
+                '(?:\((?P<delimiter>.*?)\))?' .//delimiter
+                '(?:\|(?P<default>.*?))' . (count($value) == 0 ? '' : '?') .
+                '\1/si';
+        }
+
         return '/(@@|##)' . preg_quote($label, '/') .
             '(?:\|(.*?))' . (is_null($value) ? '' : '?') .
             '\1/si';
+    }
+
+    /**
+     * Used as an callback for preg_replace_callback
+     *
+     * @param $matches
+     * @return string
+     */
+    public function replacementMultiValueCallback($matches) {
+        $value = $this->opt['value'];
+
+        //default value
+        if (is_null($value) || $value === false) {
+            if (isset($matches['default']) && $matches['default'] != '') {
+                return $matches['default'];
+            }
+            return $matches[0];
+        }
+
+        //check if matched string containts a pair of brackets
+        $delimiter = preg_match('/\(.*\)/s', $matches[0]) ? $matches['delimiter'] : ', ';
+
+        return implode($delimiter, $value);
     }
 
     /**
@@ -232,6 +263,11 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      */
     public function getReplacementValue() {
         $value = $this->getParam('value');
+
+        if (is_array($value)) {
+            return array($this, 'replacementMultiValueCallback');
+        }
+
         return is_null($value) || $value === false ? '$2' : $value;
     }
 
