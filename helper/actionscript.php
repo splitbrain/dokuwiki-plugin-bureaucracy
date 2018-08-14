@@ -32,6 +32,13 @@ class helper_plugin_bureaucracy_actionscript extends helper_plugin_bureaucracy_a
         $classFragment = substr($scriptName, 0, strpos($scriptName, '.'));
         $className = 'helper_plugin_bureaucracy_handler_' . $classFragment;
 
+        $deprecatedClassName = 'bureaucracy_handler_' . $classFragment;
+        if (!class_exists($className) && class_exists($deprecatedClassName)) {
+            msg("Please change this script's class-name to <code>$className</code>.
+Your current scheme <code>$deprecatedClassName</code> is deprecated and will stop working in the future.", 2);
+            $className = $deprecatedClassName;
+        }
+
         /** @var dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface $handler */
         $handler = new $className;
 
