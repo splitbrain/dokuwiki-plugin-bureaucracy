@@ -79,7 +79,7 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
         if(!$mail->send()) {
             throw new Exception($this->getLang('e_mail'));
         }
-        return $thanks;
+        return '<p>' . $thanks . '</p>';
     }
 
     /**
