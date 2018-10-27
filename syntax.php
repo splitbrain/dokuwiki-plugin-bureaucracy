@@ -356,10 +356,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
 		// create thanks string
-		$thanks = '';
-		foreach(array_unique($thanks_array) as $thanks_string) {
-			$thanks .= '<p>' . $thanks_string . '</p>';
-		}
+		$thanks = implode('', array_unique($thanks_array));
 
         return $thanks;
     }
