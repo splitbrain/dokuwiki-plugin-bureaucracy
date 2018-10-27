@@ -480,7 +480,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         if($strftime) {
             $input = preg_replace_callback(
                 '/%./',
-                create_function('$m', 'return strftime($m[0]);'),
+                function($m){return strftime($m[0]);},
                 $input
             );
         }

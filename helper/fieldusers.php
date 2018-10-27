@@ -45,7 +45,7 @@ class helper_plugin_bureaucracy_fieldusers extends helper_plugin_bureaucracy_fie
 
         $value = $this->opt['value'];
         //copy the value by default
-        if (count($matches[2]) == 2) {
+        if (is_array($matches[2]) && count($matches[2]) == 2) {
             return is_null($value) || $value === false ? $matches[0] : $value;
         }
 
