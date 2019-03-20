@@ -1,5 +1,6 @@
 language: php
 php:
+  - "7.3"
   - "7.2"
   - "7.1"
   - "7.0"
@@ -8,4 +9,4 @@ before_install: wget https://raw.github.com/splitbrain/dokuwiki-travis/master/tr
 install: sh travis.sh
 script:
   - cd _test
-  - phpunit --group plugin_bureaucracy
+  - ./phpunit.phar --group plugin_bureaucracy
