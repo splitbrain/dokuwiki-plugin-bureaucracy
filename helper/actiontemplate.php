@@ -70,6 +70,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         foreach ($fields as $field) {
             $pname = $field->getParam('pagename');
             if (!is_null($pname)) {
+                if (is_array($pname)) $pname = implode($sep, $pname);
                 $this->pagename .= $sep . $pname;
             }
         }
