@@ -12,6 +12,7 @@ $lang['checkagainst']    = '(Comparado com /%s/i)';
 $lang['e_email']         = '"%s" tem de ser um endereço de email válido.';
 $lang['e_numeric']       = '"%s" tem de ser um número.';
 $lang['e_date']          = '"%s" tem de ser uma data válida no formato dd-mm-yyyy.';
+$lang['e_time']          = '"%s" tem de ser um horário válido no formato (h)h:mm(:ss).';
 $lang['e_user']          = '"%s" tem de ser o nome de um usuário existente.';
 $lang['e_users']         = '"%s" tem de ser uma lista de nomes de usuários existentes separados por vírgulas.';
 $lang['e_min']           = '"%s" tem de ser maior que %s.';

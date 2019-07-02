@@ -358,10 +358,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
 		// create thanks string
-		$thanks = '';
-		foreach(array_unique($thanks_array) as $thanks_string) {
-			$thanks .= '<p>' . $thanks_string . '</p>';
-		}
+		$thanks = implode('', array_unique($thanks_array));
 
         return $thanks;
     }
@@ -482,7 +479,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         if($strftime) {
             $input = preg_replace_callback(
                 '/%./',
-                create_function('$m', 'return strftime($m[0]);'),
+                function($m){return strftime($m[0]);},
                 $input
             );
         }

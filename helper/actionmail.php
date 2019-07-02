@@ -79,7 +79,7 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
         if(!$mail->send()) {
             throw new Exception($this->getLang('e_mail'));
         }
-        return $thanks;
+        return '<p>' . $thanks . '</p>';
     }
 
     /**
@@ -140,6 +140,7 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
 
                 default:
                     if($value === null || $label === null) break;
+                    if(is_array($value)) $value = implode(', ', $value);
                     list($html, $text) = $this->mail_buildRow($label, $value);
 
                     if(!is_null($field->getParam('replyto'))) {
