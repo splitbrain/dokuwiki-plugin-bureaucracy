@@ -115,6 +115,34 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
     }
 
     /**
+     * Returns raw pagetemplate contents for the ID's namespace
+     *
+     * @param string $id the id of the page to be created
+     * @return string raw pagetemplate content
+     */
+    protected function rawPageTemplate($id) {
+        global $conf;
+
+        $path = dirname(wikiFN($id));
+        if(file_exists($path.'/_template.txt')) {
+            $tplfile = $path.'/_template.txt';
+        } else {
+            // search upper namespaces for templates
+            $len = strlen(rtrim($conf['datadir'], '/'));
+            while(strlen($path) >= $len) {
+                if(file_exists($path.'/__template.txt')) {
+                    $tplfile = $path.'/__template.txt';
+                    break;
+                }
+                $path = substr($path, 0, strrpos($path, '/'));
+            }
+        }
+
+        $tpl = io_readFile($tplfile);
+        return $tpl;
+    }
+
+    /**
      * Load template(s) for targetpage as given via action field
      *
      * @param string $tpl    template name as given in form
@@ -129,6 +157,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         if ($tpl == '_') {
             // use namespace template
             if (!isset($this->targetpages[$this->pagename])) {
+                $raw = $this->rawPageTemplate($this->pagename);
+                $this->noreplace_save($raw);
                 $this->targetpages[$this->pagename] = pageTemplate(array($this->pagename));
             }
         } elseif ($tpl !== '!') {
@@ -392,9 +422,12 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @param string $templatepageid pageid of template for this targetpage
      */
     protected function addParsedTargetpage($targetpageid, $templatepageid) {
+        $tpl = rawWiki($templatepageid);
+        $this->noreplace_save($tpl);
+
         $data = array(
             'id' => $targetpageid,
-            'tpl' => rawWiki($templatepageid),
+            'tpl' => $tpl,
             'doreplace' => true,
         );
         parsePageTemplate($data);
