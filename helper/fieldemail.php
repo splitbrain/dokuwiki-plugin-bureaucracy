@@ -23,7 +23,7 @@ class helper_plugin_bureaucracy_fieldemail extends helper_plugin_bureaucracy_fie
         parent::_validate();
 
         $value = $this->getParam('value');
-        if(!is_null($value) && $value !== '@MAIL@' && !mail_isvalid($value)){
+        if(!is_null($value) && $value !== '@MAIL@' && !mail_isvalid(trim($value))){
             throw new Exception(sprintf($this->getLang('e_email'),hsc($this->getParam('display'))));
         }
     }
