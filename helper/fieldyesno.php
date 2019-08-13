@@ -20,6 +20,12 @@ class helper_plugin_bureaucracy_fieldyesno extends helper_plugin_bureaucracy_fie
         $this->init($args);
         $newargs = array();
         foreach ($args as $arg) {
+            // as in other types, terminating "!" should mark an optional field
+            if (preg_match('/\!$/', $arg)) {
+                $newargs[] = $arg;
+                $this->opt['optional'] = true;
+                continue;
+            }
             switch ($arg[0]) {
             case '=':
                 if($arg == '==1') {
@@ -38,7 +44,6 @@ class helper_plugin_bureaucracy_fieldyesno extends helper_plugin_bureaucracy_fie
             }
         }
         $this->standardArgs($newargs);
-        $this->opt['optional'] = true;
     }
 
     /**
@@ -52,7 +57,7 @@ class helper_plugin_bureaucracy_fieldyesno extends helper_plugin_bureaucracy_fie
             if ($this->opt['value'] === '1') {
                 return isset($this->opt['true_value']) ?
                        $this->opt['true_value'] :
-                       null;
+                       $this->opt['value']; // return the value to make validation work
             } elseif ($this->opt['value'] === '0') {
                 return isset($this->opt['false_value']) ?
                        $this->opt['false_value'] :
