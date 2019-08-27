@@ -199,7 +199,7 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @return bool Whether the passed value is valid
      */
     public function handle_post($value, &$fields, $index, $formid) {
-        return $this->hidden || $this->setVal($value);
+        return $this->hidden || $this->setVal($value, $fields);
     }
 
     /**
@@ -275,9 +275,10 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * Validate value and stores it
      *
      * @param mixed $value value entered into field
+     * @param array $fields
      * @return bool whether the passed value is valid
      */
-    protected function setVal($value) {
+    protected function setVal($value, &$fields = null) {
         if ($value === '') {
             $value = null;
         }
