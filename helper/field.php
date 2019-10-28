@@ -109,7 +109,7 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 $this->opt['rows'] = substr($arg,1);
             } elseif($arg[0] == '.') {
                 $this->opt['class'] = substr($arg, 1);
-            } elseif(preg_match('/0{2,}/', $arg)) {
+            } elseif(preg_match('/^0{2,}$/', $arg)) {
                 $this->opt['leadingzeros'] = strlen($arg);
             } elseif($arg[0].$arg[1] == '**') {
                 $this->opt['matchexplanation'] = substr($arg,2);
