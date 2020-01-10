@@ -104,7 +104,12 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
                 //target
                 $relativetargetpage = $field->getParam('page_tgt');
                 resolve_pageid($ns, $relativeTargetPageid, $ignored);
-                $targetpage = "$this->pagename:$relativetargetpage";
+
+                if (substr($relativetargetpage, 0, 1) != ":") {
+                  $targetpage = "$this->pagename:$relativetargetpage";
+                } else {
+                  $targetpage = $relativetargetpage;
+                }
 
                 $auth = $this->aclcheck($templatepage); // runas
                 if ($auth >= AUTH_READ ) {
