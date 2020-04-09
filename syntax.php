@@ -404,7 +404,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         do {
             $len = strlen($line);
             for($i = 0; $i < $len; $i++) {
-                if($line{$i} == '"') {
+                if($line[$i] == '"') {
                     if($inQuote) {
                         if($escapedQuote) {
                             $arg .= '"';
