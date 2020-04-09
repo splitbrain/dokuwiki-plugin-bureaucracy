@@ -411,7 +411,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                             $escapedQuote = false;
                             continue;
                         }
-                        if($line{$i + 1} == '"') {
+                        if($line[$i + 1] == '"') {
                             $escapedQuote = true;
                             continue;
                         }
@@ -423,7 +423,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                         $inQuote = true;
                         continue;
                     }
-                } else if($line{$i} == ' ') {
+                } else if($line[$i] == ' ') {
                     if($inQuote) {
                         $arg .= ' ';
                         continue;
@@ -434,7 +434,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                         continue;
                     }
                 }
-                $arg .= $line{$i};
+                $arg .= $line[$i];
             }
             if(!$inQuote || count($lines) === 0) break;
             $line = array_shift($lines);
