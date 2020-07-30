@@ -39,7 +39,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         $evdata = array(
             'patterns' => &$this->patterns,
             'values' => &$this->values,
-            'fields' => $fields
+            'fields' => $fields,
+            'action' => $this
         );
 
         $event = new Doku_Event('PLUGIN_BUREAUCRACY_PAGENAME', $evdata);
