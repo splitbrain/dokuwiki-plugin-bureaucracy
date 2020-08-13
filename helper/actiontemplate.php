@@ -36,7 +36,18 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         $this->prepareNoincludeReplacement();
         $this->prepareFieldReplacements($fields);
 
-        $this->buildTargetPagename($fields, $sep);
+        $evdata = array(
+            'patterns' => &$this->patterns,
+            'values' => &$this->values,
+            'fields' => $fields,
+            'action' => $this
+        );
+
+        $event = new Doku_Event('PLUGIN_BUREAUCRACY_PAGENAME', $evdata);
+        if ($event->advise_before()) {
+            $this->buildTargetPagename($fields, $sep);
+        }
+        $event->advise_after();
 
         //target&template(s) from addpage fields
         $this->getAdditionalTargetpages($fields);
