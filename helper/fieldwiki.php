@@ -53,7 +53,17 @@ class helper_plugin_bureaucracy_fieldwiki extends helper_plugin_bureaucracy_fiel
      * @return string The parsed template
      */
     protected function _parse_tpl($tpl, $params) {
-        $ins = array_slice(p_get_instructions($params['display']), 2, -2);
+        $ins = p_get_instructions($params['display']);
+        // remove document and p instructions (opening and closing)
+        $start = 2;
+        $end = 2;
+        // check if struct instructions have to be removed as well from the beginning or end
+        if (isset($ins[1][1][0]) && $ins[1][1][0] === 'struct_output') {
+            $start = 3;
+        } elseif (isset($ins[count($ins) - 2][1][0]) && $ins[count($ins) - 2][1][0] === 'struct_output') {
+            $end = 3;
+        }
+        $ins = array_slice($ins, $start, -$end);
         $tpl = p_render('xhtml', $ins, $byref_ignore);
         return '<p>'.$tpl.'</p>';
     }
