@@ -32,53 +32,62 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
         $this->prepareNoincludeReplacement();
         $this->prepareFieldReplacements($fields);
 
-        //set default subject
-        $this->subject = sprintf($this->getLang('mailsubject'), $ID);
+        $evdata = [
+            'fields' => $fields,
+            'values' => &$this->values
+        ];
+        $event = new Doku_Event('PLUGIN_BUREAUCRACY_EMAIL_SEND', $evdata);
+        if($event->advise_before()) {
+            //set default subject
+            $this->subject = sprintf($this->getLang('mailsubject'), $ID);
 
-        //build html&text table, collect replyto and subject
-        list($table_html, $table_text) = $this->processFieldsBuildTable($fields, $mail);
+            //build html&text table, collect replyto and subject
+            list($table_html, $table_text) = $this->processFieldsBuildTable($fields, $mail);
 
-        //Body
-        if($this->mailtemplate) {
-            //show template
-            $this->patterns['__tablehtml__'] = '/@TABLEHTML@/';
-            $this->patterns['__tabletext__'] = '/@TABLETEXT@/';
-            $this->values['__tablehtml__'] = $table_html;
-            $this->values['__tabletext__'] = $table_text;
+            //Body
+            if($this->mailtemplate) {
+                //show template
+                $this->patterns['__tablehtml__'] = '/@TABLEHTML@/';
+                $this->patterns['__tabletext__'] = '/@TABLETEXT@/';
+                $this->values['__tablehtml__'] = $table_html;
+                $this->values['__tabletext__'] = $table_text;
 
-            list($this->_mail_html, $this->_mail_text) = $this->getContent();
+                list($this->_mail_html, $this->_mail_text) = $this->getContent();
 
-        } else {
-            //show simpel listing
-            $this->_mail_html .= sprintf($this->getLang('mailintro')."<br><br>", dformat());
-            $this->_mail_html .= $table_html;
+            } else {
+                //show simpel listing
+                $this->_mail_html .= sprintf($this->getLang('mailintro')."<br><br>", dformat());
+                $this->_mail_html .= $table_html;
 
-            $this->_mail_text .= sprintf($this->getLang('mailintro')."\n\n", dformat());
-            $this->_mail_text .= $table_text;
+                $this->_mail_text .= sprintf($this->getLang('mailintro')."\n\n", dformat());
+                $this->_mail_text .= $table_text;
+            }
+            $mail->setBody($this->_mail_text,null,null,$this->_mail_html);
+
+            // Reply-to
+            if(!empty($this->replyto)) {
+                $replyto = $mail->cleanAddress($this->replyto);
+                $mail->setHeader('Reply-To', $replyto, false);
+            }
+
+            // To
+            $to = $this->replace(implode(',',$argv)); // get recipient address(es)
+            $to = $mail->cleanAddress($to);
+            $mail->to($to);
+
+            // From
+            $mail->from($conf['mailfrom']);
+
+            // Subject
+            $this->subject = $this->replace($this->subject);
+            $mail->subject($this->subject);
+
+            if(!$mail->send()) {
+                throw new Exception($this->getLang('e_mail'));
+            }
         }
-        $mail->setBody($this->_mail_text,null,null,$this->_mail_html);
+        $event->advise_after();
 
-        // Reply-to
-        if(!empty($this->replyto)) {
-            $replyto = $mail->cleanAddress($this->replyto);
-            $mail->setHeader('Reply-To', $replyto, false);
-        }
-
-        // To
-        $to = $this->replace(implode(',',$argv)); // get recipient address(es)
-        $to = $mail->cleanAddress($to);
-        $mail->to($to);
-
-        // From
-        $mail->from($conf['mailfrom']);
-
-        // Subject
-        $this->subject = $this->replace($this->subject);
-        $mail->subject($this->subject);
-
-        if(!$mail->send()) {
-            throw new Exception($this->getLang('e_mail'));
-        }
         return '<p>' . $thanks . '</p>';
     }
 
