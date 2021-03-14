@@ -539,9 +539,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         global $conf;
 
         //no 2nd argument for default date format
-        if($match[2] == null) {
-            $match[2] = $conf['dformat'];
-        }
+        $match[2] = $match[2] ?? $conf['dformat'];
 
         return strftime($match[2], strtotime($match[1]));
     }
