@@ -23,8 +23,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
     public function run($fields, $thanks, $argv) {
         global $conf;
 
-        list($tpl, $this->pagename, $sep) = $argv;
-        if(is_null($sep)) $sep = $conf['sepchar'];
+        [$tpl, $this->pagename] = $argv;
+        $sep = $argv[2] ?? $conf['sepchar'];
 
         $this->patterns = array();
         $this->values   = array();
