@@ -411,7 +411,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                             $escapedQuote = false;
                             continue;
                         }
-                        if($line[$i + 1] == '"') {
+                        if($i + 1 < $len && $line[$i + 1] == '"') {
                             $escapedQuote = true;
                             continue;
                         }
