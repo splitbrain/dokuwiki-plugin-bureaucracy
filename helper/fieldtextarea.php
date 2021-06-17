@@ -14,6 +14,9 @@ class helper_plugin_bureaucracy_fieldtextarea extends helper_plugin_bureaucracy_
      */
     public function initialize($args) {
         parent::initialize($args);
+        if (!isset($this->opt['class'])) {
+            $this->opt['class'] = '';
+        }
         $this->opt['class'] .= ' textareafield';
     }
 

@@ -411,7 +411,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                             $escapedQuote = false;
                             continue;
                         }
-                        if($line[$i + 1] == '"') {
+                        if($i + 1 < $len && $line[$i + 1] == '"') {
                             $escapedQuote = true;
                             continue;
                         }
@@ -539,9 +539,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         global $conf;
 
         //no 2nd argument for default date format
-        if($match[2] == null) {
-            $match[2] = $conf['dformat'];
-        }
+        $match[2] = $match[2] ?? $conf['dformat'];
 
         return strftime($match[2], strtotime($match[1]));
     }
@@ -587,8 +585,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->values['__formpage_!!page__'] = utf8_ucwords($page);
         $this->values['__formpage_!page!__'] = utf8_strtoupper($page);
         $this->values['__user__'] = $INPUT->server->str('REMOTE_USER');
-        $this->values['__name__'] = $USERINFO['name'];
-        $this->values['__mail__'] = $USERINFO['mail'];
+        $this->values['__name__'] = $USERINFO['name'] ?? '';
+        $this->values['__mail__'] = $USERINFO['mail'] ?? '';
         $this->values['__date__'] = strftime($conf['dformat']);
     }
 
