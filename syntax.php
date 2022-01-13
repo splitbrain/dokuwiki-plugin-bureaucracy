@@ -552,6 +552,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     function prepareNamespacetemplateReplacements() {
         /* @var Input $INPUT */
         global $INPUT;
+        global $INFO;
         global $USERINFO;
         global $conf;
         global $ID;
@@ -572,11 +573,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->patterns['__date__'] = '/@DATE@/';
 
         // replace placeholders
-        $file = noNS($ID);
+        $localid = isset($INFO['id']) ? $INFO['id'] : $ID;
+        $file = noNS($localid);
         $page = strtr($file, $conf['sepchar'], ' ');
-        $this->values['__formpage_id__'] = $ID;
-        $this->values['__formpage_ns__'] = getNS($ID);
-        $this->values['__formpage_curns__'] = curNS($ID);
+        $this->values['__formpage_id__'] = $localid;
+        $this->values['__formpage_ns__'] = getNS($localid);
+        $this->values['__formpage_curns__'] = curNS($localid);
         $this->values['__formpage_file__'] = $file;
         $this->values['__formpage_!file__'] = utf8_ucfirst($file);
         $this->values['__formpage_!file!__'] = utf8_strtoupper($file);
