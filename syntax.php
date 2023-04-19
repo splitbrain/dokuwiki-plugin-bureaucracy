@@ -10,6 +10,8 @@
  * @author     Adrian Lang <dokuwiki@cosmocode.de>
  */
 // must be run within Dokuwiki
+use dokuwiki\Utf8\PhpString;
+
 if(!defined('DOKU_INC')) die();
 
 /**
@@ -580,12 +582,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->values['__formpage_ns__'] = getNS($localid);
         $this->values['__formpage_curns__'] = curNS($localid);
         $this->values['__formpage_file__'] = $file;
-        $this->values['__formpage_!file__'] = utf8_ucfirst($file);
-        $this->values['__formpage_!file!__'] = utf8_strtoupper($file);
+        $this->values['__formpage_!file__'] = PhpString::ucfirst($file);
+        $this->values['__formpage_!file!__'] = PhpString::strtoupper($file);
         $this->values['__formpage_page__'] = $page;
-        $this->values['__formpage_!page__'] = utf8_ucfirst($page);
-        $this->values['__formpage_!!page__'] = utf8_ucwords($page);
-        $this->values['__formpage_!page!__'] = utf8_strtoupper($page);
+        $this->values['__formpage_!page__'] = PhpString::ucfirst($page);
+        $this->values['__formpage_!!page__'] = PhpString::ucwords($page);
+        $this->values['__formpage_!page!__'] = PhpString::strtoupper($page);
         $this->values['__user__'] = $INPUT->server->str('REMOTE_USER');
         $this->values['__name__'] = $USERINFO['name'] ?? '';
         $this->values['__mail__'] = $USERINFO['mail'] ?? '';
