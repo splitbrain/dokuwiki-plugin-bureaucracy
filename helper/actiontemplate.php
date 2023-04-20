@@ -344,7 +344,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
                     $last_folder[$n] = array(
                         'id' => substr($ID, 0, strpos($ID, ':', ($n > 0 ? strlen($last_folder[$n - 1]['id']) : 0) + 1) + 1),
                         'level' => $n + 1,
-                        'open' => 1
+                        'open' => 1,
+                        'type' => null,
                     );
                     $data[] = $last_folder[$n];
                 }
