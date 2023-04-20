@@ -1,9 +1,13 @@
 <?php
+
+use dokuwiki\plugin\bureaucracy\test\BureaucracyTest;
+use DOMWrap\Document;
+
 /**
  * @group plugin_bureaucracy
  * @group plugins
  */
-class syntax_plugin_bureaucracy_fieldfile_test extends DokuWikiTest {
+class syntax_plugin_bureaucracy_fieldfile_test extends BureaucracyTest {
 
     protected $pluginsEnabled = array('bureaucracy');
 
@@ -15,9 +19,10 @@ class syntax_plugin_bureaucracy_fieldfile_test extends DokuWikiTest {
      */
     protected function assertPqSelector($syntax, $pqSelector) {
         $xhtml = p_render('xhtml', p_get_instructions($syntax), $info);
-        $doc = phpQuery::newDocument($xhtml);
-        $result = pq($pqSelector, $doc);
-        $this->assertEquals(1, $result->length, "selector: \"$pqSelector\" not found in\n$xhtml\n");
+        $doc = new Document();
+        $doc->loadHTML($xhtml);
+        $result = $doc->find($pqSelector);
+        $this->assertEquals(1, $result->count(), "selector: \"$pqSelector\" not found in\n$xhtml\n");
     }
 
     /**
