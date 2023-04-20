@@ -1,4 +1,7 @@
 <?php
+
+use dokuwiki\File\PageResolver;
+
 /**
  * Simple template replacement action for the bureaucracy plugin
  *
@@ -86,10 +89,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             }
         }
 
-        $this->pagename = $this->replace($this->pagename);
-
-        $myns = getNS($ID);
-        resolve_pageid($myns, $this->pagename, $ignored); // resolve relatives
+        $resolver = new PageResolver(getNS($ID));
+        $this->pagename = $resolver->resolveId($this->replace($this->pagename));
 
         if ($this->pagename === '') {
             throw new Exception($this->getLang('e_pagename'));
@@ -108,13 +109,14 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
 
         foreach ($fields as $field) {
             if (!is_null($field->getParam('page_tpl')) && !is_null($field->getParam('page_tgt')) ) {
+                $resolver = new PageResolver($ns);
+
                 //template
                 $templatepage = $this->replace($field->getParam('page_tpl'));
-                resolve_pageid(getNS($ID), $templatepage, $ignored);
+                $templatepage = $resolver->resolveId($templatepage);
 
                 //target
-                $relativetargetpage = $field->getParam('page_tgt');
-                resolve_pageid($ns, $relativeTargetPageid, $ignored);
+                $relativetargetpage = $resolver->resolveId($field->getParam('page_tgt'));
                 $targetpage = "$this->pagename:$relativetargetpage";
 
                 $auth = $this->aclcheck($templatepage); // runas
@@ -176,12 +178,13 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             $tpl = $this->replace($tpl);
 
             // resolve templates, but keep references to whole namespaces intact (ending in a colon)
+            $resolver = new PageResolver(getNS($ID));
             if(substr($tpl, -1) == ':') {
                 $tpl = $tpl.'xxx'; // append a fake page name
-                resolve_pageid(getNS($ID), $tpl, $ignored);
+                $tpl = $resolver->resolveId($tpl);
                 $tpl = substr($tpl, 0, -3); // cut off fake page name again
             } else {
-                resolve_pageid(getNS($ID), $tpl, $ignored);
+                $tpl = $resolver->resolveId($tpl);
             }
 
             $backup = array();
@@ -352,7 +355,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             }
             $data[] = array('id' => $ID, 'level' => 1 + substr_count($ID, ':'), 'type' => 'f');
         }
-        $html .= html_buildlist($data, 'idx', array($this, 'html_list_index'), 'html_li_index');
+        $index = new dokuwiki\Ui\Index();
+        $html .= html_buildlist($data, 'idx', array($this, 'html_list_index'), array($index, 'tagListItem'));
 
         // Add indexer bugs for every just-created page
         $html .= '<div class="no">';
