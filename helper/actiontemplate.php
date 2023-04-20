@@ -354,7 +354,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             }
             $data[] = array('id' => $ID, 'level' => 1 + substr_count($ID, ':'), 'type' => 'f');
         }
-        $html .= html_buildlist($data, 'idx', array($this, 'html_list_index'), 'html_li_index');
+        $index = new dokuwiki\Ui\Index();
+        $html .= html_buildlist($data, 'idx', array($this, 'html_list_index'), array($index, 'tagListItem'));
 
         // Add indexer bugs for every just-created page
         $html .= '<div class="no">';
