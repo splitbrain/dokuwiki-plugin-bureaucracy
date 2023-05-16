@@ -310,10 +310,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         foreach($data['fields'] as $index => $field) {
             /** @var $field helper_plugin_bureaucracy_field */
 
-            if($field->getFieldType() === 'submit') {
-                continue;
-            }
-            
             $isValid = true;
             if($field->getFieldType() === 'file') {
                 $file = array();
