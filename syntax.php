@@ -319,7 +319,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $isValid = $field->handle_post($file, $data['fields'], $index, $this->form_id);
 
             } elseif($field->getFieldType() === 'fieldset' || !$field->hidden) {
-                $isValid = $field->handle_post($_POST['bureaucracy'][$index], $data['fields'], $index, $this->form_id);
+                $isValid = $field->handle_post($_POST['bureaucracy'][$index] ?? null, $data['fields'], $index, $this->form_id);
             }
 
             if(!$isValid) {
