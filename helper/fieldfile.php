@@ -9,6 +9,7 @@ class helper_plugin_bureaucracy_fieldfile extends helper_plugin_bureaucracy_fiel
      * Arguments:
      *  - cmd
      *  - label
+     *  - overwrite
      *  - ^ (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
@@ -18,6 +19,8 @@ class helper_plugin_bureaucracy_fieldfile extends helper_plugin_bureaucracy_fiel
 
         //default namespace for file upload (pagepath:file_name)
         $this->opt['namespace'] = '.';
+        //default to not allow overwriting if a namespace:filename conflict exists
+        $this->opt['overwrite'] = false;
 
         //check whenever the first argument is an upload namespace
         if (isset($args[0]) && preg_match('/^[a-z.\-_:]+$/', $args[0])) {
