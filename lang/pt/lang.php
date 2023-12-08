@@ -3,6 +3,7 @@
 /**
  * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
  *
+ * @author Daniel Dias Rodrigues <danieldiasr@gmail.com>
  * @author Rafael Grando <r.grando@live.com>
  */
 $lang['e_unknowntype']         = 'Tipo desconhecido "%s"';
@@ -23,6 +24,7 @@ $lang['e_user']                = '"%s" precisa ser o nome de um usuário existen
 $lang['e_users']               = '"%s" precisa ser uma lista separada por vírgulas de nomes de usuários existentes.';
 $lang['e_min']                 = '"%s" precisa ser maior que %s.';
 $lang['e_max']                 = '"%s" precisa ser menor que %s.';
+$lang['e_pagename']            = 'Nome da página ausente.';
 $lang['e_pageexists']          = 'A página "%s" já existe. Por favor, escolha um nome diferente para a página.';
 $lang['e_template']            = 'Não foi possível ler o modelo "%s". Talvez ele não exista ou você não tenha permissões de leitura?';
 $lang['e_denied']              = 'Você não está autorizado a criar esta página. Talvez tenha esquecido de entrar?';
