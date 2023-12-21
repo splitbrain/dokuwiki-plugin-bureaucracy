@@ -8,7 +8,7 @@ class helper_plugin_bureaucracy_actionscript extends helper_plugin_bureaucracy_a
      * @inheritDoc
      * @throws \InvalidArgumentException
      */
-    public function run($fields, $thanks, $argv) {
+    public function run(&$fields, &$thanks, $argv) {
         if (count($argv) < 1) {
             throw new InvalidArgumentException('The "script"-action expects exactly 1 argument: the script name.');
         }
