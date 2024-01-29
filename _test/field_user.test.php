@@ -12,7 +12,7 @@ class syntax_plugin_bureaucracy_fielduser_test extends BureaucracyTest
     /**
      * Create some users
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

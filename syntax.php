@@ -10,6 +10,8 @@
  * @author     Adrian Lang <dokuwiki@cosmocode.de>
  */
 // must be run within Dokuwiki
+use dokuwiki\Utf8\PhpString;
+
 if(!defined('DOKU_INC')) die();
 
 /**
@@ -21,6 +23,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     private $form_id = 0;
     var $patterns = array();
     var $values = array();
+    var $noreplace = null;
+    var $functions = array();
 
     /**
      * Prepare some replacements
@@ -28,6 +32,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     public function __construct() {
         $this->prepareDateTimereplacements();
         $this->prepareNamespacetemplateReplacements();
+        $this->prepareFunctions();
     }
 
     /**
@@ -314,7 +319,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $isValid = $field->handle_post($file, $data['fields'], $index, $this->form_id);
 
             } elseif($field->getFieldType() === 'fieldset' || !$field->hidden) {
-                $isValid = $field->handle_post($_POST['bureaucracy'][$index], $data['fields'], $index, $this->form_id);
+                $isValid = $field->handle_post($_POST['bureaucracy'][$index] ?? null, $data['fields'], $index, $this->form_id);
             }
 
             if(!$isValid) {
@@ -368,12 +373,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @return string html of the form
      */
     private function _htmlform($fields) {
-        global $ID;
+        global $INFO;
 
         $form = new Doku_Form(array('class'   => 'bureaucracy__plugin',
                                     'id'      => 'bureaucracy__plugin' . $this->form_id,
                                     'enctype' => 'multipart/form-data'));
-        $form->addHidden('id', $ID);
+        $form->addHidden('id', $INFO['id']);
         $form->addHidden('bureaucracy[$$id]', $this->form_id);
 
         foreach($fields as $id => $field) {
@@ -401,14 +406,14 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         do {
             $len = strlen($line);
             for($i = 0; $i < $len; $i++) {
-                if($line{$i} == '"') {
+                if($line[$i] == '"') {
                     if($inQuote) {
                         if($escapedQuote) {
                             $arg .= '"';
                             $escapedQuote = false;
                             continue;
                         }
-                        if($line{$i + 1} == '"') {
+                        if($i + 1 < $len && $line[$i + 1] == '"') {
                             $escapedQuote = true;
                             continue;
                         }
@@ -420,7 +425,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                         $inQuote = true;
                         continue;
                     }
-                } else if($line{$i} == ' ') {
+                } else if($line[$i] == ' ') {
                     if($inQuote) {
                         $arg .= ' ';
                         continue;
@@ -431,7 +436,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                         continue;
                     }
                 }
-                $arg .= $line{$i};
+                $arg .= $line[$i];
             }
             if(!$inQuote || count($lines) === 0) break;
             $line = array_shift($lines);
@@ -452,6 +457,18 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     }
 
     /**
+     * Save content in <noreplace> tags into $this->noreplace
+     *
+     * @param string $input    The text to work on
+     */
+    protected function noreplace_save($input) {
+        $pattern = '/<noreplace>(.*?)<\/noreplace>/is';
+        //save content of <noreplace> tags
+        preg_match_all($pattern, $input, $matches);
+        $this->noreplace = $matches[1];
+    }
+
+    /**
      * Apply replacement patterns and values as prepared earlier
      * (disable $strftime to prevent double replacements with default strftime() replacements in nstemplate)
      *
@@ -460,6 +477,11 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @return string processed text
      */
     function replace($input, $strftime = true) {
+        //in helper_plugin_struct_field::setVal $input can be an array
+        //just return $input in that case
+        if (!is_string($input)) return $input;
+        if (is_null($this->noreplace)) $this->noreplace_save($input);
+
         foreach ($this->values as $label => $value) {
             $pattern = $this->patterns[$label];
             if (is_callable($value)) {
@@ -488,6 +510,23 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             array($this, 'replacedate'),
             $input
         );
+
+        //run functions
+        foreach ($this->functions as $name => $callback) {
+            $pattern = '/@' . preg_quote($name) . '\((.*?)\)@/';
+            if (is_callable($callback)) {
+                $input = preg_replace_callback($pattern, function ($matches) use ($callback) {
+                    return call_user_func($callback, $matches[1]);
+                }, $input);
+            }
+        }
+
+        //replace <noreplace> tags with their original content
+        $pattern = '/<noreplace>.*?<\/noreplace>/is';
+        if (is_array($this->noreplace)) foreach ($this->noreplace as $nr) {
+            $input = preg_replace($pattern, $nr, $input, 1);
+        }
+
         return $input;
     }
 
@@ -507,9 +546,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         }
 
         //no 2nd argument for default date format
-        if($match[2] == null) {
-            $match[2] = $conf['dformat'];
-        }
+        $match[2] = $match[2] ?? $conf['dformat'];
 
         return strftime($match[2], $t);
     }
@@ -522,6 +559,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     function prepareNamespacetemplateReplacements() {
         /* @var Input $INPUT */
         global $INPUT;
+        global $INFO;
         global $USERINFO;
         global $conf;
         global $ID;
@@ -542,21 +580,22 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->patterns['__date__'] = '/@DATE@/';
 
         // replace placeholders
-        $file = noNS($ID);
+        $localid = isset($INFO['id']) ? $INFO['id'] : $ID;
+        $file = noNS($localid);
         $page = strtr($file, $conf['sepchar'], ' ');
-        $this->values['__formpage_id__'] = $ID;
-        $this->values['__formpage_ns__'] = curNS($ID);
-        $this->values['__formpage_curns__'] = getNS($ID);
+        $this->values['__formpage_id__'] = $localid;
+        $this->values['__formpage_ns__'] = getNS($localid);
+        $this->values['__formpage_curns__'] = curNS($localid);
         $this->values['__formpage_file__'] = $file;
-        $this->values['__formpage_!file__'] = utf8_ucfirst($file);
-        $this->values['__formpage_!file!__'] = utf8_strtoupper($file);
+        $this->values['__formpage_!file__'] = PhpString::ucfirst($file);
+        $this->values['__formpage_!file!__'] = PhpString::strtoupper($file);
         $this->values['__formpage_page__'] = $page;
-        $this->values['__formpage_!page__'] = utf8_ucfirst($page);
-        $this->values['__formpage_!!page__'] = utf8_ucwords($page);
-        $this->values['__formpage_!page!__'] = utf8_strtoupper($page);
+        $this->values['__formpage_!page__'] = PhpString::ucfirst($page);
+        $this->values['__formpage_!!page__'] = PhpString::ucwords($page);
+        $this->values['__formpage_!page!__'] = PhpString::strtoupper($page);
         $this->values['__user__'] = $INPUT->server->str('REMOTE_USER');
-        $this->values['__name__'] = $USERINFO['name'];
-        $this->values['__mail__'] = $USERINFO['mail'];
+        $this->values['__name__'] = $USERINFO['name'] ?? '';
+        $this->values['__mail__'] = $USERINFO['mail'] ?? '';
         $this->values['__date__'] = strftime($conf['dformat']);
     }
 
@@ -577,5 +616,15 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->values['__time__'] = date('H:i');
         $this->values['__timesec__'] = date('H:i:s');
 
+    }
+
+    /**
+     * Functions that can be used after replacements
+     */
+    function prepareFunctions() {
+        $this->functions['curNS'] = 'curNS';
+        $this->functions['getNS'] = 'getNS';
+        $this->functions['noNS'] = 'noNS';
+        $this->functions['p_get_first_heading'] = 'p_get_first_heading';
     }
 }

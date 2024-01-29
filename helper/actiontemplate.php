@@ -1,4 +1,7 @@
 <?php
+
+use dokuwiki\File\PageResolver;
+
 /**
  * Simple template replacement action for the bureaucracy plugin
  *
@@ -23,8 +26,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
     public function run($fields, $thanks, $argv) {
         global $conf;
 
-        list($tpl, $this->pagename, $sep) = $argv;
-        if(is_null($sep)) $sep = $conf['sepchar'];
+        [$tpl, $this->pagename] = $argv;
+        $sep = $argv[2] ?? $conf['sepchar'];
 
         $this->patterns = array();
         $this->values   = array();
@@ -36,7 +39,18 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         $this->prepareNoincludeReplacement();
         $this->prepareFieldReplacements($fields);
 
-        $this->buildTargetPagename($fields, $sep);
+        $evdata = array(
+            'patterns' => &$this->patterns,
+            'values' => &$this->values,
+            'fields' => $fields,
+            'action' => $this
+        );
+
+        $event = new Doku_Event('PLUGIN_BUREAUCRACY_PAGENAME', $evdata);
+        if ($event->advise_before()) {
+            $this->buildTargetPagename($fields, $sep);
+        }
+        $event->advise_after();
 
         //target&template(s) from addpage fields
         $this->getAdditionalTargetpages($fields);
@@ -75,10 +89,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             }
         }
 
-        $this->pagename = $this->replace($this->pagename);
-
-        $myns = getNS($ID);
-        resolve_pageid($myns, $this->pagename, $ignored); // resolve relatives
+        $resolver = new PageResolver(getNS($ID));
+        $this->pagename = $resolver->resolveId($this->replace($this->pagename));
 
         if ($this->pagename === '') {
             throw new Exception($this->getLang('e_pagename'));
@@ -97,13 +109,14 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
 
         foreach ($fields as $field) {
             if (!is_null($field->getParam('page_tpl')) && !is_null($field->getParam('page_tgt')) ) {
+                $resolver = new PageResolver($ns);
+
                 //template
                 $templatepage = $this->replace($field->getParam('page_tpl'));
-                resolve_pageid(getNS($ID), $templatepage, $ignored);
+                $templatepage = $resolver->resolveId($templatepage);
 
                 //target
-                $relativetargetpage = $field->getParam('page_tgt');
-                resolve_pageid($ns, $relativeTargetPageid, $ignored);
+                $relativetargetpage = $resolver->resolveId($field->getParam('page_tgt'));
                 $targetpage = "$this->pagename:$relativetargetpage";
 
                 $auth = $this->aclcheck($templatepage); // runas
@@ -112,6 +125,34 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
                 }
             }
         }
+    }
+
+    /**
+     * Returns raw pagetemplate contents for the ID's namespace
+     *
+     * @param string $id the id of the page to be created
+     * @return string raw pagetemplate content
+     */
+    protected function rawPageTemplate($id) {
+        global $conf;
+
+        $path = dirname(wikiFN($id));
+        if(file_exists($path.'/_template.txt')) {
+            $tplfile = $path.'/_template.txt';
+        } else {
+            // search upper namespaces for templates
+            $len = strlen(rtrim($conf['datadir'], '/'));
+            while(strlen($path) >= $len) {
+                if(file_exists($path.'/__template.txt')) {
+                    $tplfile = $path.'/__template.txt';
+                    break;
+                }
+                $path = substr($path, 0, strrpos($path, '/'));
+            }
+        }
+
+        $tpl = io_readFile($tplfile);
+        return $tpl;
     }
 
     /**
@@ -129,18 +170,21 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         if ($tpl == '_') {
             // use namespace template
             if (!isset($this->targetpages[$this->pagename])) {
+                $raw = $this->rawPageTemplate($this->pagename);
+                $this->noreplace_save($raw);
                 $this->targetpages[$this->pagename] = pageTemplate(array($this->pagename));
             }
         } elseif ($tpl !== '!') {
             $tpl = $this->replace($tpl);
 
             // resolve templates, but keep references to whole namespaces intact (ending in a colon)
+            $resolver = new PageResolver(getNS($ID));
             if(substr($tpl, -1) == ':') {
                 $tpl = $tpl.'xxx'; // append a fake page name
-                resolve_pageid(getNS($ID), $tpl, $ignored);
+                $tpl = $resolver->resolveId($tpl);
                 $tpl = substr($tpl, 0, -3); // cut off fake page name again
             } else {
-                resolve_pageid(getNS($ID), $tpl, $ignored);
+                $tpl = $resolver->resolveId($tpl);
             }
 
             $backup = array();
@@ -303,14 +347,16 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
                     $last_folder[$n] = array(
                         'id' => substr($ID, 0, strpos($ID, ':', ($n > 0 ? strlen($last_folder[$n - 1]['id']) : 0) + 1) + 1),
                         'level' => $n + 1,
-                        'open' => 1
+                        'open' => 1,
+                        'type' => null,
                     );
                     $data[] = $last_folder[$n];
                 }
             }
             $data[] = array('id' => $ID, 'level' => 1 + substr_count($ID, ':'), 'type' => 'f');
         }
-        $html .= html_buildlist($data, 'idx', array($this, 'html_list_index'), 'html_li_index');
+        $index = new dokuwiki\Ui\Index();
+        $html .= html_buildlist($data, 'idx', array($this, 'html_list_index'), array($index, 'tagListItem'));
 
         // Add indexer bugs for every just-created page
         $html .= '<div class="no">';
@@ -392,9 +438,12 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @param string $templatepageid pageid of template for this targetpage
      */
     protected function addParsedTargetpage($targetpageid, $templatepageid) {
+        $tpl = rawWiki($templatepageid);
+        $this->noreplace_save($tpl);
+
         $data = array(
             'id' => $targetpageid,
-            'tpl' => rawWiki($templatepageid),
+            'tpl' => $tpl,
             'doreplace' => true,
         );
         parsePageTemplate($data);
