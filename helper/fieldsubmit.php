@@ -44,6 +44,9 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
         if(isset($this->opt['id'])) {
             $attr['id'] = $this->opt['id'];
         }
+        if(isset($this->opt['class'])) {
+            $attr['class'] = $this->opt['class'];
+        }
         $this->tpl = form_makeButton('submit','', '@@DISPLAY|' . $this->getLang('submit') . '@@', $attr);
         parent::renderfield($params, $form, $formid);
     }
