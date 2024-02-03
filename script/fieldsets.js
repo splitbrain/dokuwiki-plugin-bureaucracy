@@ -17,15 +17,24 @@
 jQuery(function () {
 
     jQuery('form.bureaucracy__plugin').each(function () {
-
+        function isShowOrHide(input,dp) {
+            
+            var tvals=dp.tval.split('|');
+            var soh=false;
+            for (const tval of tvals[Symbol.iterator]()) {
+                soh ||=
+                input.parentNode.parentNode.style.display !== 'none' &&                  // input/checkbox is displayed AND
+                ((input.checked === tval) ||                                             //  ( checkbox is checked
+                (input.type !== 'checkbox' && (tval === true && input.value !== '')) ||  //  OR no checkbox, but input is set
+                input.value === tval);                                                   //  OR input === tval )
+            }  
+            return soh
+        }
         //show/hide fieldset and trigger depending children
         function updateFieldset(input) {
             jQuery.each(jQuery(input).data('dparray'), function (i, dp) {
-                var showOrHide =
-                    input.parentNode.parentNode.style.display !== 'none' &&                     // input/checkbox is displayed AND
-                    ((input.checked === dp.tval) ||                                             //  ( checkbox is checked
-                     (input.type !== 'checkbox' && (dp.tval === true && input.value !== '')) || //  OR no checkbox, but input is set
-                     input.value === dp.tval);                                                  //  OR input === dp.tval )
+                
+                var showOrHide = isShowOrHide(input,dp);
 
                 dp.fset.toggle(showOrHide);
 
