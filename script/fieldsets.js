@@ -18,9 +18,11 @@ jQuery(function () {
 
     jQuery('form.bureaucracy__plugin').each(function () {
         function isShowOrHide(input,dp) {
-            
-            var tvals=dp.tval.split('|');
+
+            try { var tvals=dp.tval.split('|'); }
+            catch(err) {var tvals=[dp.tval]; }
             var soh=false;
+            
             for (const tval of tvals[Symbol.iterator]()) {
                 soh ||=
                 input.parentNode.parentNode.style.display !== 'none' &&                  // input/checkbox is displayed AND
