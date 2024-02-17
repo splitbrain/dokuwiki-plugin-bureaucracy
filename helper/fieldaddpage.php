@@ -11,6 +11,7 @@ class helper_plugin_bureaucracy_fieldaddpage extends helper_plugin_bureaucracy_f
      *  - cmd
      *  - page_tpl
      *  - page_tgt
+     *  - page_ignore_exist (optional)
      *
      * @param array $args The tokenized definition, only split at spaces
      */
@@ -19,10 +20,19 @@ class helper_plugin_bureaucracy_fieldaddpage extends helper_plugin_bureaucracy_f
             msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
                         hsc($args[1])), -1);
             return;
+        } elseif (count($args) == 3) {
+            // add page_ignore_exist default value
+            $args[] = '@';
         }
 
-        // get standard arguments
-        $this->opt = array_combine(array('cmd', 'page_tpl', 'page_tgt'), $args);
+        $this->opt = array_combine(array('cmd', 'page_tpl', 'page_tgt', 'page_ignore_exist'), $args);
+
+        // handle page_ignore_exist
+        if ($this->opt['page_ignore_exist'] == '!') {
+            $this->opt['page_ignore_exist'] = True;
+        } else {
+            $this->opt['page_ignore_exist'] = False;
+        }
     }
 
     /**

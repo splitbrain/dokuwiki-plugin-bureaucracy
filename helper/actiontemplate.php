@@ -32,6 +32,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         $this->patterns = array();
         $this->values   = array();
         $this->targetpages = array();
+        $this->ignoreExistErrorPages = array();
 
         $this->prepareNamespacetemplateReplacements();
         $this->prepareDateTimereplacements();
@@ -60,8 +61,6 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         if(empty($this->targetpages)) {
             throw new Exception(sprintf($this->getLang('e_template'), $tpl));
         }
-
-        $this->checkTargetPageNames();
 
         $this->processUploads($fields);
         $this->replaceAndSavePages($fields);
@@ -118,6 +117,11 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
                 //target
                 $relativetargetpage = $resolver->resolveId($field->getParam('page_tgt'));
                 $targetpage = "$this->pagename:$relativetargetpage";
+
+                //ignore exist error
+                if ($field->getParam('page_ignore_exist')) {
+                    array_push($this->ignoreExistErrorPages, $targetpage);
+                }
 
                 $auth = $this->aclcheck($templatepage); // runas
                 if ($auth >= AUTH_READ ) {
@@ -234,24 +238,32 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
     }
 
     /**
-     * Checks for existance and access of target pages
+     * Checks for existance and access of a target page
      *
      * @return mixed
      * @throws Exception
      */
-    protected function checkTargetPageNames() {
-        foreach (array_keys($this->targetpages) as $pname) {
-            // prevent overriding already existing pages
-            if (page_exists($pname)) {
-                throw new Exception(sprintf($this->getLang('e_pageexists'), html_wikilink($pname)));
-            }
+    protected function checkTargetPageName($pname) {
+        // prevent overriding already existing pages
+        if (page_exists($pname)) {
+            throw new Exception(sprintf($this->getLang('e_pageexists'), html_wikilink($pname)));
+        }
 
-            $auth = $this->aclcheck($pname);
-            if ($auth < AUTH_CREATE) {
-                throw new Exception($this->getLang('e_denied'));
-            }
+        $auth = $this->aclcheck($pname);
+        if ($auth < AUTH_CREATE) {
+            throw new Exception($this->getLang('e_denied'));
         }
     }
+
+    /**
+     * Checks if a page existance must be ignored.
+     *
+     * @return bool
+     */
+    protected function ignoreExistError($pname) {
+        return in_array($pname, $this->ignoreExistErrorPages);
+    }
+
 
     /**
      * Perform replacements on the collected templates, and save the pages.
@@ -263,6 +275,16 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
     protected function replaceAndSavePages($fields) {
         global $ID;
         foreach ($this->targetpages as $pageName => $template) {
+            try {
+                $this->checkTargetPageName($pageName);
+            } catch (Exception $e) {
+                if ($this->ignoreExistError($pageName)) {
+                    continue;
+                } else {
+                    throw $e;
+                }
+            }
+
             // set NSBASE var to make certain dataplugin constructs easier
             $this->patterns['__nsbase__'] = '/@NSBASE@/';
             $this->values['__nsbase__'] = noNS(getNS($pageName));
