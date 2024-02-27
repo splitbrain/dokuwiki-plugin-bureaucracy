@@ -203,7 +203,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     public function render($format, Doku_Renderer $R, $data) {
         if($format != 'xhtml') return false;
         $R->info['cache'] = false; // don't cache
-
         /**
          * replace some time and name placeholders in the default values
          * @var $field helper_plugin_bureaucracy_field
@@ -309,7 +308,6 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $success = true;
         foreach($data['fields'] as $index => $field) {
             /** @var $field helper_plugin_bureaucracy_field */
-
             $isValid = true;
             if($field->getFieldType() === 'file') {
                 $file = array();
