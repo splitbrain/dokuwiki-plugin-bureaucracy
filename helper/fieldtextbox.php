@@ -23,6 +23,10 @@ class helper_plugin_bureaucracy_fieldtextbox extends helper_plugin_bureaucracy_f
             $attr['required'] = 'required';
         }
 
+        if(isset($this->opt['readonly'])) {
+            $attr['readonly'] = 'readonly';
+        }
+
         $this->tpl = form_makeTextField('@@NAME@@', '@@VALUE@@', '@@DISPLAY@@', '@@ID@@', '@@CLASS@@', $attr);
         if(isset($this->opt['class'])){
             $this->tpl['class'] .= ' '.$this->opt['class'];
