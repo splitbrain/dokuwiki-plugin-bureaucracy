@@ -57,6 +57,37 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     }
 
     /**
+     * Where to sort in?
+     */
+    private function _checkvalidpages($ID, $namespaces) {
+        if (count($namespaces)) {
+            $id = explode(':',$ID);
+            foreach($namespaces as $PAT) {
+                $pat = explode(':',$PAT);
+                $found=true;
+                for ($i = 0; $i < count($pat); $i++) {
+                    if ($i>count($id)-1) {
+                        $found=false;
+                        break;
+                    } elseif ($pat[$i]=='**') {
+                        break;
+                    } elseif ($pat[$i]=='*') {
+                        continue;
+                    } elseif ($pat[$i]!=$id[$i]) {
+                        $found=false;
+                        break;
+                    }            
+                }
+                if ($found) {
+                    break;
+                }
+            }
+            return $found;
+        } else {
+            return true;
+        }
+    }
+    /**
      * Connect pattern to lexer
      *
      * @param string $mode
@@ -75,11 +106,18 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @return  bool|array Return an array with all data you want to use in render, false don't add an instruction
      */
     public function handle($match, $state, $pos, Doku_Handler $handler) {
+        global $ID;
         $match = substr($match, 6, -7); // remove form wrap
         $lines = explode("\n", $match);
         $actions = $rawactions = array();
         $thanks = '';
         $labels = '';
+
+        $namespaces = $this->getConf('namespaces');
+        if (!$this->_checkvalidpages($ID, $namespaces)) {        
+            msg($this->getLang('e_namespace'), -1);
+            return false;
+        }
 
         // parse the lines into an command/argument array
         $cmds = array();
