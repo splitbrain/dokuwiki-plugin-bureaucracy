@@ -23,7 +23,7 @@ class helper_plugin_bureaucracy_fieldtextarea extends helper_plugin_bureaucracy_
     protected $tpl =
 '<label class="@@CLASS@@">
     <span>@@DISPLAY@@</span>
-    <textarea name="@@NAME@@" id="@@ID@@" rows="@@ROWS|10@@" cols="10" class="edit @@OPTIONAL|required" required="required@@">@@VALUE@@</textarea>
+    <textarea name="@@NAME@@" id="@@ID@@" rows="@@ROWS|10@@" cols="10" class="edit @@OPTIONAL|required@@" required="@@OPTIONAL|required@@">@@VALUE@@</textarea>
 </label>';
 
 }

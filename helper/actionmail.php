@@ -176,7 +176,7 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
             $html = '<tr><td colspan="2"><u>'.hsc($column1).'<u></td></tr>';
             $text = "\n=====".$column1.'=====';
         } else {
-            $html = '<tr><td><b>'.hsc($column1).'<b></td><td>'.hsc($column2).'</td></tr>';
+            $html = '<tr><td><b>'.hsc($column1).'<b></td><td>'.nl2br(hsc($column2)).'</td></tr>';
             $text = "\n $column1 \t\t $column2";
         }
         return array($html, $text);
