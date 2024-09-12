@@ -5,7 +5,7 @@
  * Creates a dropdown list
  */
 class helper_plugin_bureaucracy_fieldselect extends helper_plugin_bureaucracy_field {
-
+ 
     protected $mandatory_args = 3;
 
     /**
@@ -14,12 +14,22 @@ class helper_plugin_bureaucracy_fieldselect extends helper_plugin_bureaucracy_fi
      *  - label
      *  - option1|option2|etc
      *  - ^ (optional)
-     *
+     * show1|show2|show3#real1|real2|real3
      * @param array $args The tokenized definition, only split at spaces
      */
     public function initialize($args) {
         $this->init($args);
-        $this->opt['args'] = array_map('trim', explode('|',array_shift($args)));
+        $total_params=array_map('trim', explode('#',array_shift($args)));
+		if (!isset($total_params[1])) 
+		    {$this->opt['args'] = array_map('trim', explode('|',$total_params[0]));
+			$this->opt['show_params'] = $this->opt['args'];
+			}
+     		else 
+			{$this->opt['args'] = array_map('trim', explode('|',$total_params[1]));
+			 $this->opt['show_params'] = array_map('trim', explode('|',$total_params[0]));
+			}
+			
+		
         $this->standardArgs($args);
         if (!isset($this->opt['value']) && isset($this->opt['optional'])) {
             array_unshift($this->opt['args'],' ');
@@ -45,12 +55,13 @@ class helper_plugin_bureaucracy_fieldselect extends helper_plugin_bureaucracy_fi
             $params['class'] = 'bureaucracy_error';
         }
         $params = array_merge($this->opt, $params);
+		$this->opt['show_params'] = array_combine($params['args'],$this->opt['show_params']);
         $form->addElement(call_user_func_array('form_makeListboxField',
                                                 $this->_parse_tpl(
                                                     array(
                                                         '@@NAME@@',
-                                                        $params['args'],
-                                                        '@@VALUE|' . $params['args'][0] . '@@',
+							$this->opt['show_params'],
+                                                        '@@VALUE@@|'.$this->opt['show_params'][0],
                                                         '@@DISPLAY@@',
                                                         '@@ID@@',
                                                         '@@CLASS@@'
