@@ -277,7 +277,7 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @param mixed $value value entered into field
      * @return bool whether the passed value is valid
      */
-    protected function setVal($value) {
+    public function setVal($value) {
         if ($value === '') {
             $value = null;
         }
