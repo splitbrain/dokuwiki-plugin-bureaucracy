@@ -1,30 +1,89 @@
 <?php
 
-$lang['e_unknowntype']   = 'Nezināma tipa "%s"';
-$lang['e_missingargs']   = 'Pietrūkst argumentu %s %s';
-$lang['e_noaction']      = 'Nav definēta darbība, kur dati jāsūta vai jāievieto';
-$lang['e_mail']          = 'Kļūme nosūtot datus';
+/**
+ * @license    GPL 2 (https://www.gnu.org/licenses/gpl.html)
+ *
+ * @author Thầu xây dựng Ninh Thuận <dorris.asmus@live.nl>
+ */
+$lang['e_unknowntype']         = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you! However, how could we communicate?
+https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_unknownaction']       = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you! However, how could we communicate?
+https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_missingargs']         = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account 
+it. Look advanced to far added agreeable from 
+you! However, how could we communicate? https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_noaction']            = 'Littleton';
+$lang['e_mail']                = 'dorris.asmus@live.nl';
+$lang['e_unknownconstraint']   = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was 
+a amusement account it. Look advanced to far added agreeable from you!
+However, how could we communicate? https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_labelpage']           = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you! However,
+how could we communicate? https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_required']            = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you!
 
-$lang['e_required']      = 'Jāaizpilda "%s" ';
-$lang['e_match']         = 'Nav pareizi aizpildīts "%s"  %s';
-$lang['checkagainst']    = '(neatbilst prasībai /%s/i)';
-$lang['e_email']         = '"%s" jābūt derīgai epasta adresei.';
-$lang['e_numeric']       = '"%s" jābūt skaitlim.';
-$lang['e_min']           = '"%s" jābūt lielākam par %s.';
-$lang['e_max']           = '"%s" jābūt mazākam par %s.';
+However, how could we communicate? https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_match']               = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you!
+However, how could we communicate? https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['checkagainst']          = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you!
+However, how could we communicate? https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_email']               = 'dorris.asmus@live.nl';
+$lang['e_numeric']             = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you! However, how could we communicate?
+https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_date']                = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you! However, how could we communicate?
+https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_time']                = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a 
+amusement account it. Look advanced to far added agreeable from you!
+However, how could we communicate? https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_user']                = 'Dorris';
+$lang['e_users']               = 'Dorris';
+$lang['e_min']                 = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you! However, how could we communicate?
 
-$lang['e_pagename']      = 'Nav lapas nosaukuma.';
-$lang['e_pageexists']    = 'Lapa "%s" jau eksistē. Lūdzu norādīt citu lapas vārdu.';
-$lang['e_template']      = 'Nevar nolasīt šablonu "%s". Varbūt tāda nav vai pietrūkst lasīšanas tiesību?';
-$lang['e_denied']        = 'Jums nav tiesību izveidot šo lapu, varbūt aizmirsāt ielogoties?';
+https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_max']                 = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you!
+However, how could we communicate? https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_pagename']            = 'Asmus';
+$lang['e_pageexists']          = 'Dorris';
+$lang['e_template']            = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you! However, how could we communicate?
+https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['e_denied']              = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account 
+it. Look advanced to far added agreeable from you!
+However, how could we communicate? https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['mailsubject']           = 'DokuWiki Localization';
+$lang['mailintro']             = 'dorris.asmus@live.nl';
+$lang['mail_thanks']           = 'dorris.asmus@live.nl';
+$lang['template_thanks']       = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
+$lang['summary']               = 'Dorris';
+$lang['attachmentMailEmpty']   = 'dorris.asmus@live.nl';
+$lang['attachmentMailToLarge'] = 'dorris.asmus@live.nl';
+$lang['attachmentMailToLarge_userinfo'] = 'dorris.asmus@live.nl';
+$lang['submit']                = 'https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/ 
+Thank you for the good writeup. It in fact was a amusement account it.
+Look advanced to far added agreeable from you!
 
-$lang['mailsubject']     = 'Veidlapas dati nosūtīti uz %s';
-$lang['mailintro']       = 'Norādīties dati nosūtīti uz %s.';
-
-$lang['mail_thanks']     = 'Jūsu dati veiksmīgi nosūtīti. Paldies!';
-$lang['template_thanks'] = 'Lapa izveidota, lai to atvērtu lieto šo saiti.';
-
-$lang['summary']         = 'Izveidots no veidlapas  %s';
-
-
-$lang['submit'] = 'Saglabāt';
+However, how could we communicate? https://xaydungtrangtrinoithat.com/nha-thau-xay-dung-tai-ninh-thuan-thi-cong-xay-nha-tron-goi/';
