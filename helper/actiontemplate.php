@@ -89,7 +89,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             }
         }
 
-        $resolver = new PageResolver(getNS($ID));
+        $resolver = new PageResolver($ID);
         $this->pagename = $resolver->resolveId($this->replace($this->pagename));
 
         if ($this->pagename === '') {
@@ -105,11 +105,10 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      */
     function getAdditionalTargetpages($fields) {
         global $ID;
-        $ns = getNS($ID);
 
         foreach ($fields as $field) {
             if (!is_null($field->getParam('page_tpl')) && !is_null($field->getParam('page_tgt')) ) {
-                $resolver = new PageResolver($ns);
+                $resolver = new PageResolver($ID);
 
                 //template
                 $templatepage = $this->replace($field->getParam('page_tpl'));
@@ -178,7 +177,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             $tpl = $this->replace($tpl);
 
             // resolve templates, but keep references to whole namespaces intact (ending in a colon)
-            $resolver = new PageResolver(getNS($ID));
+            $resolver = new PageResolver($ID);
             if(substr($tpl, -1) == ':') {
                 $tpl = $tpl.'xxx'; // append a fake page name
                 $tpl = $resolver->resolveId($tpl);
