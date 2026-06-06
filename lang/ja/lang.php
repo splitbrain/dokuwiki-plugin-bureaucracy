@@ -7,6 +7,7 @@
  */
 $lang['e_unknowntype']         = '"%s" という型はありません。';
 $lang['e_unknownaction']       = '不明なアクション「%s」';
+$lang['e_forbiddenaction'] = 'アクション「%s」は禁止されています。action_whitelist を確認してください';
 $lang['e_missingargs']         = '%s %s には引数が十分ではありません。';
 $lang['e_noaction']            = 'action が定義されていません - どこにデータを送信するのですか？';
 $lang['e_mail']                = 'データの送信について何かがおかしいです。';

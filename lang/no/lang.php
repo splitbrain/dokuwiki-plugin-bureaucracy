@@ -2,6 +2,7 @@
 
 $lang['e_unknowntype']   = 'Ukjent type "%s"';
 $lang['e_unknownaction'] = 'Ukjent handling "%s"';
+$lang['e_forbiddenaction'] = 'Handlingen "%s" er forbudt. Sjekk action_whitelist';
 $lang['e_missingargs']   = 'Ikke nok verdier for %s %s';
 $lang['e_noaction']      = 'Ingen handling valgt - hvor skal dataene sendes til?';
 $lang['e_mail']          = 'Det oppsto en feil ved innsending av dataene';

@@ -7,6 +7,7 @@
  */
 $lang['e_unknowntype']         = 'Neznámy typ "%s"';
 $lang['e_unknownaction']       = 'Neznáma akcia "%s"';
+$lang['e_forbiddenaction'] = 'Akcia "%s" je zakázaná. Skontrolujte action_whitelist';
 $lang['e_missingargs']         = 'Nedostatok argumentov pre %s %s';
 $lang['e_noaction']            = 'Nie je definovaná žiadna akcia - kam sa majú dáta odoslať?';
 $lang['e_mail']                = 'Pri odosielaní dát sa niečo pokazilo';

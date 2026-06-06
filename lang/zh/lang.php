@@ -2,6 +2,7 @@
 
 $lang['e_unknowntype']   = '未知类型 "%s"';
 $lang['e_unknownaction'] = '未知action "%s"';
+$lang['e_forbiddenaction'] = '操作"%s"被禁止。请检查 action_whitelist';
 $lang['e_missingargs']   = '参数不足： %s %s';
 $lang['e_noaction']      = '未定义action - 数据要送到哪里去？';
 $lang['e_mail']          = '发送该数据时发生错误';

@@ -8,6 +8,7 @@
  */
 $lang['e_unknowntype']         = 'Неизвестный тип «%s»';
 $lang['e_unknownaction']       = 'Неизвестное действие «%s»';
+$lang['e_forbiddenaction'] = 'Действие «%s» запрещено. Проверьте action_whitelist';
 $lang['e_missingargs']         = 'Недостаточно аргументов для %s %s';
 $lang['e_noaction']            = 'Не указано действие (action). Куда следует отправить данные?';
 $lang['e_mail']                = 'Что-то пошло не так при отправке данных';

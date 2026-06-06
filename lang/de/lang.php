@@ -7,6 +7,7 @@
  */
 $lang['e_unknowntype']         = 'Unbekannter Typ "%s"';
 $lang['e_unknownaction']       = 'Unbekannte Aktion "%s"';
+$lang['e_forbiddenaction'] = 'Die Aktion "%s" ist nicht erlaubt. Siehe action_whitelist';
 $lang['e_missingargs']         = 'Nicht genug Argumente für %s %s';
 $lang['e_noaction']            = 'Keine Aktion definiert - wohin sollen die Daten gesendet werden?';
 $lang['e_mail']                = 'Beim Versenden der Daten ist ein Fehler aufgetreten';

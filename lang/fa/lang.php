@@ -7,6 +7,7 @@
  */
 $lang['e_unknowntype']         = 'نوع ناشناخته "%s"';
 $lang['e_unknownaction']       = 'عمل ناشناخته "%s"';
+$lang['e_forbiddenaction'] = 'عمل «%s» ممنوع است. action_whitelist را بررسی کنید';
 $lang['e_missingargs']         = 'آرگومانهای ناکافی برای %s %s';
 $lang['e_noaction']            = 'عملی تعریف نشده است- داده‌ها باید به کجا فرستاده شوند؟';
 $lang['e_mail']                = 'در فرستادن داده‌ها اشکالی پیش آمده است';

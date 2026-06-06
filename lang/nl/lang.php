@@ -7,6 +7,7 @@
  */
 $lang['e_unknowntype']         = 'Onbekend type "%s"';
 $lang['e_unknownaction']       = 'Onbekende actie "%s"';
+$lang['e_forbiddenaction'] = 'De actie "%s" is verboden. Controleer action_whitelist';
 $lang['e_missingargs']         = 'Onvoldoende argumenten voor %s %s';
 $lang['e_noaction']            = 'Geen aktie opgegeven - waar moeten de gegevens heen?';
 $lang['e_mail']                = 'Het versturen van de gegevens is mislukt';

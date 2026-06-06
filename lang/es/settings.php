@@ -7,3 +7,4 @@
  */
 $lang['runas']                 = 'Afecta el modo plantilla. Use los permisos de este usuario (virtual) cuando compruebe los ACLs para leer plantillas y crear páginas.';
 $lang['maxEmailAttachmentSize'] = 'Maximo tamaño, en Bytes, de los elementos incrustados en un eMail. (por fichero)';
+$lang['action_whitelist'] = 'Si se define, solo las acciones listadas están permitidas para todos los usuarios del wiki';
