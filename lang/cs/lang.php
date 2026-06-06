@@ -1,6 +1,7 @@
 <?php
 
 $lang['e_unknowntype']   = 'Neznámý typ "%s"';
+$lang['e_forbiddenaction'] = 'Akce "%s" je zakázána. Zkontrolujte action_whitelist';
 $lang['e_missingargs']   = 'Příliš málo argumentů pro %s %s';
 $lang['e_noaction']      = 'Žádná akce nebyla nastavena';
 $lang['e_mail']          = 'Nastala chyba při odesílání';

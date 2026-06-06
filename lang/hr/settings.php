@@ -7,3 +7,4 @@
  */
 $lang['runas']                 = 'Utječe na mod predloška. Koristi ove (virtualne) ovlasti kada provjeravaš ACL za čitanje predloška i stvaranje stranice.';
 $lang['maxEmailAttachmentSize'] = 'Maksimalna veličina priloga pošti u Bajtovima. (po datoteci)';
+$lang['action_whitelist'] = 'Ako je definirano, samo navedene akcije su dopuštene svim wiki korisnicima';

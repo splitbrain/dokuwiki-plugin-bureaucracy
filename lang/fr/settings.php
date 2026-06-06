@@ -7,3 +7,4 @@
  */
 $lang['runas']                 = 'Mode «template» : teste les ACL avec les permissions de cet utilisateur (virtuel) pour la lecture des modèles et la création de page.';
 $lang['maxEmailAttachmentSize'] = 'Taille max en octet des pièces jointes dans les courriels. (par fichier)';
+$lang['action_whitelist'] = 'Si défini, seules les actions listées sont autorisées pour tous les utilisateurs du wiki';

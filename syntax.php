@@ -141,6 +141,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         foreach($rawactions as $action) {
             $action['type'] = $this->_sanitizeClassName($action['type']);
 
+            // check whitelist
+            $whitelist = $this->getConf('action_whitelist');
+            if(!empty($whitelist) && !in_array($action['type'], $whitelist)) {
+                msg(sprintf($this->getLang('e_forbiddenaction'), hsc($action['type'])), -1);
+                continue;
+            }
+
             if(strpos($action['type'], '_') === false) {
                 $action['actionname'] = 'bureaucracy_action' . $action['type'];
             } else {

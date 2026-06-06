@@ -7,3 +7,4 @@
  */
 $lang['runas']                 = 'Gebruikt in de template mode. Gebruik de rechten van deze (virtuele) gebruiker bij het controleren van de ACL gebruiker voor het lezen van templates en het maken van pagina\'s';
 $lang['maxEmailAttachmentSize'] = 'Max grootte van e-mailbijlages in Bytes. (per bestand)';
+$lang['action_whitelist'] = 'Indien gedefinieerd, zijn alleen de genoemde acties toegestaan voor alle wiki-gebruikers';

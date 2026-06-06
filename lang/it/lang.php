@@ -1,6 +1,7 @@
 <?php
 
 $lang['e_unknowntype'] = 'Tipo sconosciuto "%s"';
+$lang['e_forbiddenaction'] = 'L\'azione "%s" è proibita. Controllare action_whitelist';
 $lang['e_missingargs'] = 'Gli argomenti specificati non sono sufficenti per %s %s';
 $lang['e_noaction']    = 'Nessuna azione definita - dove devono essere spediti i dati ?';
 $lang['e_mail']        = 'Si sono verificati dei problemi sulla spedizione dei dati';

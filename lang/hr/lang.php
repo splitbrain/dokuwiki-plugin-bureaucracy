@@ -7,6 +7,7 @@
  */
 $lang['e_unknowntype']         = 'Nepoznat tip "%s"';
 $lang['e_unknownaction']       = 'Nepoznata aktivnost "%s"';
+$lang['e_forbiddenaction'] = 'Akcija "%s" je zabranjena. Provjerite action_whitelist';
 $lang['e_missingargs']         = 'Nema dovoljno argumenata za %s %s';
 $lang['e_noaction']            = 'Nema definirane akcije - gdje podaci trebaju biti poslani?';
 $lang['e_mail']                = 'Nešto je pošlo krivo s slanjem ovih podataka';

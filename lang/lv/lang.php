@@ -1,6 +1,7 @@
 <?php
 
 $lang['e_unknowntype']   = 'Nezināma tipa "%s"';
+$lang['e_forbiddenaction'] = 'Darbība "%s" ir aizliegta. Pārbaudiet action_whitelist';
 $lang['e_missingargs']   = 'Pietrūkst argumentu %s %s';
 $lang['e_noaction']      = 'Nav definēta darbība, kur dati jāsūta vai jāievieto';
 $lang['e_mail']          = 'Kļūme nosūtot datus';
