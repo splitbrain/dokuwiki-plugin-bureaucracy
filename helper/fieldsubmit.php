@@ -4,6 +4,7 @@
  *
  * Creates a submit button
  */
+
 class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_field {
     protected $mandatory_args = 1;
     static $captcha_displayed = array();
@@ -23,6 +24,14 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
         $this->opt['optional'] = true;
     }
 
+    function form_button($attrs)
+    {
+        $p = (!empty($attrs['_action'])) ? 'name="do[' . $attrs['_action'] . ']" ' : '';
+        $label = $attrs['label'];
+        unset($attrs['label']);
+        return '<button ' . $p . buildAttributes($attrs, true) . '>' . $label . '</button>';
+    }
+
     /**
      * Render the field as XHTML
      *
@@ -40,12 +49,37 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
                 $form->addElement($helper->getHTML());
             }
         }
+
         $attr = array();
+        $attr['name'] = 'submit';
+        if(isset($this->opt['value'])) {
+            $attr['value'] = $this->opt['value'];
+        }
+        if(isset($this->opt['label'])) {
+            $attr['label'] = $this->opt['label'];
+        }
         if(isset($this->opt['id'])) {
             $attr['id'] = $this->opt['id'];
         }
+        if(isset($this->opt['class'])) {
+            $attr['class'] = $this->opt['class'];
+        }
+
         $this->tpl = form_makeButton('submit','', '@@DISPLAY|' . $this->getLang('submit') . '@@', $attr);
-        parent::renderfield($params, $form, $formid);
+
+        $this->_handlePreload();
+
+        if(!$form->_infieldset){
+            $form->startFieldset('');
+        }
+        if ($this->error) {
+            $params['class'] = 'bureaucracy_error';
+        }
+
+        $params = array_merge($this->opt, $params);
+        $element = $this->_parse_tpl($this->tpl, $params);
+        $form->addElement($this->form_button($element));
+
     }
 
     /**
@@ -57,9 +91,13 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
      * @param helper_plugin_bureaucracy_field[] $fields (reference) form fields (POST handled upto $this field)
      * @param int    $index  index number of field in form
      * @param int    $formid unique identifier of the form which contains this field
-     * @return bool Whether the posted form has a valid captcha
+     * @return bool Whether the posted f$_POSTorm has a valid captcha
      */
     public function handle_post($value, &$fields, $index, $formid) {
+
+        // Set the value of the submit filed to the label of the button which was pressed
+        $this->setVal($_POST['submit']);
+
         if ($this->hidden) {
             return true;
         }
@@ -83,7 +121,7 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
      * @return mixed|null
      */
     public function getParam($name) {
-        return ($name === 'value') ? null : parent::getParam($name);
+        return ($name === 'value') ? (($this->hidden)? null : parent::getParam($name)) : parent::getParam($name);
     }
 
 }

@@ -103,6 +103,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 }
             } elseif($arg == '@') {
                 $this->opt['pagename'] = true;
+            } elseif($arg == '#') {
+                $this->opt['readonly'] = true;
             } elseif($arg == '@@') {
                 $this->opt['replyto'] = true;
             } elseif(preg_match('/x\d/', $arg)) {

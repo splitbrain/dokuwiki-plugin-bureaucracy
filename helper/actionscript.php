@@ -42,11 +42,13 @@ Your current scheme <code>$deprecatedClassName</code> is deprecated and will sto
         /** @var dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface $handler */
         $handler = new $className;
 
-        if (!is_a($handler, dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface::class)) {
+        if (is_a($handler, dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface::class)) {
+            return $handler->handleData($fields, $thanks);
+        } elseif (is_a($handler, dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface_ex::class)) {
+            return $handler->handleData($fields, $thanks,$argv);
+        } else {
             throw new InvalidArgumentException('The handler must implement the interface <code>dokuwiki\\plugin\\bureaucracy\\interfaces\\bureaucracy_handler_interface</code> !');
         }
-
-        return $handler->handleData($fields, $thanks);
     }
 
     /**
