@@ -20,7 +20,7 @@ class helper_plugin_bureaucracy_actionmail extends helper_plugin_bureaucracy_act
      * @return string thanks message
      * @throws Exception mailing failed
      */
-    public function run($fields, $thanks, $argv) {
+    public function run(&$fields, &$thanks, $argv) {
         global $ID;
         global $conf;
 

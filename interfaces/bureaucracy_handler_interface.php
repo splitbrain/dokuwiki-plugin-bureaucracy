@@ -15,5 +15,5 @@ interface bureaucracy_handler_interface {
      * @return bool|string false on error, $thanks on success
      *
      */
-    public function handleData($fields, $thanks);
+    public function handleData(&$fields, &$thanks);
 }
