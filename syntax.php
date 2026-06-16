@@ -373,12 +373,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @return string html of the form
      */
     private function _htmlform($fields) {
-        global $INFO;
+        global $INFO, $ID;
 
         $form = new Doku_Form(array('class'   => 'bureaucracy__plugin',
                                     'id'      => 'bureaucracy__plugin' . $this->form_id,
                                     'enctype' => 'multipart/form-data'));
-        $form->addHidden('id', $INFO['id']);
+        $localid = isset($INFO['id']) ? $INFO['id'] : $ID;
+        $form->addHidden('id', $localid);
         $form->addHidden('bureaucracy[$$id]', $this->form_id);
 
         foreach($fields as $id => $field) {
