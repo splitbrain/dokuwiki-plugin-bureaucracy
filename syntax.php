@@ -540,10 +540,15 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     function replacedate($match) {
         global $conf;
 
+        //First check for empty or invalid input
+        if($match[1] == "" || ($t=strtotime($match[1]))===false){
+            return "";
+        }
+
         //no 2nd argument for default date format
         $match[2] = $match[2] ?? $conf['dformat'];
 
-        return strftime($match[2], strtotime($match[1]));
+        return strftime($match[2], $t);
     }
 
     /**
