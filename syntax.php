@@ -68,6 +68,10 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Handler to prepare matched data for the rendering process
      *
+     * The returned data goes into the instruction cache, which restores plain
+     * data only. The field definitions are therefore turned into field objects
+     * by createFields() at render time.
+     *
      * @param   string       $match   The text matched by the patterns
      * @param   int          $state   The lexer state for the match
      * @param   int          $pos     The character position of the matched text
@@ -122,19 +126,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                 $name = $args[0];
             }
 
-            /** @var helper_plugin_bureaucracy_field $field */
-            $field = $this->loadHelper($name, false);
-            if($field && is_a($field, 'helper_plugin_bureaucracy_field')) {
-                $field->initialize($args);
-                $cmds[] = $field;
-            } else {
-                $evdata = array('fields' => &$cmds, 'args' => $args);
-                $event = new Doku_Event('PLUGIN_BUREAUCRACY_FIELD_UNKNOWN', $evdata);
-                if($event->advise_before()) {
-                    msg(sprintf($this->getLang('e_unknowntype'), hsc($name)), -1);
-                }
-            }
-
+            $cmds[] = array('name' => $name, 'args' => $args);
         }
 
         // check if action is available
@@ -204,6 +196,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         if($format != 'xhtml') return false;
         $R->info['cache'] = false; // don't cache
 
+        $data['fields'] = $this->createFields($data['fields']);
+
         /**
          * replace some time and name placeholders in the default values
          * @var $field helper_plugin_bureaucracy_field
@@ -228,6 +222,35 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $R->doc .= $this->_htmlform($data['fields']);
 
         return true;
+    }
+
+    /**
+     * Create the field objects from their definitions
+     *
+     * Unknown field types are announced through the
+     * PLUGIN_BUREAUCRACY_FIELD_UNKNOWN event, which allows other plugins to
+     * add a field of their own.
+     *
+     * @param array $definitions list of arrays with the helper component 'name' and the definition 'args'
+     * @return helper_plugin_bureaucracy_field[] the form fields
+     */
+    public function createFields($definitions) {
+        $fields = array();
+        foreach($definitions as $definition) {
+            /** @var helper_plugin_bureaucracy_field $field */
+            $field = $this->loadHelper($definition['name'], false);
+            if($field && is_a($field, 'helper_plugin_bureaucracy_field')) {
+                $field->initialize($definition['args']);
+                $fields[] = $field;
+            } else {
+                $evdata = array('fields' => &$fields, 'args' => $definition['args']);
+                $event = new Doku_Event('PLUGIN_BUREAUCRACY_FIELD_UNKNOWN', $evdata);
+                if($event->advise_before()) {
+                    msg(sprintf($this->getLang('e_unknowntype'), hsc($definition['name'])), -1);
+                }
+            }
+        }
+        return $fields;
     }
 
     /**

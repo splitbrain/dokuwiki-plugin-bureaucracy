@@ -49,6 +49,7 @@ class BureaucracyTest extends \DokuWikiTest
         /** @var \syntax_plugin_bureaucracy $syntax_plugin */
         $syntax_plugin = plugin_load('syntax', 'bureaucracy');
         $data = $syntax_plugin->handle($form_syntax, 0, 0, new \Doku_Handler());
+        $data['fields'] = $syntax_plugin->createFields($data['fields']);
 
         $actionData = $data['actions'][0];
         /** @var \helper_plugin_bureaucracy_action $action */
