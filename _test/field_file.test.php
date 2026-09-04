@@ -68,6 +68,7 @@ class syntax_plugin_bureaucracy_fieldfile_test extends BureaucracyTest {
 
         $syntax_plugin = new syntax_plugin_bureaucracy();
         $data = $syntax_plugin->handle($form_syntax, 0, 0, new Doku_Handler());
+        $data['fields'] = $syntax_plugin->createFields($data['fields']);
 
         $actionData = $data['actions'][0];
         $action = plugin_load('helper', $actionData['actionname']);

@@ -44,9 +44,6 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * default value, mark the field as optional or define that the field is
      * part of a pagename (when using the template action).
      *
-     * Since the field objects are cached, this constructor may not reference
-     * request data.
-     *
      * @param array $args The tokenized definition, only split at spaces
      */
     public function initialize($args) {
