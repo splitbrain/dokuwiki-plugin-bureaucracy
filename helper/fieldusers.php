@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Class helper_plugin_bureaucracy_fieldusers
  *
  * Create multi-user input, with autocompletion
  */
-class helper_plugin_bureaucracy_fieldusers extends helper_plugin_bureaucracy_fieldtextbox {
-
+class helper_plugin_bureaucracy_fieldusers extends helper_plugin_bureaucracy_fieldtextbox
+{
     /**
      * Arguments:
      *  - cmd
@@ -14,7 +15,8 @@ class helper_plugin_bureaucracy_fieldusers extends helper_plugin_bureaucracy_fie
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function initialize($args) {
+    public function initialize($args)
+    {
         parent::initialize($args);
         $this->tpl['class'] .= ' userspicker';
     }
@@ -25,10 +27,11 @@ class helper_plugin_bureaucracy_fieldusers extends helper_plugin_bureaucracy_fie
      *
      * @return string
      */
-    public function getReplacementPattern() {
+    public function getReplacementPattern()
+    {
         $label = $this->opt['label'];
         return '/(@@|##)' . preg_quote($label, '/') .
-            '(?:\((?P<delimiter>.*?)\))?' .//delimiter
+            '(?:\((?P<delimiter>.*?)\))?' . //delimiter
             '(?:\.(?P<attribute>.*?))?' .  //match attribute after "."
             '\1/si';
     }
@@ -39,7 +42,8 @@ class helper_plugin_bureaucracy_fieldusers extends helper_plugin_bureaucracy_fie
      * @param $matches
      * @return string
      */
-    public function replacementValueCallback($matches) {
+    public function replacementValueCallback($matches)
+    {
         /** @var DokuWiki_Auth_Plugin $auth */
         global $auth;
 
@@ -49,22 +53,16 @@ class helper_plugin_bureaucracy_fieldusers extends helper_plugin_bureaucracy_fie
             return is_null($value) || $value === false ? $matches[0] : $value;
         }
 
-        $attribute = isset($matches['attribute']) ? $matches['attribute'] : '';
+        $attribute = $matches['attribute'] ?? '';
         //check if matched string containts a pair of brackets
         $delimiter = preg_match('/\(.*\)/s', $matches[0]) ? $matches['delimiter'] : ', ';
-        $users     = array_map('trim', explode(',', $value));
+        $users     = array_map(trim(...), explode(',', $value));
 
-        switch($attribute) {
-            case '':
-                return implode($delimiter, $users);
-            case 'name':
-            case 'mail':
-                return implode($delimiter, array_map(function ($user) use ($auth, $attribute) {
-                    return $auth->getUserData($user)[$attribute];
-                }, $users));
-            default:
-                return $matches[0];
-        }
+        return match ($attribute) {
+            '' => implode($delimiter, $users),
+            'name', 'mail' => implode($delimiter, array_map(fn($user) => $auth->getUserData($user)[$attribute], $users)),
+            default => $matches[0],
+        };
     }
 
     /**
@@ -72,8 +70,9 @@ class helper_plugin_bureaucracy_fieldusers extends helper_plugin_bureaucracy_fie
      *
      * @return array
      */
-    public function getReplacementValue() {
-        return array($this, 'replacementValueCallback');
+    public function getReplacementValue()
+    {
+        return $this->replacementValueCallback(...);
     }
 
     /**
@@ -81,7 +80,8 @@ class helper_plugin_bureaucracy_fieldusers extends helper_plugin_bureaucracy_fie
      *
      * @throws Exception when user not exists
      */
-    protected function _validate() {
+    protected function _validate()
+    {
         parent::_validate();
 
         /** @var DokuWiki_Auth_Plugin $auth */

@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Class helper_plugin_bureaucracy_fieldyesno
  *
  * Creates a checkbox
  */
-class helper_plugin_bureaucracy_fieldyesno extends helper_plugin_bureaucracy_field {
-
+class helper_plugin_bureaucracy_fieldyesno extends helper_plugin_bureaucracy_field
+{
     /**
      * Arguments:
      *  - cmd
@@ -16,25 +17,26 @@ class helper_plugin_bureaucracy_fieldyesno extends helper_plugin_bureaucracy_fie
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function initialize($args) {
+    public function initialize($args)
+    {
         $this->init($args);
-        $newargs = array();
+        $newargs = [];
         foreach ($args as $arg) {
             switch ($arg[0]) {
-            case '=':
-                if($arg == '==1') {
-                    $this->opt['value'] = '1';
-                }elseif($arg == '==0') {
-                    $this->opt['value'] = '0';
-                }else{
-                    $this->opt['true_value'] = substr($arg, 1);
-                }
-                break;
-            case '!':
-                $this->opt['false_value'] = substr($arg, 1);
-                break;
-            default:
-                $newargs[] = $arg;
+                case '=':
+                    if ($arg == '==1') {
+                        $this->opt['value'] = '1';
+                    } elseif ($arg == '==0') {
+                        $this->opt['value'] = '0';
+                    } else {
+                        $this->opt['true_value'] = substr($arg, 1);
+                    }
+                    break;
+                case '!':
+                    $this->opt['false_value'] = substr($arg, 1);
+                    break;
+                default:
+                    $newargs[] = $arg;
             }
         }
         $this->standardArgs($newargs);
@@ -47,16 +49,14 @@ class helper_plugin_bureaucracy_fieldyesno extends helper_plugin_bureaucracy_fie
      * @param string $key
      * @return mixed|null
      */
-    public function getParam($key) {
+    public function getParam($key)
+    {
         if ($key === 'value') {
             if ($this->opt['value'] === '1') {
-                return isset($this->opt['true_value']) ?
-                       $this->opt['true_value'] :
-                       null;
-            } elseif ($this->opt['value'] === '0') {
-                return isset($this->opt['false_value']) ?
-                       $this->opt['false_value'] :
-                       null;
+                return $this->opt['true_value'] ?? null;
+            }
+            if ($this->opt['value'] === '0') {
+                return $this->opt['false_value'] ?? null;
             }
         }
         return parent::getParam($key);
@@ -67,7 +67,8 @@ class helper_plugin_bureaucracy_fieldyesno extends helper_plugin_bureaucracy_fie
      *
      * @return bool whether field is set
      */
-    public function isSet_() {
+    public function isSet_()
+    {
         return $this->opt['value'] === '1';
     }
 
@@ -78,20 +79,21 @@ class helper_plugin_bureaucracy_fieldyesno extends helper_plugin_bureaucracy_fie
      * @params Doku_Form $form   The target Doku_Form object
      * @params int       $formid unique identifier of the form which contains this field
      */
-    public function renderfield($params, Doku_Form $form, $formid) {
-        $id = 'bureaucracy__'.md5(rand());
-        if(isset($this->opt['id'])) {
+    public function renderfield($params, Doku_Form $form, $formid)
+    {
+        $id = 'bureaucracy__' . md5(random_int(0, mt_getrandmax()));
+        if (isset($this->opt['id'])) {
             $id = $this->opt['id'];
         }
         $params = array_merge(
-            array('value' => false),
+            ['value' => false],
             $this->opt,
             $params
         );
         $check = $params['value'] ? 'checked="checked"' : '';
-        $this->tpl = '<label class="@@CLASS@@" for="'.$id.'"><span>@@DISPLAY@@</span>'.
+        $this->tpl = '<label class="@@CLASS@@" for="' . $id . '"><span>@@DISPLAY@@</span>' .
                      '<input type="hidden" name="@@NAME@@" value="0" />' .
-                     '<input type="checkbox" name="@@NAME@@" value="1" id="'.$id.'" ' . $check . ' />' .
+                     '<input type="checkbox" name="@@NAME@@" value="1" id="' . $id . '" ' . $check . ' />' .
                      '</label>';
         parent::renderfield($params, $form, $formid);
     }

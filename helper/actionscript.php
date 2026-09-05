@@ -1,14 +1,17 @@
 <?php
 
-class helper_plugin_bureaucracy_actionscript extends helper_plugin_bureaucracy_action {
+use dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface;
 
+class helper_plugin_bureaucracy_actionscript extends helper_plugin_bureaucracy_action
+{
     protected $scriptNamePattern = '/^[_a-zA-Z0-9]+\.php$/';
 
     /**
      * @inheritDoc
      * @throws \InvalidArgumentException
      */
-    public function run($fields, $thanks, $argv) {
+    public function run($fields, $thanks, $argv)
+    {
         if (count($argv) < 1) {
             throw new InvalidArgumentException('The "script"-action expects exactly 1 argument: the script name.');
         }
@@ -39,10 +42,10 @@ Your current scheme <code>$deprecatedClassName</code> is deprecated and will sto
             $className = $deprecatedClassName;
         }
 
-        /** @var dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface $handler */
-        $handler = new $className;
+        /** @var bureaucracy_handler_interface $handler */
+        $handler = new $className();
 
-        if (!is_a($handler, dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface::class)) {
+        if (!$handler instanceof bureaucracy_handler_interface) {
             throw new InvalidArgumentException('The handler must implement the interface <code>dokuwiki\\plugin\\bureaucracy\\interfaces\\bureaucracy_handler_interface</code> !');
         }
 
@@ -54,9 +57,9 @@ Your current scheme <code>$deprecatedClassName</code> is deprecated and will sto
      *
      * @return bool
      */
-    protected function validateScriptName($scriptName) {
+    protected function validateScriptName($scriptName)
+    {
         $valid = preg_match($this->scriptNamePattern, $scriptName);
         return $valid === 1;
     }
-
 }

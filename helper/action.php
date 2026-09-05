@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base class for bureaucracy actions.
  *
@@ -9,14 +10,15 @@
  *
  * @author Michael Klier <chi@chimeric.de>
  */
-class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
-
+class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy
+{
     /**
      * Return false to prevent DokuWiki reusing instances of the plugin
      *
      * @return bool
      */
-    public function isSingleton() {
+    public function isSingleton()
+    {
         return false;
     }
 
@@ -34,7 +36,8 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      * @param array                             $argv   additional arguments passed to the action
      * @return bool|string false on error, $thanks on success
      */
-    public function run($fields, $thanks, $argv){
+    public function run($fields, $thanks, $argv)
+    {
         msg('ERROR: called action %s did not implement a run() function');
         return false;
     }
@@ -42,7 +45,8 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
     /**
      * Adds some language related replacement patterns
      */
-    function prepareLanguagePlaceholder() {
+    public function prepareLanguagePlaceholder()
+    {
         global $ID;
         global $conf;
 
@@ -65,10 +69,11 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      *
      * @param helper_plugin_bureaucracy_field $field
      */
-    function prepareFieldReplacement($field) {
+    public function prepareFieldReplacement($field)
+    {
         $label = $field->getParam('label');
 
-        if(!is_null($label)) {
+        if (!is_null($label)) {
             $this->patterns[$label] = $field->getReplacementPattern();
             $this->values[$label] = $field->getReplacementValue();
         }
@@ -77,7 +82,8 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
     /**
      * Adds <noinclude></noinclude> to replacement patterns
      */
-    function prepareNoincludeReplacement() {
+    public function prepareNoincludeReplacement()
+    {
         $this->patterns['__noinclude__'] = '/<noinclude>(.*?)<\/noinclude>/is';
         $this->values['__noinclude__'] = '';
     }
@@ -88,7 +94,8 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      * @param helper_plugin_bureaucracy_field[]  $fields  List of field objects
      * @return array
      */
-    function prepareFieldReplacements($fields) {
+    public function prepareFieldReplacements($fields)
+    {
         foreach ($fields as $field) {
             //field replacements
             $this->prepareFieldReplacement($field);
@@ -101,16 +108,14 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      * @param string $id pageid
      * @return int
      */
-    protected function aclcheck($id) {
+    protected function aclcheck($id)
+    {
         $runas = $this->getConf('runas');
 
-        if($runas) {
-            $auth = auth_aclcheck($id, $runas, array());
-        } else {
-            $auth = auth_quickaclcheck($id);
+        if ($runas) {
+            return auth_aclcheck($id, $runas, []);
         }
-        return $auth;
-
+        return auth_quickaclcheck($id);
     }
 
     /**
@@ -118,19 +123,17 @@ class helper_plugin_bureaucracy_action extends syntax_plugin_bureaucracy {
      *
      * @return array
      */
-    public function getMethods() {
-        $result = array();
-        $result[] = array(
+    public function getMethods()
+    {
+        return [[
             'name' => 'run',
             'desc' => 'Handle the user input',
-            'params' => array(
+            'params' => [
                 'fields' => 'helper_plugin_bureaucracy_field[]',
                 'thanks' => 'string',
                 'argv'   => 'array'
-            ),
-            'return' => array('false on error, thanks message on success' => 'bool|string')
-        );
-        return $result;
+            ],
+            'return' => ['false on error, thanks message on success' => 'bool|string']
+        ]];
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Bureaucracy Plugin: Allows flexible creation of forms
  *
@@ -9,27 +10,32 @@
  * @author     Andreas Gohr <andi@splitbrain.org>
  * @author     Adrian Lang <dokuwiki@cosmocode.de>
  */
+
 // must be run within Dokuwiki
+use dokuwiki\Extension\SyntaxPlugin;
+use dokuwiki\Parsing\Handler;
+use dokuwiki\Extension\Event;
 use dokuwiki\Utf8\PhpString;
 
-if(!defined('DOKU_INC')) die();
+if (!defined('DOKU_INC')) die();
 
 /**
  * All DokuWiki plugins to extend the parser/rendering mechanism
  * need to inherit from this class
  */
-class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
-
+class syntax_plugin_bureaucracy extends SyntaxPlugin
+{
     private $form_id = 0;
-    var $patterns = array();
-    var $values = array();
-    var $noreplace = null;
-    var $functions = array();
+    public $patterns = [];
+    public $values = [];
+    public $noreplace;
+    public $functions = [];
 
     /**
      * Prepare some replacements
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->prepareDateTimereplacements();
         $this->prepareNamespacetemplateReplacements();
         $this->prepareFunctions();
@@ -38,21 +44,24 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * What kind of syntax are we?
      */
-    public function getType() {
+    public function getType()
+    {
         return 'substition';
     }
 
     /**
      * What about paragraphs?
      */
-    public function getPType() {
+    public function getPType()
+    {
         return 'block';
     }
 
     /**
      * Where to sort in?
      */
-    public function getSort() {
+    public function getSort()
+    {
         return 155;
     }
 
@@ -61,7 +70,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      *
      * @param string $mode
      */
-    public function connectTo($mode) {
+    public function connectTo($mode)
+    {
         $this->Lexer->addSpecialPattern('<form>.*?</form>', $mode, 'plugin_bureaucracy');
     }
 
@@ -75,113 +85,115 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @param   string       $match   The text matched by the patterns
      * @param   int          $state   The lexer state for the match
      * @param   int          $pos     The character position of the matched text
-     * @param   Doku_Handler $handler The Doku_Handler object
+     * @param Handler $handler The Doku_Handler object
      * @return  bool|array Return an array with all data you want to use in render, false don't add an instruction
      */
-    public function handle($match, $state, $pos, Doku_Handler $handler) {
+    public function handle($match, $state, $pos, Handler $handler)
+    {
         $match = substr($match, 6, -7); // remove form wrap
         $lines = explode("\n", $match);
-        $actions = $rawactions = array();
+        $actions = [];
+        $rawactions = [];
         $thanks = '';
         $labels = '';
 
         // parse the lines into an command/argument array
-        $cmds = array();
-        while(count($lines) > 0) {
+        $cmds = [];
+        while (count($lines) > 0) {
             $line = trim(array_shift($lines));
-            if(!$line) continue;
+            if (!$line) continue;
             $args = $this->_parse_line($line, $lines);
             $args[0] = $this->_sanitizeClassName($args[0]);
 
-            if(in_array($args[0], array('action', 'thanks', 'labels'))) {
-                if(count($args) < 2) {
+            if (in_array($args[0], ['action', 'thanks', 'labels'])) {
+                if (count($args) < 2) {
                     msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]), hsc($args[1])), -1);
                     continue;
                 }
 
                 // is action element?
-                if($args[0] == 'action') {
+                if ($args[0] == 'action') {
                     array_shift($args);
-                    $rawactions[] = array('type' => array_shift($args), 'argv' => $args);
+                    $rawactions[] = ['type' => array_shift($args), 'argv' => $args];
                     continue;
                 }
 
                 // is thank you text?
-                if($args[0] == 'thanks') {
+                if ($args[0] == 'thanks') {
                     $thanks = $args[1];
                     continue;
                 }
 
                 // is labels?
-                if($args[0] == 'labels') {
+                if ($args[0] == 'labels') {
                     $labels = $args[1];
                     continue;
                 }
             }
 
-            if(strpos($args[0], '_') === false) {
+            if (!str_contains($args[0], '_')) {
                 $name = 'bureaucracy_field' . $args[0];
             } else {
                 //name convention: plugin_componentname
                 $name = $args[0];
             }
 
-            $cmds[] = array('name' => $name, 'args' => $args);
+            $cmds[] = ['name' => $name, 'args' => $args];
         }
 
         // check if action is available
-        foreach($rawactions as $action) {
+        foreach ($rawactions as $action) {
             $action['type'] = $this->_sanitizeClassName($action['type']);
 
-            if(strpos($action['type'], '_') === false) {
+            if (!str_contains($action['type'], '_')) {
                 $action['actionname'] = 'bureaucracy_action' . $action['type'];
             } else {
                 //name convention for other plugins: plugin_componentname
                 $action['actionname'] = $action['type'];
             }
 
-            list($plugin, $component) = explode('_', $action['actionname']);
-            $alternativename = $action['type'] . '_'. $action['type'];
+            [$plugin, $component] = explode('_', $action['actionname']);
+            $alternativename = $action['type'] . '_' . $action['type'];
 
             // bureaucracy_action<name> or <plugin>_<componentname>
-            if(!plugin_isdisabled($action['actionname']) || @file_exists(DOKU_PLUGIN . $plugin . '/helper/'  . $component . '.php')) {
+            if (!plugin_isdisabled($action['actionname']) || @file_exists(DOKU_PLUGIN . $plugin . '/helper/'  . $component . '.php')) {
                 $actions[] = $action;
 
             // shortcut for other plugins with component name <name>_<name>
-            } elseif(plugin_isdisabled($alternativename) || !@file_exists(DOKU_PLUGIN . $action['type'] . '/helper/'  . $action['type'] . '.php')) {
+            } elseif (plugin_isdisabled($alternativename) || !@file_exists(DOKU_PLUGIN . $action['type'] . '/helper/'  . $action['type'] . '.php')) {
                 $action['actionname'] = $alternativename;
                 $actions[] = $action;
 
             // not found
             } else {
-                $evdata = array('actions' => &$actions, 'action' => $action);
-                $event = new Doku_Event('PLUGIN_BUREAUCRACY_ACTION_UNKNOWN', $evdata);
-                if($event->advise_before()) {
+                $evdata = ['actions' => &$actions, 'action' => $action];
+                $event = new Event('PLUGIN_BUREAUCRACY_ACTION_UNKNOWN', $evdata);
+                if ($event->advise_before()) {
                     msg(sprintf($this->getLang('e_unknownaction'), hsc($action['actionname'])), -1);
                 }
             }
         }
 
         // action(s) found?
-        if(count($actions) < 1) {
+        if (count($actions) < 1) {
             msg($this->getLang('e_noaction'), -1);
         }
 
         // set thank you message
-        if(!$thanks) {
+        if (!$thanks) {
             $thanks = "";
-            foreach($actions as $action) {
+            foreach ($actions as $action) {
                 $thanks .= $this->getLang($action['type'] . '_thanks');
             }
         } else {
             $thanks = hsc($thanks);
         }
-        return array(
+        return [
             'fields'  => $cmds,
             'actions' => $actions,
             'thanks'  => $thanks,
             'labels'  => $labels
-        );
+        ];
     }
 
     /**
@@ -192,8 +204,9 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @param array           $data     data created by handler()
      * @return  boolean                 rendered correctly? (however, returned value is not used at the moment)
      */
-    public function render($format, Doku_Renderer $R, $data) {
-        if($format != 'xhtml') return false;
+    public function render($format, Doku_Renderer $R, $data)
+    {
+        if ($format != 'xhtml') return false;
         $R->info['cache'] = false; // don't cache
 
         $data['fields'] = $this->createFields($data['fields']);
@@ -202,18 +215,18 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
          * replace some time and name placeholders in the default values
          * @var $field helper_plugin_bureaucracy_field
          */
-        foreach($data['fields'] as &$field) {
-            if(isset($field->opt['value'])) {
+        foreach ($data['fields'] as &$field) {
+            if (isset($field->opt['value'])) {
                 $field->opt['value'] = $this->replace($field->opt['value']);
             }
         }
 
-        if($data['labels']) $this->loadlabels($data);
+        if ($data['labels']) $this->loadlabels($data);
 
         $this->form_id++;
-        if(isset($_POST['bureaucracy']) && checkSecurityToken() && $_POST['bureaucracy']['$$id'] == $this->form_id) {
+        if (isset($_POST['bureaucracy']) && checkSecurityToken() && $_POST['bureaucracy']['$$id'] == $this->form_id) {
             $success = $this->_handlepost($data);
-            if($success !== false) {
+            if ($success !== false) {
                 $R->doc .= '<div class="bureaucracy__plugin" id="scroll__here">' . $success . '</div>';
                 return true;
             }
@@ -234,18 +247,19 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @param array $definitions list of arrays with the helper component 'name' and the definition 'args'
      * @return helper_plugin_bureaucracy_field[] the form fields
      */
-    public function createFields($definitions) {
-        $fields = array();
-        foreach($definitions as $definition) {
+    public function createFields($definitions)
+    {
+        $fields = [];
+        foreach ($definitions as $definition) {
             /** @var helper_plugin_bureaucracy_field $field */
             $field = $this->loadHelper($definition['name'], false);
-            if($field && is_a($field, 'helper_plugin_bureaucracy_field')) {
+            if ($field && is_a($field, 'helper_plugin_bureaucracy_field')) {
                 $field->initialize($definition['args']);
                 $fields[] = $field;
             } else {
-                $evdata = array('fields' => &$fields, 'args' => $definition['args']);
-                $event = new Doku_Event('PLUGIN_BUREAUCRACY_FIELD_UNKNOWN', $evdata);
-                if($event->advise_before()) {
+                $evdata = ['fields' => &$fields, 'args' => $definition['args']];
+                $event = new Event('PLUGIN_BUREAUCRACY_FIELD_UNKNOWN', $evdata);
+                if ($event->advise_before()) {
                     msg(sprintf($this->getLang('e_unknowntype'), hsc($definition['name'])), -1);
                 }
             }
@@ -258,36 +272,37 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      *
      * @param array $data all data passed to render()
      */
-    protected function loadlabels(&$data) {
+    protected function loadlabels(&$data)
+    {
         global $INFO;
         $labelpage = $data['labels'];
         $exists = false;
         resolve_pageid($INFO['namespace'], $labelpage, $exists);
-        if(!$exists) {
+        if (!$exists) {
             msg(sprintf($this->getLang('e_labelpage'), html_wikilink($labelpage)), -1);
             return;
         }
 
         // parse simple list (first level cdata only)
-        $labels = array();
+        $labels = [];
         $instructions = p_cached_instructions(wikiFN($labelpage));
         $inli = 0;
         $item = '';
-        foreach($instructions as $instruction) {
-            if($instruction[0] == 'listitem_open') {
+        foreach ($instructions as $instruction) {
+            if ($instruction[0] == 'listitem_open') {
                 $inli++;
                 continue;
             }
-            if($inli === 1 && $instruction[0] == 'cdata') {
+            if ($inli === 1 && $instruction[0] == 'cdata') {
                 $item .= $instruction[1][0];
             }
-            if($instruction[0] == 'listitem_close') {
+            if ($instruction[0] == 'listitem_close') {
                 $inli--;
-                if($inli === 0) {
-                    list($k, $v) = explode('=', $item, 2);
+                if ($inli === 0) {
+                    [$k, $v] = explode('=', $item, 2);
                     $k = trim($k);
                     $v = trim($v);
-                    if($k && $v) $labels[$k] = $v;
+                    if ($k && $v) $labels[$k] = $v;
                     $item = '';
                 }
             }
@@ -295,29 +310,27 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
 
         // apply labels to all fields
         $len = count($data['fields']);
-        for($i = 0; $i < $len; $i++) {
-            if(isset($data['fields'][$i]->depends_on)) {
+        for ($i = 0; $i < $len; $i++) {
+            if (isset($data['fields'][$i]->depends_on)) {
                 // translate dependency on fieldsets
                 $label = $data['fields'][$i]->depends_on[0];
-                if(isset($labels[$label])) {
+                if (isset($labels[$label])) {
                     $data['fields'][$i]->depends_on[0] = $labels[$label];
                 }
-
-            } else if(isset($data['fields'][$i]->opt['label'])) {
+            } elseif (isset($data['fields'][$i]->opt['label'])) {
                 // translate field labels
                 $label = $data['fields'][$i]->opt['label'];
-                if(isset($labels[$label])) {
+                if (isset($labels[$label])) {
                     $data['fields'][$i]->opt['display'] = $labels[$label];
                 }
             }
         }
 
-        if(isset($data['thanks'])) {
-            if(isset($labels[$data['thanks']])) {
+        if (isset($data['thanks'])) {
+            if (isset($labels[$data['thanks']])) {
                 $data['thanks'] = $labels[$data['thanks']];
             }
         }
-
     }
 
     /**
@@ -328,40 +341,40 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      *      returns thanks message when fields validated and performed the action(s) succesfully;
      *      otherwise returns false.
      */
-    private function _handlepost($data) {
+    private function _handlepost($data)
+    {
         $success = true;
-        foreach($data['fields'] as $index => $field) {
+        foreach ($data['fields'] as $index => $field) {
             /** @var $field helper_plugin_bureaucracy_field */
 
             $isValid = true;
-            if($field->getFieldType() === 'file') {
-                $file = array();
-                foreach($_FILES['bureaucracy'] as $key => $value) {
+            if ($field->getFieldType() === 'file') {
+                $file = [];
+                foreach ($_FILES['bureaucracy'] as $key => $value) {
                     $file[$key] = $value[$index];
                 }
                 $isValid = $field->handle_post($file, $data['fields'], $index, $this->form_id);
-
-            } elseif($field->getFieldType() === 'fieldset' || !$field->hidden) {
+            } elseif ($field->getFieldType() === 'fieldset' || !$field->hidden) {
                 $isValid = $field->handle_post($_POST['bureaucracy'][$index] ?? null, $data['fields'], $index, $this->form_id);
             }
 
-            if(!$isValid) {
+            if (!$isValid) {
                 // Do not return instantly to allow validation of all fields.
                 $success = false;
             }
         }
-        if(!$success) {
+        if (!$success) {
             return false;
         }
 
-        $thanks_array = array();
+        $thanks_array = [];
 
-        foreach($data['actions'] as $actionData) {
+        foreach ($data['actions'] as $actionData) {
             /** @var helper_plugin_bureaucracy_action $action */
             $action = $this->loadHelper($actionData['actionname'], false);
 
             // action helper found?
-            if(!$action) {
+            if (!$action) {
                 msg(sprintf($this->getLang('e_unknownaction'), hsc($actionData['actionname'])), -1);
                 return false;
             }
@@ -372,19 +385,19 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
                     $data['thanks'],
                     $actionData['argv']
                 );
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 msg($e->getMessage(), -1);
                 return false;
             }
         }
 
         // Perform after_action hooks
-        foreach($data['fields'] as $field) {
+        foreach ($data['fields'] as $field) {
             $field->after_action();
         }
 
-		// create thanks string
-		$thanks = implode('', array_unique($thanks_array));
+        // create thanks string
+        $thanks = implode('', array_unique($thanks_array));
 
         return $thanks;
     }
@@ -395,17 +408,18 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @param helper_plugin_bureaucracy_field[] $fields array with form fields
      * @return string html of the form
      */
-    private function _htmlform($fields) {
+    private function _htmlform($fields)
+    {
         global $INFO;
 
-        $form = new Doku_Form(array('class'   => 'bureaucracy__plugin',
+        $form = new Doku_Form(['class'   => 'bureaucracy__plugin',
                                     'id'      => 'bureaucracy__plugin' . $this->form_id,
-                                    'enctype' => 'multipart/form-data'));
+                                    'enctype' => 'multipart/form-data']);
         $form->addHidden('id', $INFO['id']);
         $form->addHidden('bureaucracy[$$id]', $this->form_id);
 
-        foreach($fields as $id => $field) {
-            $field->renderfield(array('name' => 'bureaucracy[' . $id . ']'), $form, $this->form_id);
+        foreach ($fields as $id => $field) {
+            $field->renderfield(['name' => 'bureaucracy[' . $id . ']'], $form, $this->form_id);
         }
 
         return $form->getForm();
@@ -421,51 +435,51 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @param array  $lines all remaining lines
      * @return array with all the arguments
      */
-    private function _parse_line($line, &$lines) {
-        $args = array();
+    private function _parse_line($line, &$lines)
+    {
+        $args = [];
         $inQuote = false;
         $escapedQuote = false;
         $arg = '';
         do {
             $len = strlen($line);
-            for($i = 0; $i < $len; $i++) {
-                if($line[$i] == '"') {
-                    if($inQuote) {
-                        if($escapedQuote) {
+            for ($i = 0; $i < $len; $i++) {
+                if ($line[$i] == '"') {
+                    if ($inQuote) {
+                        if ($escapedQuote) {
                             $arg .= '"';
                             $escapedQuote = false;
                             continue;
                         }
-                        if($i + 1 < $len && $line[$i + 1] == '"') {
+                        if ($i + 1 < $len && $line[$i + 1] == '"') {
                             $escapedQuote = true;
                             continue;
                         }
-                        array_push($args, $arg);
+                        $args[] = $arg;
                         $inQuote = false;
                         $arg = '';
                         continue;
-                    } else {
-                        $inQuote = true;
-                        continue;
                     }
-                } else if($line[$i] == ' ') {
-                    if($inQuote) {
+                    $inQuote = true;
+                    continue;
+                }
+                if ($line[$i] == ' ') {
+                    if ($inQuote) {
                         $arg .= ' ';
                         continue;
-                    } else {
-                        if(strlen($arg) < 1) continue;
-                        array_push($args, $arg);
-                        $arg = '';
-                        continue;
                     }
+                    if (strlen($arg) < 1) continue;
+                    $args[] = $arg;
+                    $arg = '';
+                    continue;
                 }
                 $arg .= $line[$i];
             }
-            if(!$inQuote || count($lines) === 0) break;
+            if (!$inQuote || count($lines) === 0) break;
             $line = array_shift($lines);
             $arg .= "\n";
-        } while(true);
-        if(strlen($arg) > 0) array_push($args, $arg);
+        } while (true);
+        if ($arg !== '') $args[] = $arg;
         return $args;
     }
 
@@ -475,7 +489,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @param string $classname
      * @return string cleaned name
      */
-    private function _sanitizeClassName($classname) {
+    private function _sanitizeClassName($classname)
+    {
         return preg_replace('/[^\w\x7f-\xff]/', '', strtolower($classname));
     }
 
@@ -484,7 +499,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      *
      * @param string $input    The text to work on
      */
-    protected function noreplace_save($input) {
+    protected function noreplace_save($input)
+    {
         $pattern = '/<noreplace>(.*?)<\/noreplace>/is';
         //save content of <noreplace> tags
         preg_match_all($pattern, $input, $matches);
@@ -499,7 +515,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @param bool   $strftime Apply strftime() replacements
      * @return string processed text
      */
-    function replace($input, $strftime = true) {
+    public function replace($input, $strftime = true)
+    {
         //in helper_plugin_struct_field::setVal $input can be an array
         //just return $input in that case
         if (!is_string($input)) return $input;
@@ -516,13 +533,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
             } else {
                 $input = preg_replace($pattern, $value, $input);
             }
-
         }
 
-        if($strftime) {
+        if ($strftime) {
             $input = preg_replace_callback(
                 '/%./',
-                function($m){return strftime($m[0]);},
+                fn($m) => strftime($m[0]),
                 $input
             );
         }
@@ -530,7 +546,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         // strftime() is already applied once, so syntax is at this point: %.(.*?)
         $input = preg_replace_callback(
             '/@DATE\((.*?)(?:,\s*(.*?))?\)@/',
-            array($this, 'replacedate'),
+            $this->replacedate(...),
             $input
         );
 
@@ -538,9 +554,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         foreach ($this->functions as $name => $callback) {
             $pattern = '/@' . preg_quote($name) . '\((.*?)\)@/';
             if (is_callable($callback)) {
-                $input = preg_replace_callback($pattern, function ($matches) use ($callback) {
-                    return call_user_func($callback, $matches[1]);
-                }, $input);
+                $input = preg_replace_callback($pattern, fn($matches) => call_user_func($callback, $matches[1]), $input);
             }
         }
 
@@ -560,11 +574,12 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      * @param array $match with [0]=>whole match, [1]=> first subpattern, [2] => second subpattern
      * @return string
      */
-    function replacedate($match) {
+    public function replacedate($match)
+    {
         global $conf;
 
         //no 2nd argument for default date format
-        $match[2] = $match[2] ?? $conf['dformat'];
+        $match[2] ??= $conf['dformat'];
 
         return strftime($match[2], strtotime($match[1]));
     }
@@ -574,7 +589,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
      *
      * @see parsePageTemplate()
      */
-    function prepareNamespacetemplateReplacements() {
+    public function prepareNamespacetemplateReplacements()
+    {
         /* @var Input $INPUT */
         global $INPUT;
         global $INFO;
@@ -598,7 +614,7 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->patterns['__date__'] = '/@DATE@/';
 
         // replace placeholders
-        $localid = isset($INFO['id']) ? $INFO['id'] : $ID;
+        $localid = $INFO['id'] ?? $ID;
         $file = noNS($localid);
         $page = strtr($file, $conf['sepchar'], ' ');
         $this->values['__formpage_id__'] = $localid;
@@ -620,7 +636,8 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
     /**
      * Date time replacements
      */
-    function prepareDateTimereplacements() {
+    public function prepareDateTimereplacements()
+    {
         $this->patterns['__year__'] = '/@YEAR@/';
         $this->patterns['__month__'] = '/@MONTH@/';
         $this->patterns['__monthname__'] = '/@MONTHNAME@/';
@@ -633,13 +650,13 @@ class syntax_plugin_bureaucracy extends DokuWiki_Syntax_Plugin {
         $this->values['__day__'] = date('d');
         $this->values['__time__'] = date('H:i');
         $this->values['__timesec__'] = date('H:i:s');
-
     }
 
     /**
      * Functions that can be used after replacements
      */
-    function prepareFunctions() {
+    public function prepareFunctions()
+    {
         $this->functions['curNS'] = 'curNS';
         $this->functions['getNS'] = 'getNS';
         $this->functions['noNS'] = 'noNS';
