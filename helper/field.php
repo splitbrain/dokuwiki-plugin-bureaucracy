@@ -14,20 +14,20 @@
  *
  * base class for all the form fields
  */
-class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
-
+class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy
+{
     protected $mandatory_args = 2;
-    public $opt = array();
+    public $opt = [];
     /** @var string|array */
     protected $tpl;
-    protected $checks = array();
+    protected $checks = [];
     public $hidden = false;
     protected $error = false;
-    protected $checktypes = array(
+    protected $checktypes = [
         '/' => 'match',
         '<' => 'max',
         '>' => 'min'
-    );
+    ];
 
     /**
      * Construct a helper_plugin_bureaucracy_field object
@@ -46,7 +46,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function initialize($args) {
+    public function initialize($args)
+    {
         $this->init($args);
         $this->standardArgs($args);
     }
@@ -56,7 +57,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @return bool
      */
-    public function isSingleton() {
+    public function isSingleton()
+    {
         return false;
     }
 
@@ -65,16 +67,20 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @param array $args array with the definition
      */
-    protected function init(&$args) {
-        if(count($args) < $this->mandatory_args){
-            msg(sprintf($this->getLang('e_missingargs'), hsc($args[0]),
-                        hsc($args[1])), -1);
+    protected function init(&$args)
+    {
+        if (count($args) < $this->mandatory_args) {
+            msg(sprintf(
+                $this->getLang('e_missingargs'),
+                hsc($args[0]),
+                hsc($args[1])
+            ), -1);
             return;
         }
 
         // get standard arguments
-        $this->opt = array();
-        foreach (array('cmd', 'label') as $key) {
+        $this->opt = [];
+        foreach (['cmd', 'label'] as $key) {
             if (count($args) === 0) break;
             $this->opt[$key] = array_shift($args);
         }
@@ -86,11 +92,12 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @param array $args array with remaining definition arguments
      */
-    protected function standardArgs($args) {
+    protected function standardArgs($args)
+    {
         // parse additional arguments
-        foreach($args as $arg){
+        foreach ($args as $arg) {
             if ($arg[0] == '=') {
-                $this->setVal(substr($arg,1));
+                $this->setVal(substr($arg, 1));
             } elseif ($arg == '!') {
                 $this->opt['optional'] = true;
             } elseif ($arg == '^') {
@@ -98,35 +105,35 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 if (helper_plugin_bureaucracy_field::hasFocus()) {
                     $this->opt['id'] = 'focus__this';
                 }
-            } elseif($arg == '@') {
+            } elseif ($arg == '@') {
                 $this->opt['pagename'] = true;
-            } elseif($arg == '@@') {
+            } elseif ($arg == '@@') {
                 $this->opt['replyto'] = true;
-            } elseif(preg_match('/x\d/', $arg)) {
-                $this->opt['rows'] = substr($arg,1);
-            } elseif($arg[0] == '.') {
+            } elseif (preg_match('/x\d/', $arg)) {
+                $this->opt['rows'] = substr($arg, 1);
+            } elseif ($arg[0] == '.') {
                 $this->opt['class'] = substr($arg, 1);
-            } elseif(preg_match('/^0{2,}$/', $arg)) {
+            } elseif (preg_match('/^0{2,}$/', $arg)) {
                 $this->opt['leadingzeros'] = strlen($arg);
-            } elseif($arg[0].$arg[1] == '**') {
-                $this->opt['matchexplanation'] = substr($arg,2);
+            } elseif ($arg[0] . $arg[1] == '**') {
+                $this->opt['matchexplanation'] = substr($arg, 2);
             } else {
                 $t = $arg[0];
-                $d = substr($arg,1);
-                if (in_array($t, array('>', '<')) && !is_numeric($d)) {
+                $d = substr($arg, 1);
+                if (in_array($t, ['>', '<']) && !is_numeric($d)) {
                     break;
                 }
                 if ($t == '/') {
-                    if (substr($d, -1) !== '/') {
+                    if (!str_ends_with($d, '/')) {
                         break;
                     }
                     $d = substr($d, 0, -1);
                 }
                 if (!isset($this->checktypes[$t]) || !method_exists($this, 'validate_' . $this->checktypes[$t])) {
-                    msg(sprintf($this->getLang('e_unknownconstraint'), hsc($t).' ('.hsc($arg).')'), -1);
+                    msg(sprintf($this->getLang('e_unknownconstraint'), hsc($t) . ' (' . hsc($arg) . ')'), -1);
                     return;
                 }
-                $this->checks[] = array('t' => $t, 'd' => $d);
+                $this->checks[] = ['t' => $t, 'd' => $d];
             }
         }
     }
@@ -143,9 +150,10 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @param Doku_Form $form   The target Doku_Form object
      * @param int       $formid unique identifier of the form which contains this field
      */
-    public function renderfield($params, Doku_Form $form, $formid) {
+    public function renderfield($params, Doku_Form $form, $formid)
+    {
         $this->_handlePreload();
-        if(!$form->_infieldset){
+        if (!$form->_infieldset) {
             $form->startFieldset('');
         }
         if ($this->error) {
@@ -161,22 +169,23 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @return bool
      */
-    protected static function hasFocus(){
+    protected static function hasFocus()
+    {
         static $focus = true;
-        if($focus) {
+        if ($focus) {
             $focus = false;
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
     /**
      * Check for preload value in the request url
      */
-    protected function _handlePreload() {
-        $preload_name = '@' . strtr($this->getParam('label'),' .','__') . '@';
+    protected function _handlePreload()
+    {
+        $preload_name = '@' . strtr($this->getParam('label'), ' .', '__') . '@';
         if (isset($_GET[$preload_name])) {
             $this->setVal($_GET[$preload_name]);
         }
@@ -195,7 +204,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
      */
-    public function handle_post($value, &$fields, $index, $formid) {
+    public function handle_post($value, &$fields, $index, $formid)
+    {
         return $this->hidden || $this->setVal($value);
     }
 
@@ -204,7 +214,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @return string
      **/
-    public function getFieldType() {
+    public function getFieldType()
+    {
         return $this->opt['cmd'];
     }
 
@@ -213,13 +224,14 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @return string
      */
-    public function getReplacementPattern() {
+    public function getReplacementPattern()
+    {
         $label = $this->getParam('label');
         $value = $this->getParam('value');
 
         if (is_array($value)) {
             return '/(@@|##)' . preg_quote($label, '/') .
-                '(?:\((?P<delimiter>.*?)\))?' .//delimiter
+                '(?:\((?P<delimiter>.*?)\))?' . //delimiter
                 '(?:\|(?P<default>.*?))' . (count($value) == 0 ? '' : '?') .
                 '\1/si';
         }
@@ -235,7 +247,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @param $matches
      * @return string
      */
-    public function replacementMultiValueCallback($matches) {
+    public function replacementMultiValueCallback($matches)
+    {
         $value = $this->opt['value'];
 
         //default value
@@ -258,11 +271,12 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @return mixed|string
      */
-    public function getReplacementValue() {
+    public function getReplacementValue()
+    {
         $value = $this->getParam('value');
 
         if (is_array($value)) {
-            return array($this, 'replacementMultiValueCallback');
+            return $this->replacementMultiValueCallback(...);
         }
 
         return is_null($value) || $value === false ? '$2' : $value;
@@ -274,7 +288,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @param mixed $value value entered into field
      * @return bool whether the passed value is valid
      */
-    protected function setVal($value) {
+    protected function setVal($value)
+    {
         if ($value === '') {
             $value = null;
         }
@@ -294,7 +309,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @return bool whether field is set
      */
-    public function isSet_() {
+    public function isSet_()
+    {
         return !is_null($this->getParam('value'));
     }
 
@@ -303,22 +319,23 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @throws Exception when field didn't validate.
      */
-    protected function _validate() {
+    protected function _validate()
+    {
         $value = $this->getParam('value');
         if (is_null($value)) {
-            if(!isset($this->opt['optional'])) {
-                throw new Exception(sprintf($this->getLang('e_required'),hsc($this->opt['label'])));
+            if (!isset($this->opt['optional'])) {
+                throw new Exception(sprintf($this->getLang('e_required'), hsc($this->opt['label'])));
             }
             return;
         }
 
         foreach ($this->checks as $check) {
             $checktype = $this->checktypes[$check['t']];
-            if (!call_user_func(array($this, 'validate_' . $checktype), $check['d'], $value)) {
+            if (!call_user_func([$this, 'validate_' . $checktype], $check['d'], $value)) {
                 //replacement is custom explanation or just the regexp or the requested value
-                if(isset($this->opt['matchexplanation'])) {
+                if (isset($this->opt['matchexplanation'])) {
                     $replacement = hsc($this->opt['matchexplanation']);
-                } elseif($checktype == 'match') {
+                } elseif ($checktype == 'match') {
                     $replacement = sprintf($this->getLang('checkagainst'), hsc($check['d']));
                 } else {
                     $replacement = hsc($check['d']);
@@ -335,7 +352,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @param string $name
      * @return mixed|null
      */
-    public function getParam($name) {
+    public function getParam($name)
+    {
         if (!isset($this->opt[$name]) || $name === 'value' && $this->hidden) {
             return null;
         }
@@ -346,8 +364,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
                 return null;
             }
             global $conf;
-            if($conf['useslash']) $value = str_replace('/',' ',$value);
-            return str_replace(':',' ',$value);
+            if ($conf['useslash']) $value = str_replace('/', ' ', $value);
+            return str_replace(':', ' ', $value);
         }
         return $this->opt[$name];
     }
@@ -363,11 +381,12 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @return string|array The parsed template
      */
-    protected function _parse_tpl($tpl, $params) {
+    protected function _parse_tpl($tpl, $params)
+    {
         // addElement supports a special array format as well. In this case
         // not all elements should be escaped.
         $is_simple = !is_array($tpl);
-        if ($is_simple) $tpl = array($tpl);
+        if ($is_simple) $tpl = [$tpl];
 
         foreach ($tpl as &$val) {
             // Select box passes options as an array. We do not escape those.
@@ -375,28 +394,29 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
 
             // find all variables and their defaults or param values
             preg_match_all('/@@([A-Z]+)(?:\|((?:[^@]|@$|@[^@])*))?@@/', $val, $pregs);
-            for ($i = 0 ; $i < count($pregs[2]) ; ++$i) {
+            $counter = count($pregs[2]);
+            for ($i = 0; $i < $counter; ++$i) {
                 if (isset($params[strtolower($pregs[1][$i])])) {
                     $pregs[2][$i] = $params[strtolower($pregs[1][$i])];
                 }
             }
             // we now have placeholders in $pregs[0] and their values in $pregs[2]
-            $replacements = array(); // check if empty to prevent php 5.3 warning
+            $replacements = []; // check if empty to prevent php 5.3 warning
             if (!empty($pregs[0])) {
                 $replacements = array_combine($pregs[0], $pregs[2]);
             }
 
-            if($is_simple){
+            if ($is_simple) {
                 // for simple string templates, we escape all replacements
-                $replacements = array_map('hsc', $replacements);
-            }else{
+                $replacements = array_map(hsc(...), $replacements);
+            } else {
                 // for the array ones, we escape the label and display only
-                if(isset($replacements['@@LABEL@@']))   $replacements['@@LABEL@@']   = hsc($replacements['@@LABEL@@']);
-                if(isset($replacements['@@DISPLAY@@'])) $replacements['@@DISPLAY@@'] = hsc($replacements['@@DISPLAY@@']);
+                if (isset($replacements['@@LABEL@@']))   $replacements['@@LABEL@@']   = hsc($replacements['@@LABEL@@']);
+                if (isset($replacements['@@DISPLAY@@'])) $replacements['@@DISPLAY@@'] = hsc($replacements['@@DISPLAY@@']);
             }
 
             // we attach a mandatory marker to the display
-            if(isset($replacements['@@DISPLAY@@']) && !isset($params['optional'])){
+            if (isset($replacements['@@DISPLAY@@']) && !isset($params['optional'])) {
                 $replacements['@@DISPLAY@@'] .= ' <sup>*</sup>';
             }
             $val = str_replace(array_keys($replacements), array_values($replacements), $val);
@@ -407,7 +427,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
     /**
      * Executed after performing the action hooks
      */
-    public function after_action() {
+    public function after_action()
+    {
     }
 
     /**
@@ -417,7 +438,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @param mixed $value
      * @return int|bool
      */
-    protected function validate_match($d, $value) {
+    protected function validate_match($d, $value)
+    {
         return @preg_match('/' . $d . '/i', $value);
     }
 
@@ -428,7 +450,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @param mixed $value of field
      * @return bool
      */
-    protected function validate_min($d, $value) {
+    protected function validate_min($d, $value)
+    {
         return $value > $d;
     }
 
@@ -439,7 +462,8 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      * @param mixed $value of field
      * @return bool
      */
-    protected function validate_max($d, $value) {
+    protected function validate_max($d, $value)
+    {
         return $value < $d;
     }
 
@@ -448,58 +472,50 @@ class helper_plugin_bureaucracy_field extends syntax_plugin_bureaucracy {
      *
      * @return array
      */
-    public function getMethods() {
-        $result = array();
-        $result[] = array(
+    public function getMethods()
+    {
+        return [[
             'name' => 'initialize',
             'desc' => 'Initiate object, first parameters are at least cmd and label',
-            'params' => array(
+            'params' => [
                 'params' => 'array'
-            )
-        );
-        $result[] = array(
+            ]
+        ], [
             'name' => 'renderfield',
             'desc' => 'Add parsed element to Form which generates XHTML',
-            'params' => array(
+            'params' => [
                 'params' => 'array',
                 'form' => 'Doku_Form',
                 'formid' => 'integer'
-            )
-        );
-        $result[] = array(
+            ]
+        ], [
             'name' => 'handle_post',
             'desc' => 'Handle a post to the field',
-            'params' => array(
+            'params' => [
                 'value' => 'array',
                 'fields' => 'helper_plugin_bureaucracy_field[]',
                 'index' => 'Doku_Form',
                 'formid' => 'integer'
-            ),
-            'return' => array('isvalid' => 'bool')
-        );
-        $result[] = array(
+            ],
+            'return' => ['isvalid' => 'bool']
+        ], [
             'name' => 'getFieldType',
             'desc' => 'Get the field type',
-            'return' => array('fieldtype' => 'string')
-        );
-        $result[] = array(
+            'return' => ['fieldtype' => 'string']
+        ], [
             'name' => 'isSet_',
             'desc' => 'Whether the field is true (used for depending fieldsets)  ',
-            'return' => array('isset' => 'bool')
-        );
-        $result[] = array(
+            'return' => ['isset' => 'bool']
+        ], [
             'name' => 'getParam',
             'desc' => 'Get an arbitrary parameter',
-            'params' => array(
+            'params' => [
                 'name' => 'string'
-            ),
-            'return' => array('Parameter value' => 'mixed|null')
-        );
-        $result[] = array(
+            ],
+            'return' => ['Parameter value' => 'mixed|null']
+        ], [
             'name' => 'after_action',
             'desc' => 'Executed after performing the action hooks'
-        );
-        return $result;
+        ]];
     }
-
 }

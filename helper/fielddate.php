@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Class helper_plugin_bureaucracy_fielddate
  *
  * A date in the format YYYY-MM-DD, provides a date picker
  */
-class helper_plugin_bureaucracy_fielddate extends helper_plugin_bureaucracy_fieldtextbox {
+class helper_plugin_bureaucracy_fielddate extends helper_plugin_bureaucracy_fieldtextbox
+{
     /**
      * Arguments:
      *  - cmd
@@ -13,13 +15,14 @@ class helper_plugin_bureaucracy_fielddate extends helper_plugin_bureaucracy_fiel
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function initialize($args) {
+    public function initialize($args)
+    {
         parent::initialize($args);
-        $attr = array(
+        $attr = [
             'class' => 'datepicker edit',
-            'maxlength'=>'10'
-        );
-        if(!isset($this->opt['optional'])) {
+            'maxlength' => '10'
+        ];
+        if (!isset($this->opt['optional'])) {
             $attr['required'] = 'required';
             $attr['class'] .= ' required';
         }
@@ -31,12 +34,13 @@ class helper_plugin_bureaucracy_fielddate extends helper_plugin_bureaucracy_fiel
      *
      * @throws Exception when empty or wrong date format
      */
-    protected function _validate() {
+    protected function _validate()
+    {
         parent::_validate();
 
         $value = $this->getParam('value');
         if (!is_null($value) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
-            throw new Exception(sprintf($this->getLang('e_date'),hsc($this->getParam('display'))));
+            throw new Exception(sprintf($this->getLang('e_date'), hsc($this->getParam('display'))));
         }
     }
 }

@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Class helper_plugin_bureaucracy_fieldhiddenautoinc
  *
  * Creates an invisible field with a number that increases by 1 on each form submit
  */
-class helper_plugin_bureaucracy_fieldhiddenautoinc extends helper_plugin_bureaucracy_fieldnumber {
-
+class helper_plugin_bureaucracy_fieldhiddenautoinc extends helper_plugin_bureaucracy_fieldnumber
+{
     /**
      * Arguments:
      *  - cmd
@@ -13,7 +14,8 @@ class helper_plugin_bureaucracy_fieldhiddenautoinc extends helper_plugin_bureauc
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    function initialize($args) {
+    public function initialize($args)
+    {
         $args[] = '++';
         parent::initialize($args);
     }
@@ -27,9 +29,9 @@ class helper_plugin_bureaucracy_fieldhiddenautoinc extends helper_plugin_bureauc
      * @param Doku_Form $form   The target Doku_Form object
      * @param $formid
      */
-    function renderfield($params, Doku_Form $form, $formid) {
+    public function renderfield($params, Doku_Form $form, $formid)
+    {
         $this->_handlePreload();
         $form->addHidden($params['name'], $this->getParam('value') . '');
     }
-
 }
