@@ -90,6 +90,14 @@ class syntax_plugin_bureaucracy extends SyntaxPlugin
      */
     public function handle($match, $state, $pos, Handler $handler)
     {
+        return $this->handle_private($match);
+    }
+    /**
+     * Real handler used by handler() and used for parse data for prefill
+     *
+     */
+     private function handle_private($match)
+    {
         $match = substr($match, 6, -7); // remove form wrap
         $lines = explode("\n", $match);
         $actions = [];
@@ -206,11 +214,48 @@ class syntax_plugin_bureaucracy extends SyntaxPlugin
      */
     public function render($format, Doku_Renderer $R, $data)
     {
+        global $INPUT;
+
         if ($format != 'xhtml') return false;
         $R->info['cache'] = false; // don't cache
 
         $data['fields'] = $this->createFields($data['fields']);
 
+        /**
+         * the user should add $bureaucracy_plugin_prefill=mark:pageid to the URL for
+         * bureaucracy prefill the form from an existing page's data.
+         * "mark" is the <mark> ... </mark> tag like placeholders surround the form data
+         */
+        if (!empty($INPUT->get->str('$bureaucracy_plugin_prefill'))) {                                                                                                                                             
+           $prefill['pageid'] = $INPUT->get->str('id');                                                                                                                                                           
+           [$prefill['tag'], $prefill['source_id']] = 
+               array_pad(explode(':', $INPUT->get->str('$bureaucracy_plugin_prefill'), 2), 2, '');                                                                         
+           $prefill['source_id'] = cleanID($prefill['source_id']);                                                                                                                                                
+           if (page_exists($prefill['source_id'])) {                                                                                                                                                               
+               $prefill['regex'] = "/^<$prefill[tag]>(.*)<\/$prefill[tag]>/sm";                                                                                                                                   
+               preg_match($prefill['regex'], rawWiki($prefill['source_id']), $match);                                                                                                                             
+               $prefill['match'] = $match[1];                                                                                                                                                                     
+               $prefill['data'] = $this->handle_private('<form>'.$prefill['match'].'</form>');                                                                                                                    
+               foreach ($prefill['data']['fields'] as &$field) {                                                                                                                                                  
+                   if (isset($field['args'][2])) {                                                                                                                                                                 
+                       $prefill['values'][$field['args'][1]] = 
+                           ['type' => $field['args'][0],
+                           'value' => str_starts_with($field['args'][2], '=') ?
+                                           substr($field['args'][2], 1) : $field['args'][2]];                                                                                               
+                   }                                                                                                                                                                                              
+               }                                                                                                                                                                                                  
+               foreach ($data['fields'] as &$field) {                                                                                                                                                             
+        /**
+         * prefill form with parsed data if form element's type and label are equal
+         */
+                   if (isset($prefill['values'][$field->opt['label']]) &&
+                       $prefill['values'][$field->opt['label']]['type'] == $field->opt['cmd']) {                                                               
+                           $field->opt['value'] = $prefill['values'][$field->opt['label']]['value'];                                                                                                                  
+                   }                                                                                                                                                                                              
+               }                                                                                                                                                                                                  
+           }                                                                                                                                                                                                      
+        }                                                                                                                                                                                                          
+        
         /**
          * replace some time and name placeholders in the default values
          * @var $field helper_plugin_bureaucracy_field
