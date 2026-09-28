@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Class helper_plugin_bureaucracy_fieldstatic
  *
  * Adds some static text to the form
  */
-class helper_plugin_bureaucracy_fieldstatic extends helper_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldstatic extends helper_plugin_bureaucracy_field
+{
     protected $tpl = '<p>@@DISPLAY@@</p>';
 
     /**
@@ -14,7 +16,8 @@ class helper_plugin_bureaucracy_fieldstatic extends helper_plugin_bureaucracy_fi
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function initialize($args) {
+    public function initialize($args)
+    {
         parent::initialize($args);
         // make always optional to prevent being marked as required
         $this->opt['optional'] = true;
@@ -29,7 +32,8 @@ class helper_plugin_bureaucracy_fieldstatic extends helper_plugin_bureaucracy_fi
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
      */
-    public function handle_post($value, &$fields, $index, $formid) {
+    public function handle_post($value, &$fields, $index, $formid)
+    {
         return true;
     }
 
@@ -39,7 +43,8 @@ class helper_plugin_bureaucracy_fieldstatic extends helper_plugin_bureaucracy_fi
      * @param string $name
      * @return mixed|null
      */
-    public function getParam($name) {
+    public function getParam($name)
+    {
         return ($name === 'value') ? null : parent::getParam($name);
     }
 
@@ -50,11 +55,11 @@ class helper_plugin_bureaucracy_fieldstatic extends helper_plugin_bureaucracy_fi
      * @params Doku_Form $form   The target Doku_Form object
      * @params int       $formid unique identifier of the form which contains this field
      */
-    public function renderfield($params, Doku_Form $form, $formid) {
+    public function renderfield($params, Doku_Form $form, $formid)
+    {
         if (!isset($this->opt['display'])) {
             $this->opt['display'] = $this->opt['label'];
         }
         parent::renderfield($params, $form, $formid);
     }
-
 }

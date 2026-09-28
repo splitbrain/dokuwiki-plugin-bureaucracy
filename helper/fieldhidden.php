@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Class helper_plugin_bureaucracy_fieldhidden
  *
  * Creates an invisible field with static data
  */
-class helper_plugin_bureaucracy_fieldhidden extends helper_plugin_bureaucracy_field {
-
+class helper_plugin_bureaucracy_fieldhidden extends helper_plugin_bureaucracy_field
+{
     /**
      * Arguments:
      *  - cmd
@@ -22,7 +23,8 @@ class helper_plugin_bureaucracy_fieldhidden extends helper_plugin_bureaucracy_fi
      * @param Doku_Form $form   The target Doku_Form object
      * @param int       $formid unique identifier of the form which contains this field
      */
-    function renderfield($params, Doku_Form $form, $formid) {
+    public function renderfield($params, Doku_Form $form, $formid)
+    {
         $this->_handlePreload();
         $form->addHidden($params['name'], $this->getParam('value') . '');
     }
@@ -33,8 +35,9 @@ class helper_plugin_bureaucracy_fieldhidden extends helper_plugin_bureaucracy_fi
      * @param string $name
      * @return mixed|null
      */
-    function getParam($name) {
-        if (!isset($this->opt[$name]) || in_array($name, array('pagename', 'value')) && $this->hidden) {
+    public function getParam($name)
+    {
+        if (!isset($this->opt[$name]) || in_array($name, ['pagename', 'value']) && $this->hidden) {
             return null;
         }
         if ($name === 'pagename') {

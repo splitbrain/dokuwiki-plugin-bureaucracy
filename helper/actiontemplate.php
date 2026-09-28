@@ -1,5 +1,7 @@
 <?php
 
+use dokuwiki\Extension\Event;
+use dokuwiki\Ui\Index;
 use dokuwiki\File\PageResolver;
 
 /**
@@ -8,10 +10,10 @@ use dokuwiki\File\PageResolver;
  * @author Michael Klier <chi@chimeric.de>
  */
 
-class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy_action {
-
-    var $targetpages;
-    var $pagename;
+class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy_action
+{
+    public $targetpages;
+    public $pagename;
 
     /**
      * Performs template action
@@ -23,15 +25,16 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      *
      * @throws Exception
      */
-    public function run($fields, $thanks, $argv) {
+    public function run($fields, $thanks, $argv)
+    {
         global $conf;
 
         [$tpl, $this->pagename] = $argv;
         $sep = $argv[2] ?? $conf['sepchar'];
 
-        $this->patterns = array();
-        $this->values   = array();
-        $this->targetpages = array();
+        $this->patterns = [];
+        $this->values   = [];
+        $this->targetpages = [];
 
         $this->prepareNamespacetemplateReplacements();
         $this->prepareDateTimereplacements();
@@ -39,14 +42,14 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         $this->prepareNoincludeReplacement();
         $this->prepareFieldReplacements($fields);
 
-        $evdata = array(
+        $evdata = [
             'patterns' => &$this->patterns,
             'values' => &$this->values,
             'fields' => $fields,
             'action' => $this
-        );
+        ];
 
-        $event = new Doku_Event('PLUGIN_BUREAUCRACY_PAGENAME', $evdata);
+        $event = new Event('PLUGIN_BUREAUCRACY_PAGENAME', $evdata);
         if ($event->advise_before()) {
             $this->buildTargetPagename($fields, $sep);
         }
@@ -57,7 +60,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
         //target&template(s) from action field
         $tpl = $this->getActionTargetpages($tpl);
 
-        if(empty($this->targetpages)) {
+        if (empty($this->targetpages)) {
             throw new Exception(sprintf($this->getLang('e_template'), $tpl));
         }
 
@@ -78,7 +81,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @param string                             $sep     Separator between fields for page id
      * @throws Exception missing pagename
      */
-    protected function buildTargetPagename($fields, $sep) {
+    protected function buildTargetPagename($fields, $sep)
+    {
         global $ID;
 
         foreach ($fields as $field) {
@@ -103,11 +107,12 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @param helper_plugin_bureaucracy_field[]  $fields  List of field objects
      * @return array
      */
-    function getAdditionalTargetpages($fields) {
+    public function getAdditionalTargetpages($fields)
+    {
         global $ID;
 
         foreach ($fields as $field) {
-            if (!is_null($field->getParam('page_tpl')) && !is_null($field->getParam('page_tgt')) ) {
+            if (!is_null($field->getParam('page_tpl')) && !is_null($field->getParam('page_tgt'))) {
                 $resolver = new PageResolver($ID);
 
                 //template
@@ -119,7 +124,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
                 $targetpage = "$this->pagename:$relativetargetpage";
 
                 $auth = $this->aclcheck($templatepage); // runas
-                if ($auth >= AUTH_READ ) {
+                if ($auth >= AUTH_READ) {
                     $this->addParsedTargetpage($targetpage, $templatepage);
                 }
             }
@@ -132,18 +137,19 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @param string $id the id of the page to be created
      * @return string raw pagetemplate content
      */
-    protected function rawPageTemplate($id) {
+    protected function rawPageTemplate($id)
+    {
         global $conf;
 
         $path = dirname(wikiFN($id));
-        if(file_exists($path.'/_template.txt')) {
-            $tplfile = $path.'/_template.txt';
+        if (file_exists($path . '/_template.txt')) {
+            $tplfile = $path . '/_template.txt';
         } else {
             // search upper namespaces for templates
             $len = strlen(rtrim($conf['datadir'], '/'));
-            while(strlen($path) >= $len) {
-                if(file_exists($path.'/__template.txt')) {
-                    $tplfile = $path.'/__template.txt';
+            while (strlen($path) >= $len) {
+                if (file_exists($path . '/__template.txt')) {
+                    $tplfile = $path . '/__template.txt';
                     break;
                 }
                 $path = substr($path, 0, strrpos($path, '/'));
@@ -160,7 +166,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @param string $tpl    template name as given in form
      * @return string parsed templatename
      */
-    protected function getActionTargetpages($tpl) {
+    protected function getActionTargetpages($tpl)
+    {
         global $USERINFO;
         global $conf;
         global $ID;
@@ -171,36 +178,36 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
             if (!isset($this->targetpages[$this->pagename])) {
                 $raw = $this->rawPageTemplate($this->pagename);
                 $this->noreplace_save($raw);
-                $this->targetpages[$this->pagename] = pageTemplate(array($this->pagename));
+                $this->targetpages[$this->pagename] = pageTemplate([$this->pagename]);
             }
         } elseif ($tpl !== '!') {
             $tpl = $this->replace($tpl);
 
             // resolve templates, but keep references to whole namespaces intact (ending in a colon)
             $resolver = new PageResolver($ID);
-            if(substr($tpl, -1) == ':') {
-                $tpl = $tpl.'xxx'; // append a fake page name
+            if (str_ends_with($tpl, ':')) {
+                $tpl .= 'xxx'; // append a fake page name
                 $tpl = $resolver->resolveId($tpl);
                 $tpl = substr($tpl, 0, -3); // cut off fake page name again
             } else {
                 $tpl = $resolver->resolveId($tpl);
             }
 
-            $backup = array();
+            $backup = [];
             if ($runas) {
                 // Hack user credentials.
-                $backup = array($_SERVER['REMOTE_USER'], $USERINFO['grps']);
+                $backup = [$_SERVER['REMOTE_USER'], $USERINFO['grps']];
                 $_SERVER['REMOTE_USER'] = $runas;
-                $USERINFO['grps'] = array();
+                $USERINFO['grps'] = [];
             }
 
-            $template_pages = array();
+            $template_pages = [];
             //search checks acl (as runas)
-            $opts = array(
+            $opts = [
                 'depth' => 0,
                 'listfiles' => true,
                 'showhidden' => true
-            );
+            ];
             search($template_pages, $conf['datadir'], 'search_universal', $opts, str_replace(':', '/', getNS($tpl)));
 
             foreach ($template_pages as $template_page) {
@@ -226,7 +233,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
 
             if ($runas) {
                 /* Restore user credentials. */
-                list($_SERVER['REMOTE_USER'], $USERINFO['grps']) = $backup;
+                [$_SERVER['REMOTE_USER'], $USERINFO['grps']] = $backup;
             }
         }
         return $tpl;
@@ -238,7 +245,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @return mixed
      * @throws Exception
      */
-    protected function checkTargetPageNames() {
+    protected function checkTargetPageNames()
+    {
         foreach (array_keys($this->targetpages) as $pname) {
             // prevent overriding already existing pages
             if (page_exists($pname)) {
@@ -259,24 +267,25 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      *  - $INFO['userinfo']['name']
      *  - $INPUT->server->str('REMOTE_USER')
      */
-    protected function replaceAndSavePages($fields) {
+    protected function replaceAndSavePages($fields)
+    {
         global $ID;
         foreach ($this->targetpages as $pageName => $template) {
             // set NSBASE var to make certain dataplugin constructs easier
             $this->patterns['__nsbase__'] = '/@NSBASE@/';
             $this->values['__nsbase__'] = noNS(getNS($pageName));
 
-            $evdata = array(
+            $evdata = [
                 'patterns' => &$this->patterns,
                 'values' => &$this->values,
                 'id' => $pageName,
                 'template' => $template,
                 'form' => $ID,
                 'fields' => $fields
-            );
+            ];
 
-            $event = new Doku_Event('PLUGIN_BUREAUCRACY_TEMPLATE_SAVE', $evdata);
-            if($event->advise_before()) {
+            $event = new Event('PLUGIN_BUREAUCRACY_TEMPLATE_SAVE', $evdata);
+            if ($event->advise_before()) {
                 // save page
                 saveWikiText(
                     $evdata['id'],
@@ -300,7 +309,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * greater than zero if the first argument is considered to be
      * respectively less than, equal to, or greater than the second.
      */
-    public function _sorttargetpages($a, $b) {
+    public function _sorttargetpages($a, $b)
+    {
         $ns_diff = substr_count($a, ':') - substr_count($b, ':');
         return ($ns_diff === 0) ? strcmp($a, $b) : ($ns_diff > 0 ? -1 : 1);
     }
@@ -311,10 +321,11 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @param array $item
      * @return string
      */
-    public function html_list_index($item){
+    public function html_list_index($item)
+    {
         $ret = '';
-        if($item['type']=='f'){
-            $ret .= html_wikilink(':'.$item['id']);
+        if ($item['type'] == 'f') {
+            $ret .= html_wikilink(':' . $item['id']);
         } else {
             $ret .= '<strong>' . trim(substr($item['id'], strrpos($item['id'], ':', -2)), ':') . '</strong>';
         }
@@ -327,7 +338,8 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @param string $thanks
      * @return string html of thanks message or when redirect the first page id of created pages
      */
-    protected function buildThankYouPage($thanks) {
+    protected function buildThankYouPage($thanks)
+    {
         global $ID;
         $backupID = $ID;
 
@@ -335,27 +347,27 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
 
         // Build result tree
         $pages = array_keys($this->targetpages);
-        usort($pages, array($this, '_sorttargetpages'));
+        usort($pages, $this->_sorttargetpages(...));
 
-        $data = array();
-        $last_folder = array();
+        $data = [];
+        $last_folder = [];
         foreach ($pages as $ID) {
             $lvl = substr_count($ID, ':');
             for ($n = 0; $n < $lvl; ++$n) {
-                if (!isset($last_folder[$n]) || strpos($ID, $last_folder[$n]['id']) !== 0) {
-                    $last_folder[$n] = array(
+                if (!isset($last_folder[$n]) || !str_starts_with($ID, $last_folder[$n]['id'])) {
+                    $last_folder[$n] = [
                         'id' => substr($ID, 0, strpos($ID, ':', ($n > 0 ? strlen($last_folder[$n - 1]['id']) : 0) + 1) + 1),
                         'level' => $n + 1,
                         'open' => 1,
                         'type' => null,
-                    );
+                    ];
                     $data[] = $last_folder[$n];
                 }
             }
-            $data[] = array('id' => $ID, 'level' => 1 + substr_count($ID, ':'), 'type' => 'f');
+            $data[] = ['id' => $ID, 'level' => 1 + substr_count($ID, ':'), 'type' => 'f'];
         }
-        $index = new dokuwiki\Ui\Index();
-        $html .= html_buildlist($data, 'idx', array($this, 'html_list_index'), array($index, 'tagListItem'));
+        $index = new Index();
+        $html .= html_buildlist($data, 'idx', $this->html_list_index(...), $index->tagListItem(...));
 
         // Add indexer bugs for every just-created page
         $html .= '<div class="no">';
@@ -368,7 +380,7 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
 
             // the iframe will trigger real rendering of the pages to make sure
             // any used plugins are initialized (eg. the do plugin)
-            echo '<iframe src="' . wl($ID, array('do' => 'export_html')) . '" width="1" height="1" style="visibility:hidden"></iframe>';
+            echo '<iframe src="' . wl($ID, ['do' => 'export_html']) . '" width="1" height="1" style="visibility:hidden"></iframe>';
         }
         $html .= ob_get_contents();
         ob_end_clean();
@@ -385,41 +397,41 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @param helper_plugin_bureaucracy_field[] $fields
      * @throws Exception
      */
-    protected function processUploads($fields) {
-        foreach($fields as $field) {
-
-            if($field->getFieldType() !== 'file') continue;
+    protected function processUploads($fields)
+    {
+        foreach ($fields as $field) {
+            if ($field->getFieldType() !== 'file') continue;
 
             $label = $field->getParam('label');
             $file  = $field->getParam('file');
             $ns    = $field->getParam('namespace');
 
             //skip empty files
-            if(!$file['size']) {
+            if (!$file['size']) {
                 $this->values[$label] = '';
                 continue;
             }
 
-            $id = $ns.':'.$file['name'];
+            $id = $ns . ':' . $file['name'];
             resolve_mediaid($this->pagename, $id, $ignored); // resolve relatives
 
             $auth = $this->aclcheck($id); // runas
             $move = 'copy_uploaded_file';
             //prevent from is_uploaded_file() check
-            if(defined('DOKU_UNITTEST')) {
+            if (defined('DOKU_UNITTEST')) {
                 $move = 'copy';
             }
             $res = media_save(
-                array('name' => $file['tmp_name']),
+                ['name' => $file['tmp_name']],
                 $id,
                 false,
                 $auth,
-                $move);
+                $move
+            );
 
-            if(is_array($res)) throw new Exception($res[0]);
+            if (is_array($res)) throw new Exception($res[0]);
 
             $this->values[$label] = $res;
-
         }
     }
 
@@ -436,28 +448,28 @@ class helper_plugin_bureaucracy_actiontemplate extends helper_plugin_bureaucracy
      * @param string $targetpageid   pageid of destination
      * @param string $templatepageid pageid of template for this targetpage
      */
-    protected function addParsedTargetpage($targetpageid, $templatepageid) {
+    protected function addParsedTargetpage($targetpageid, $templatepageid)
+    {
         $tpl = rawWiki($templatepageid);
         $this->noreplace_save($tpl);
 
-        $data = array(
+        $data = [
             'id' => $targetpageid,
             'tpl' => $tpl,
             'doreplace' => true,
-        );
+        ];
         parsePageTemplate($data);
 
         //collect and apply some other replacements
-        $patterns = array();
-        $values = array();
-        $keys = array('__lang__', '__trans__', '__year__', '__month__', '__day__', '__time__');
-        foreach($keys as $key) {
+        $patterns = [];
+        $values = [];
+        $keys = ['__lang__', '__trans__', '__year__', '__month__', '__day__', '__time__'];
+        foreach ($keys as $key) {
             $patterns[$key] = $this->patterns[$key];
             $values[$key] = $this->values[$key];
         }
 
         $this->targetpages[$targetpageid] = preg_replace($patterns, $values, $data['tpl']);
     }
-
 }
 // vim:ts=4:sw=4:et:enc=utf-8:

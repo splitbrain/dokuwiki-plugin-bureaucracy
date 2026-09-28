@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Class helper_plugin_bureaucracy_fieldsubject
  *
  * Defines own subject for mail action from this form
  */
-class helper_plugin_bureaucracy_fieldsubject extends helper_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldsubject extends helper_plugin_bureaucracy_field
+{
     /**
      * Arguments:
      *  - cmd
@@ -18,7 +20,8 @@ class helper_plugin_bureaucracy_fieldsubject extends helper_plugin_bureaucracy_f
      * @params Doku_Form $form   The target Doku_Form object
      * @params int       $formid unique identifier of the form which contains this field
      */
-    public function renderfield($params, Doku_Form $form, $formid) {
+    public function renderfield($params, Doku_Form $form, $formid)
+    {
         $this->_handlePreload();
     }
 
@@ -31,7 +34,8 @@ class helper_plugin_bureaucracy_fieldsubject extends helper_plugin_bureaucracy_f
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the passed value is valid
      */
-    function handle_post($value, &$fields, $index, $formid) {
+    public function handle_post($value, &$fields, $index, $formid)
+    {
         return true;
     }
 }

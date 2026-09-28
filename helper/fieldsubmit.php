@@ -1,14 +1,15 @@
 <?php
+
 /**
  * Class helper_plugin_bureaucracy_fieldsubmit
  *
  * Creates a submit button
  */
-
-class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_field {
+class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_field
+{
     protected $mandatory_args = 1;
-    static $captcha_displayed = array();
-    static $captcha_checked = array();
+    static $captcha_displayed = [];
+    static $captcha_checked = [];
 
     /**
      * Arguments:
@@ -18,7 +19,8 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
      *
      * @param array $args The tokenized definition, only split at spaces
      */
-    public function initialize($args) {
+    public function initialize($args)
+    {
         parent::initialize($args);
         // make always optional to prevent being marked as required
         $this->opt['optional'] = true;
@@ -39,47 +41,48 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
      * @params Doku_Form $form   The target Doku_Form object
      * @params int       $formid unique identifier of the form which contains this field
      */
-    public function renderfield($params, Doku_Form $form, $formid) {
-        if(!isset(helper_plugin_bureaucracy_fieldsubmit::$captcha_displayed[$formid])) {
+    public function renderfield($params, Doku_Form $form, $formid)
+    {
+        if (!isset(helper_plugin_bureaucracy_fieldsubmit::$captcha_displayed[$formid])) {
             helper_plugin_bureaucracy_fieldsubmit::$captcha_displayed[$formid] = true;
             /** @var helper_plugin_captcha $helper */
             $helper = null;
-            if(@is_dir(DOKU_PLUGIN.'captcha')) $helper = plugin_load('helper','captcha');
-            if(!is_null($helper) && $helper->isEnabled()){
+            if (@is_dir(DOKU_PLUGIN . 'captcha')) $helper = plugin_load('helper', 'captcha');
+            if (!is_null($helper) && $helper->isEnabled()) {
                 $form->addElement($helper->getHTML());
             }
         }
 
-        $attr = array();
-        $attr['name'] = 'submit';
-        if(isset($this->opt['value'])) {
-            $attr['value'] = $this->opt['value'];
-        }
-        if(isset($this->opt['label'])) {
-            $attr['label'] = $this->opt['label'];
-        }
-        if(isset($this->opt['id'])) {
-            $attr['id'] = $this->opt['id'];
-        }
-        if(isset($this->opt['class'])) {
-            $attr['class'] = $this->opt['class'];
-        }
+$attr = [];
+$attr['name'] = 'submit';
 
-        $this->tpl = form_makeButton('submit','', '@@DISPLAY|' . $this->getLang('submit') . '@@', $attr);
+if (isset($this->opt['value'])) {
+    $attr['value'] = $this->opt['value'];
+}
+if (isset($this->opt['label'])) {
+    $attr['label'] = $this->opt['label'];
+}
+if (isset($this->opt['id'])) {
+    $attr['id'] = $this->opt['id'];
+}
+if (isset($this->opt['class'])) {
+    $attr['class'] = $this->opt['class'];
+}
 
-        $this->_handlePreload();
+$this->tpl = form_makeButton('submit', '', '@@DISPLAY|' . $this->getLang('submit') . '@@', $attr);
 
-        if(!$form->_infieldset){
-            $form->startFieldset('');
-        }
-        if ($this->error) {
-            $params['class'] = 'bureaucracy_error';
-        }
+$this->_handlePreload();
 
-        $params = array_merge($this->opt, $params);
-        $element = $this->_parse_tpl($this->tpl, $params);
-        $form->addElement($this->form_button($element));
+if (!$form->_infieldset) {
+    $form->startFieldset('');
+}
+if ($this->error) {
+    $params['class'] = 'bureaucracy_error';
+}
 
+$params = array_merge($this->opt, $params);
+$element = $this->_parse_tpl($this->tpl, $params);
+$form->addElement($this->form_button($element));
     }
 
     /**
@@ -93,21 +96,21 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the posted f$_POSTorm has a valid captcha
      */
-    public function handle_post($value, &$fields, $index, $formid) {
+public function handle_post($value, &$fields, $index, $formid)
+{
+    // Set the value of the submit field to the label of the button which was pressed
+    $this->setVal($_POST['submit']);
 
-        // Set the value of the submit filed to the label of the button which was pressed
-        $this->setVal($_POST['submit']);
-
-        if ($this->hidden) {
-            return true;
-        }
-        if(!isset(helper_plugin_bureaucracy_fieldsubmit::$captcha_checked[$formid])) {
+    if ($this->hidden) {
+        return true;
+    }
+        if (!isset(helper_plugin_bureaucracy_fieldsubmit::$captcha_checked[$formid])) {
             helper_plugin_bureaucracy_fieldsubmit::$captcha_checked[$formid] = true;
             // check CAPTCHA
             /** @var helper_plugin_captcha $helper */
             $helper = null;
-            if(@is_dir(DOKU_PLUGIN.'captcha')) $helper = plugin_load('helper','captcha');
-            if(!is_null($helper) && $helper->isEnabled()){
+            if (@is_dir(DOKU_PLUGIN . 'captcha')) $helper = plugin_load('helper', 'captcha');
+            if (!is_null($helper) && $helper->isEnabled()) {
                 return $helper->check();
             }
         }
@@ -120,8 +123,8 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
      * @param string $name
      * @return mixed|null
      */
-    public function getParam($name) {
+    public function getParam($name)
+    {
         return ($name === 'value') ? (($this->hidden)? null : parent::getParam($name)) : parent::getParam($name);
     }
-
 }

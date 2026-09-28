@@ -61,6 +61,26 @@ class syntax_plugin_bureaucracy_test extends DokuWikiTest {
 
     }
 
+    /**
+     * Field definitions have to survive the instruction cache, which restores
+     * stdClass objects only
+     */
+    public function test_instructionCache() {
+        $input = "<form>\naction mail\ntextbox \"Employee Name\"\nsubmit \"Submit Query\"\n</form>";
+
+        $instructions = unserialize(
+            serialize(p_get_instructions($input)),
+            array('allowed_classes' => array('stdClass'))
+        );
+        $xhtml = p_render('xhtml', $instructions, $info);
+
+        $doc = new Document();
+        $doc->loadHTML($xhtml);
+
+        $this->assertEquals(1, $doc->find('form.bureaucracy__plugin')->count());
+        $this->checkField($doc, 'Employee Name', 'input[type=text].edit', true);
+    }
+
     public function test_HTMLinclusion() {
         $input = file_get_contents(dirname(__FILE__) . '/input.txt');
         $xhtml = p_render('xhtml', p_get_instructions($input), $info);

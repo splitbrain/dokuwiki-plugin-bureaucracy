@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
   schedule:
-    - cron: '1 9 8 * *'
+    - cron: '45 20 3 * *'
 
 
 jobs:
