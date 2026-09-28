@@ -197,12 +197,12 @@ class syntax_plugin_bureaucracy extends SyntaxPlugin
             if (!plugin_isdisabled($action['actionname']) || @file_exists(DOKU_PLUGIN . $plugin . '/helper/'  . $component . '.php')) {
                 $actions[] = $action;
 
-            // shortcut for other plugins with component name <name>_<name>
+                // shortcut for other plugins with component name <name>_<name>
             } elseif (plugin_isdisabled($alternativename) || !@file_exists(DOKU_PLUGIN . $action['type'] . '/helper/'  . $action['type'] . '.php')) {
                 $action['actionname'] = $alternativename;
                 $actions[] = $action;
 
-            // not found
+                // not found
             } else {
                 $evdata = ['actions' => &$actions, 'action' => $action];
                 $event = new Event('PLUGIN_BUREAUCRACY_ACTION_UNKNOWN', $evdata);

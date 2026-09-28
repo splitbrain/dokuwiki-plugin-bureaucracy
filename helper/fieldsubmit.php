@@ -53,36 +53,36 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
             }
         }
 
-$attr = [];
-$attr['name'] = 'submit';
+        $attr = [];
+        $attr['name'] = 'submit';
 
-if (isset($this->opt['value'])) {
-    $attr['value'] = $this->opt['value'];
-}
-if (isset($this->opt['label'])) {
-    $attr['label'] = $this->opt['label'];
-}
-if (isset($this->opt['id'])) {
-    $attr['id'] = $this->opt['id'];
-}
-if (isset($this->opt['class'])) {
-    $attr['class'] = $this->opt['class'];
-}
+        if (isset($this->opt['value'])) {
+            $attr['value'] = $this->opt['value'];
+        }
+        if (isset($this->opt['label'])) {
+            $attr['label'] = $this->opt['label'];
+        }
+        if (isset($this->opt['id'])) {
+            $attr['id'] = $this->opt['id'];
+        }
+        if (isset($this->opt['class'])) {
+            $attr['class'] = $this->opt['class'];
+        }
 
-$this->tpl = form_makeButton('submit', '', '@@DISPLAY|' . $this->getLang('submit') . '@@', $attr);
+        $this->tpl = form_makeButton('submit', '', '@@DISPLAY|' . $this->getLang('submit') . '@@', $attr);
 
-$this->_handlePreload();
+        $this->_handlePreload();
 
-if (!$form->_infieldset) {
-    $form->startFieldset('');
-}
-if ($this->error) {
-    $params['class'] = 'bureaucracy_error';
-}
+        if (!$form->_infieldset) {
+            $form->startFieldset('');
+        }
+        if ($this->error) {
+            $params['class'] = 'bureaucracy_error';
+        }
 
-$params = array_merge($this->opt, $params);
-$element = $this->_parse_tpl($this->tpl, $params);
-$form->addElement($this->form_button($element));
+        $params = array_merge($this->opt, $params);
+        $element = $this->_parse_tpl($this->tpl, $params);
+        $form->addElement($this->form_button($element));
     }
 
     /**
@@ -96,14 +96,14 @@ $form->addElement($this->form_button($element));
      * @param int    $formid unique identifier of the form which contains this field
      * @return bool Whether the posted f$_POSTorm has a valid captcha
      */
-public function handle_post($value, &$fields, $index, $formid)
-{
-    // Set the value of the submit field to the label of the button which was pressed
-    $this->setVal($_POST['submit']);
+    public function handle_post($value, &$fields, $index, $formid)
+    {
+        // Set the value of the submit field to the label of the button which was pressed
+        $this->setVal($_POST['submit']);
 
-    if ($this->hidden) {
-        return true;
-    }
+        if ($this->hidden) {
+            return true;
+        }
         if (!isset(helper_plugin_bureaucracy_fieldsubmit::$captcha_checked[$formid])) {
             helper_plugin_bureaucracy_fieldsubmit::$captcha_checked[$formid] = true;
             // check CAPTCHA
