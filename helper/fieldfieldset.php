@@ -74,7 +74,6 @@ class helper_plugin_bureaucracy_fieldfieldset extends helper_plugin_bureaucracy_
         if ($this->depends_on === []) {
             return true;
         }
-
         // search the field where fieldset depends on in fields before fieldset
         $hidden = false;
         for ($n = 0; $n < $index; ++$n) {
@@ -83,7 +82,10 @@ class helper_plugin_bureaucracy_fieldfieldset extends helper_plugin_bureaucracy_
                 continue;
             }
             if (count($this->depends_on) > 1) {
-                $hidden = $field->getParam('value') != $this->depends_on[1];
+                $hidden = in_array(
+                    $field->getParam('value'),
+                    explode('|', $this->depends_on[1])
+                ) == false;
             } else {
                 $hidden = !$field->isSet_();
             }

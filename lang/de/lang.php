@@ -27,6 +27,7 @@ $lang['e_pagename']            = 'Seitenname nicht angegeben.';
 $lang['e_pageexists']          = 'Die Seite "%s" exisistiert bereits. Bitte wählen Sie einen anderen Namen.';
 $lang['e_template']            = 'Das Template "%s" konnte nicht geladen werden. Möglicherweise existiert es nicht oder Sie verfügen nicht über die benötigten Rechte.';
 $lang['e_denied']              = 'Sie sind nicht berechtigt diese Seite anzulegen. Haben Sie vielleicht vergessen sich anzumelden?';
+$lang['e_namespace']           = 'Forulare sind in diesem Namensraum nicht zulässig.';
 $lang['mailsubject']           = 'Formulardaten übermittelt von %s';
 $lang['mailintro']             = 'Die folgenden Daten wurden am %s abgeschickt.';
 $lang['mail_thanks']           = 'Ihre Daten wurden erfolgreich versandt. Vielen Dank.';

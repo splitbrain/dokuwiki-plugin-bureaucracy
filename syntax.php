@@ -66,6 +66,37 @@ class syntax_plugin_bureaucracy extends SyntaxPlugin
     }
 
     /**
+     * Where to sort in?
+     */
+    private function _checkvalidpages($ID, $namespaces) {
+        if (count($namespaces)) {
+            $id = explode(':',$ID);
+            foreach($namespaces as $PAT) {
+                $pat = explode(':',$PAT);
+                $found=true;
+                for ($i = 0; $i < count($pat); $i++) {
+                    if ($i>count($id)-1) {
+                        $found=false;
+                        break;
+                    } elseif ($pat[$i]=='**') {
+                        break;
+                    } elseif ($pat[$i]=='*') {
+                        continue;
+                    } elseif ($pat[$i]!=$id[$i]) {
+                        $found=false;
+                        break;
+                    }            
+                }
+                if ($found) {
+                    break;
+                }
+            }
+            return $found;
+        } else {
+            return true;
+        }
+    }
+    /**
      * Connect pattern to lexer
      *
      * @param string $mode
@@ -90,12 +121,19 @@ class syntax_plugin_bureaucracy extends SyntaxPlugin
      */
     public function handle($match, $state, $pos, Handler $handler)
     {
+        global $ID;
         $match = substr($match, 6, -7); // remove form wrap
         $lines = explode("\n", $match);
         $actions = [];
         $rawactions = [];
         $thanks = '';
         $labels = '';
+
+        $namespaces = $this->getConf('namespaces');
+        if (!$this->_checkvalidpages($ID, $namespaces)) {
+            msg($this->getLang('e_namespace'), -1);
+            return false;
+        }
 
         // parse the lines into an command/argument array
         $cmds = [];
@@ -159,12 +197,12 @@ class syntax_plugin_bureaucracy extends SyntaxPlugin
             if (!plugin_isdisabled($action['actionname']) || @file_exists(DOKU_PLUGIN . $plugin . '/helper/'  . $component . '.php')) {
                 $actions[] = $action;
 
-            // shortcut for other plugins with component name <name>_<name>
+                // shortcut for other plugins with component name <name>_<name>
             } elseif (plugin_isdisabled($alternativename) || !@file_exists(DOKU_PLUGIN . $action['type'] . '/helper/'  . $action['type'] . '.php')) {
                 $action['actionname'] = $alternativename;
                 $actions[] = $action;
 
-            // not found
+                // not found
             } else {
                 $evdata = ['actions' => &$actions, 'action' => $action];
                 $event = new Event('PLUGIN_BUREAUCRACY_ACTION_UNKNOWN', $evdata);
@@ -346,7 +384,6 @@ class syntax_plugin_bureaucracy extends SyntaxPlugin
         $success = true;
         foreach ($data['fields'] as $index => $field) {
             /** @var $field helper_plugin_bureaucracy_field */
-
             $isValid = true;
             if ($field->getFieldType() === 'file') {
                 $file = [];
