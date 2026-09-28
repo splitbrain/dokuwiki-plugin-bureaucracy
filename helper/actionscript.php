@@ -1,6 +1,7 @@
 <?php
 
 use dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface;
+use dokuwiki\plugin\bureaucracy\interfaces\bureaucracy_handler_interface_ex;
 
 class helper_plugin_bureaucracy_actionscript extends helper_plugin_bureaucracy_action
 {
